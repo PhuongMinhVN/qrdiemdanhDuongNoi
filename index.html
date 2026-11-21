@@ -3726,14 +3726,23 @@
     }
 
     function maskPhoneNumber(phone) {
-      const digits = normalizePhoneKey(phone);
+      const str = String(phone || "").trim();
+      if (/^CCCD-/i.test(str)) {
+        const d = normalizePhoneKey(str);
+        return d.length >= 6 ? `***${d.slice(-3)}` : "Xác thực CCCD";
+      }
+      const digits = normalizePhoneKey(str);
       if (digits.length >= 8) {
         return `${digits.slice(0, 4)} *** ${digits.slice(-3)}`;
       }
       if (digits.length >= 5) {
         return `${digits.slice(0, 2)}***${digits.slice(-2)}`;
       }
-      return phone || "—";
+      return str || "—";
+    }
+
+    function maskCCCDInText(text) {
+      return String(text || "").replace(/\b(\d{3})\d{3,6}(\d{3})\b/g, "$1******$2");
     }
 
     async function refreshLuckyPool() {
@@ -3966,8 +3975,14 @@
       function displayCandidate(candidate) {
         document.getElementById("stage-winner-name").textContent = candidate.fullName;
         document.getElementById("stage-winner-position").textContent = candidate.position || "Đại biểu tham dự";
-        document.getElementById("stage-winner-org").textContent = candidate.organization || "";
-        document.getElementById("stage-winner-phone").textContent = maskPhoneNumber(candidate.phone);
+        document.getElementById("stage-winner-org").textContent = maskCCCDInText(candidate.organization || "");
+
+        const cccdInOrg = (String(candidate.organization || "").match(/\b\d{9,12}\b/) || [])[0];
+        if (/^CCCD-/i.test(String(candidate.phone || "")) && cccdInOrg) {
+          document.getElementById("stage-winner-phone").textContent = maskCCCDInText(cccdInOrg);
+        } else {
+          document.getElementById("stage-winner-phone").textContent = maskPhoneNumber(candidate.phone);
+        }
       }
 
       function tick() {
@@ -4075,7 +4090,7 @@
             </td>
             <td class="py-3.5 px-4 font-bold text-white whitespace-nowrap">${escapeHtml(w.fullName)}</td>
             <td class="py-3.5 px-4 text-slate-300">${escapeHtml(w.position)}</td>
-            <td class="py-3.5 px-4 text-slate-300">${escapeHtml(w.organization)}</td>
+            <td class="py-3.5 px-4 text-slate-300">${escapeHtml(maskCCCDInText(w.organization))}</td>
             <td class="py-3.5 px-4 font-mono text-cyan-300 whitespace-nowrap" title="${escapeHtml(w.phone)}">${escapeHtml(maskPhoneNumber(w.phone))}</td>
             <td class="py-3.5 px-4 text-right whitespace-nowrap">
               <button
