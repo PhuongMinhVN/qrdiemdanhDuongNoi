@@ -633,35 +633,6 @@
         <!-- ==================== CHECK-IN FORM CARD ==================== -->
         <div id="checkin-form-wrapper" class="glass-panel rounded-2xl p-4 sm:p-7">
 
-          <!-- GPS Geofencing Status Bar -->
-          <div id="gps-status-card" class="mb-5 p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/70 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0">
-              <div id="gps-icon-box" class="w-9 h-9 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-cyan-400 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span id="gps-badge-title" class="text-xs sm:text-sm font-semibold text-slate-200">Đang xác định vị trí GPS...</span>
-                  <span id="gps-mode-pill" class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Chế độ tiêu chuẩn</span>
-                </div>
-                <p id="gps-badge-desc" class="text-xs text-slate-400 truncate mt-0.5">Đang kiểm tra khoảng cách tới hội trường</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onclick="initGPSCheck()"
-              title="Cập nhật lại vị trí GPS"
-              class="shrink-0 p-2 rounded-lg bg-slate-800/90 hover:bg-slate-700/80 text-slate-300 hover:text-cyan-300 border border-slate-700 transition"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-            </button>
-          </div>
-
           <!-- STEP 0: 2-BUTTON CHECK-IN MODE CHOOSER -->
           <div id="checkin-mode-chooser" class="space-y-3.5">
             <p class="text-center text-xs sm:text-sm font-semibold uppercase tracking-widest text-slate-300 mb-1">
@@ -931,8 +902,8 @@
                   <span id="badge-time" class="text-xs sm:text-sm font-mono font-semibold text-cyan-300 text-right">—</span>
                 </div>
                 <div class="flex items-center justify-between gap-3">
-                  <span class="text-xs text-slate-400 shrink-0">Trạng thái GPS</span>
-                  <span id="badge-gps" class="text-xs font-semibold text-right">—</span>
+                  <span class="text-xs text-slate-400 shrink-0">Trạng thái</span>
+                  <span id="badge-gps" class="text-xs font-semibold text-emerald-300 text-right">✓ Hợp lệ — Tham dự hội nghị</span>
                 </div>
               </div>
 
@@ -1195,7 +1166,7 @@
           </div>
 
           <div class="glass-panel rounded-2xl p-4 sm:p-5">
-            <p class="text-xs font-medium text-slate-400">Xác thực GPS tại hội trường</p>
+            <p class="text-xs font-medium text-slate-400">Điểm danh qua CCCD</p>
             <div class="flex items-baseline gap-2 mt-2">
               <span id="metric-gps-verified" class="font-display text-3xl sm:text-4xl font-extrabold text-emerald-400">0</span>
               <span class="text-xs text-slate-500">lượt</span>
@@ -1258,7 +1229,7 @@
                   <th class="py-3.5 px-4 whitespace-nowrap">Chức vụ</th>
                   <th class="py-3.5 px-4 whitespace-nowrap">Đơn vị</th>
                   <th class="py-3.5 px-4 whitespace-nowrap">SĐT</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap">Tọa độ GPS</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap">Hình thức</th>
                 </tr>
               </thead>
               <tbody id="admin-table-body" class="divide-y divide-slate-800/70 text-xs sm:text-sm">
@@ -1981,7 +1952,6 @@
     document.addEventListener("DOMContentLoaded", () => {
       switchTab("checkin");
       checkDeviceLockState();
-      initGPSCheck();
       updateDataSourcePill();
       initLuckyDrawState();
       init3DBackground();
@@ -2718,10 +2688,7 @@
 
       const now = new Date();
       const badgeCode = `MB-${String(now.getTime()).slice(-5)}`;
-      const gpsCoordsStr =
-        gpsState.lat !== null && gpsState.lng !== null
-          ? `${gpsState.lat}, ${gpsState.lng}`
-          : "Không có GPS";
+      const checkinMethod = isCCCDVerified ? "Xác thực CCCD" : "Nhập thủ công";
 
       const formattedTime = formatVietnameseTimestamp(now);
       const record = {
@@ -2733,11 +2700,10 @@
         position,
         organization,
         phone,
-        gps: gpsCoordsStr,
-        gpsCoords: gpsCoordsStr,
-        gpsStatus: gpsState.status,
-        gpsLabel: gpsState.label,
-        distanceMeters: gpsState.distanceMeters,
+        gps: checkinMethod,
+        gpsCoords: checkinMethod,
+        gpsStatus: isCCCDVerified ? "cccd" : "manual",
+        gpsLabel: "✓ Hợp lệ — Tham dự hội nghị",
       };
 
       const submitBtn = document.getElementById("submit-checkin-btn");
@@ -2791,16 +2757,8 @@
       document.getElementById("badge-code").textContent = `#${record.id || "MB-PASS"}`;
 
       const gpsEl = document.getElementById("badge-gps");
-      if (record.gpsStatus === "verified") {
-        gpsEl.className = "text-xs font-semibold text-emerald-300 text-right";
-        gpsEl.textContent = `✓ ${record.gpsLabel}`;
-      } else if (record.gpsStatus === "outside") {
-        gpsEl.className = "text-xs font-semibold text-amber-300 text-right";
-        gpsEl.textContent = `⚠ ${record.gpsLabel}`;
-      } else {
-        gpsEl.className = "text-xs font-semibold text-cyan-300 text-right";
-        gpsEl.textContent = record.gpsLabel || "Chế độ tiêu chuẩn";
-      }
+      gpsEl.className = "text-xs font-semibold text-emerald-300 text-right";
+      gpsEl.textContent = "✓ Hợp lệ — Tham dự hội nghị";
 
       // Tạo mã QR xác thực mini trên thẻ ra vào
       const miniQrBox = document.getElementById("badge-mini-qr");
@@ -2971,7 +2929,7 @@
         ["Đơn vị / CCCD", r.organization || "—"],
         ["Số điện thoại", r.phone || "—"],
         ["Thời gian vào", r.timestamp || "—"],
-        ["Trạng thái GPS", r.gpsLabel || "Chế độ tiêu chuẩn"],
+        ["Trạng thái", "✓ Hợp lệ — Tham dự hội nghị"],
       ];
       rows.forEach(([k, v], i) => {
         const y = 875 + i * 105;
@@ -3377,13 +3335,15 @@
 
     function updateAdminMetrics() {
       const total = adminRecords.length;
-      const gpsVerified = adminRecords.filter((r) => r.gpsStatus === "verified").length;
+      const cccdVerified = adminRecords.filter(
+        (r) => r.gpsStatus === "cccd" || /CCCD/i.test(`${r.organization || ""} ${r.position || ""} ${r.gpsCoords || ""}`)
+      ).length;
       const uniqueOrgs = new Set(
         adminRecords.map((r) => (r.organization || "").trim().toLowerCase()).filter(Boolean)
       ).size;
 
       document.getElementById("metric-total").textContent = total;
-      document.getElementById("metric-gps-verified").textContent = gpsVerified;
+      document.getElementById("metric-gps-verified").textContent = cccdVerified;
       document.getElementById("metric-orgs").textContent = uniqueOrgs;
 
       if (total > 0) {
@@ -3431,17 +3391,10 @@
 
       tbody.innerHTML = filtered
         .map((r, index) => {
-          const hasCoords = r.gpsCoords && r.gpsCoords.includes(",");
-          const mapLink = hasCoords
-            ? `<a href="https://www.google.com/maps?q=${encodeURIComponent(r.gpsCoords)}" target="_blank" rel="noopener" class="text-cyan-400 hover:underline font-mono text-xs">${escapeHtml(r.gpsCoords)}</a>`
-            : `<span class="text-slate-500 text-xs">${escapeHtml(r.gpsCoords || "Không có GPS")}</span>`;
-
-          const statusDot =
-            r.gpsStatus === "verified"
-              ? `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1.5" title="Đã xác thực tại hội trường"></span>`
-              : r.gpsStatus === "outside"
-              ? `<span class="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1.5" title="Ngoài bán kính hội trường"></span>`
-              : `<span class="inline-block w-2 h-2 rounded-full bg-slate-500 mr-1.5" title="Chế độ tiêu chuẩn"></span>`;
+          const isCCCD = r.gpsStatus === "cccd" || /CCCD/i.test(`${r.organization || ""} ${r.position || ""} ${r.gpsCoords || ""}`);
+          const methodBadge = isCCCD
+            ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-400/35">Xác thực CCCD</span>`
+            : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">Nhập thủ công</span>`;
 
           return `
             <tr class="hover:bg-slate-800/40 transition-colors">
@@ -3451,7 +3404,7 @@
               <td class="py-3.5 px-4 text-slate-300">${escapeHtml(r.position)}</td>
               <td class="py-3.5 px-4 text-slate-300">${escapeHtml(r.organization)}</td>
               <td class="py-3.5 px-4 font-mono text-slate-200 whitespace-nowrap">${escapeHtml(r.phone)}</td>
-              <td class="py-3.5 px-4 whitespace-nowrap">${statusDot}${mapLink}</td>
+              <td class="py-3.5 px-4 whitespace-nowrap">${methodBadge}</td>
             </tr>
           `;
         })
@@ -3467,20 +3420,23 @@
       const workbook = XLSX.utils.book_new();
 
       // Sheet 1: DanhSachDiemDanh
-      const checkinRows = (adminRecords || []).map((r, idx) => ({
-        "STT": idx + 1,
-        "Thời gian": r.timestamp || "",
-        "Họ tên": r.fullName || "",
-        "Chức vụ": r.position || "",
-        "Đơn vị": r.organization || "",
-        "SĐT": r.phone || "",
-        "Tọa độ GPS": r.gpsCoords || "Không có GPS",
-      }));
+      const checkinRows = (adminRecords || []).map((r, idx) => {
+        const isCCCD = r.gpsStatus === "cccd" || /CCCD/i.test(`${r.organization || ""} ${r.position || ""} ${r.gpsCoords || ""}`);
+        return {
+          "STT": idx + 1,
+          "Thời gian": r.timestamp || "",
+          "Họ tên": r.fullName || "",
+          "Chức vụ": r.position || "",
+          "Đơn vị": r.organization || "",
+          "SĐT": r.phone || "",
+          "Hình thức": isCCCD ? "Xác thực CCCD" : "Nhập thủ công",
+        };
+      });
 
       const wsCheckin =
         checkinRows.length > 0
           ? XLSX.utils.json_to_sheet(checkinRows)
-          : XLSX.utils.aoa_to_sheet([["STT", "Thời gian", "Họ tên", "Chức vụ", "Đơn vị", "SĐT", "Tọa độ GPS"]]);
+          : XLSX.utils.aoa_to_sheet([["STT", "Thời gian", "Họ tên", "Chức vụ", "Đơn vị", "SĐT", "Hình thức"]]);
 
       wsCheckin["!cols"] = [
         { wch: 6 },  // STT
@@ -3489,7 +3445,7 @@
         { wch: 24 }, // Chức vụ
         { wch: 36 }, // Đơn vị
         { wch: 16 }, // SĐT
-        { wch: 24 }, // Tọa độ GPS
+        { wch: 18 }, // Hình thức
       ];
       XLSX.utils.book_append_sheet(workbook, wsCheckin, "DanhSachDiemDanh");
 
