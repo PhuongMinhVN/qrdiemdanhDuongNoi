@@ -784,34 +784,37 @@
           </div>
 
           <!-- Action Controls Below 3D Pass -->
-          <div class="mt-4 w-full max-w-[420px] mx-auto flex flex-col items-center gap-2.5">
-            <div class="grid grid-cols-2 gap-2.5 w-full">
-              <button
-                type="button"
-                onclick="downloadPassAsPNG()"
-                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-glow transition"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
-                <span>Lưu ảnh thẻ (.PNG)</span>
-              </button>
+          <div class="mt-4 w-full max-w-[420px] mx-auto flex flex-col items-center gap-3">
+            <!-- Prominent Full-Width Download Pass Button -->
+            <button
+              type="button"
+              id="download-pass-btn"
+              onclick="downloadPassAsPNG()"
+              class="w-full py-3.5 px-5 rounded-2xl font-display font-extrabold text-sm sm:text-base tracking-wide text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:via-teal-400 hover:to-cyan-400 shadow-[0_0_28px_-4px_rgba(16,185,129,0.7)] border border-emerald-300/50 transition-all active:scale-[0.98] flex items-center justify-center gap-2.5"
+            >
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              <span id="download-pass-label">TẢI THẺ RA VÀO VỀ MÁY (.PNG)</span>
+            </button>
+
+            <div class="flex items-center justify-between w-full gap-3 px-1">
               <button
                 type="button"
                 id="toggle-ebadge-menu-btn"
                 onclick="toggleEBadgeFullscreen()"
-                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 transition"
+                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 transition"
               >
                 <span id="toggle-ebadge-menu-label">Hiện thanh menu</span>
               </button>
+              <button
+                type="button"
+                onclick="resetDeviceLock()"
+                class="text-xs text-slate-300 hover:text-cyan-300 underline underline-offset-4 transition"
+              >
+                Điểm danh cho đại biểu khác
+              </button>
             </div>
-            <button
-              type="button"
-              onclick="resetDeviceLock()"
-              class="text-xs text-slate-400 hover:text-cyan-300 underline underline-offset-4 transition pt-0.5"
-            >
-              Điểm danh cho đại biểu khác
-            </button>
           </div>
         </div>
 
@@ -2499,10 +2502,32 @@
       ctx.fillStyle = "#cbd5e1";
       ctx.fillText("Xuất trình thẻ ra vào này tại cửa kiểm soát hội trường", 540, 1765);
 
-      const link = document.createElement("a");
-      link.download = `TheRaVao_${(r.id || "MB").replace(/[^A-Za-z0-9_-]/g, "")}.png`;
-      link.href = c.toDataURL("image/png");
-      link.click();
+      const fileName = `TheRaVao_${(r.id || "MB").replace(/[^A-Za-z0-9_-]/g, "")}.png`;
+      const btnLabel = document.getElementById("download-pass-label");
+
+      c.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.download = fileName;
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+        } else {
+          const link = document.createElement("a");
+          link.download = fileName;
+          link.href = c.toDataURL("image/png");
+          link.click();
+        }
+        if (btnLabel) {
+          btnLabel.textContent = "✓ ĐÃ TẢI ẢNH THẺ VỀ MÁY!";
+          setTimeout(() => {
+            btnLabel.textContent = "TẢI THẺ RA VÀO VỀ MÁY (.PNG)";
+          }, 2600);
+        }
+      }, "image/png");
     }
 
     function resetDeviceLock() {
