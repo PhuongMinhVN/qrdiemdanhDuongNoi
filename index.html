@@ -196,18 +196,20 @@
     body.lucky-led-mode > footer {
       display: none !important;
     }
+    body.presentation-led-mode {
+      overflow: hidden !important;
+    }
+    body.presentation-led-mode > header,
+    body.presentation-led-mode > main,
+    body.presentation-led-mode > footer {
+      display: none !important;
+    }
     .lucky-fullscreen-active {
       position: fixed !important;
       inset: 0 !important;
-      z-index: 9999 !important;
+      z-index: 50 !important;
       overflow-y: auto !important;
-      background-color: #040914 !important;
-      background-image:
-        radial-gradient(circle at 20% 10%, rgba(0, 96, 175, 0.32) 0%, transparent 45%),
-        radial-gradient(circle at 80% 15%, rgba(6, 182, 212, 0.24) 0%, transparent 45%),
-        linear-gradient(to right, rgba(56, 189, 248, 0.045) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(56, 189, 248, 0.045) 1px, transparent 1px) !important;
-      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px !important;
+      background: radial-gradient(circle at 50% 35%, rgba(6, 182, 212, 0.1), rgba(4, 9, 20, 0.42)) !important;
       padding: 1.25rem 2rem 2rem !important;
     }
     .lucky-fullscreen-active .lucky-inner-wrap {
@@ -219,6 +221,51 @@
     }
     .lucky-fullscreen-active #stage-result-content {
       min-height: 170px !important;
+    }
+
+    /* Prominent QR Spotlight Frame for LED Screen */
+    @keyframes qrPulseGlow {
+      0%, 100% {
+        box-shadow:
+          0 0 40px rgba(34, 211, 238, 0.45),
+          0 0 95px rgba(0, 96, 175, 0.45),
+          0 25px 60px -10px rgba(0, 0, 0, 0.85);
+      }
+      50% {
+        box-shadow:
+          0 0 65px rgba(34, 211, 238, 0.72),
+          0 0 135px rgba(6, 182, 212, 0.5),
+          0 25px 65px -10px rgba(0, 0, 0, 0.9);
+      }
+    }
+    .qr-spotlight-frame {
+      position: relative;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+      border: 4px solid rgba(34, 211, 238, 0.85);
+      animation: qrPulseGlow 3.6s ease-in-out infinite;
+    }
+    .qr-corner {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-color: #22d3ee;
+      pointer-events: none;
+      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.9));
+    }
+    .qr-corner-tl { top: -12px; left: -12px; border-top: 4px solid; border-left: 4px solid; border-top-left-radius: 12px; }
+    .qr-corner-tr { top: -12px; right: -12px; border-top: 4px solid; border-right: 4px solid; border-top-right-radius: 12px; }
+    .qr-corner-bl { bottom: -12px; left: -12px; border-bottom: 4px solid; border-left: 4px solid; border-bottom-left-radius: 12px; }
+    .qr-corner-br { bottom: -12px; right: -12px; border-bottom: 4px solid; border-right: 4px solid; border-bottom-right-radius: 12px; }
+
+    #presentation-qr-container canvas,
+    #presentation-qr-container img {
+      width: min(460px, 50vh) !important;
+      height: min(460px, 50vh) !important;
+    }
+    #hall-qr-container canvas,
+    #hall-qr-container img {
+      width: min(320px, 72vw) !important;
+      height: min(320px, 72vw) !important;
     }
 
     /* QR Code container image styling */
@@ -238,10 +285,13 @@
     ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.55); }
   </style>
 </head>
-<body class="text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200 tech-grid">
+<body class="text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200 relative">
+
+  <!-- ==================== 3D ANIMATED TECH BACKGROUND CANVAS ==================== -->
+  <canvas id="bg-3d-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
 
   <!-- ==================== TOP NAVIGATION BAR ==================== -->
-  <header class="sticky top-0 z-40 border-b border-cyan-500/15 bg-navy-950/80 backdrop-blur-xl">
+  <header class="sticky top-0 z-40 border-b border-cyan-500/15 bg-navy-950/75 backdrop-blur-xl">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-3">
         <!-- Brand Identity -->
@@ -325,7 +375,7 @@
   </header>
 
   <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+  <main class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
     <!-- ================================================================
          TAB 1: CHECK-IN FORM & DIGITAL E-BADGE
@@ -586,23 +636,28 @@
       <div class="max-w-3xl mx-auto">
         <div class="glass-panel rounded-3xl p-6 sm:p-10 text-center">
           <!-- Branding -->
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 mb-4">
-            <span class="font-display font-extrabold tracking-widest text-xs sm:text-sm">
+          <div class="inline-flex items-center gap-2.5 px-6 py-2 rounded-full bg-slate-900/90 border border-cyan-400/45 shadow-glow mb-4">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="font-display font-extrabold tracking-widest text-sm sm:text-lg">
               <span class="text-blue-400">MOBIFONE</span>
-              <span class="text-slate-400 mx-1.5">×</span>
+              <span class="text-cyan-200 mx-2">&amp;</span>
               <span class="text-cyan-300">BETATECH</span>
             </span>
           </div>
 
-          <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
             MÃ QR ĐIỂM DANH HỘI TRƯỜNG
           </h2>
-          <p class="text-sm text-slate-400 mt-1.5 max-w-lg mx-auto">
+          <p class="text-sm text-slate-300 mt-2 max-w-lg mx-auto">
             Hiển thị trên màn hình LED hội trường hoặc bàn lễ tân để đại biểu quét bằng camera điện thoại hoặc Zalo.
           </p>
 
-          <!-- QR Code Card -->
-          <div class="my-8 inline-block p-5 sm:p-6 rounded-3xl bg-white shadow-glow-lg border-4 border-cyan-400/40">
+          <!-- Prominent QR Code Card -->
+          <div class="my-9 inline-block p-5 sm:p-7 rounded-[2rem] qr-spotlight-frame">
+            <span class="qr-corner qr-corner-tl"></span>
+            <span class="qr-corner qr-corner-tr"></span>
+            <span class="qr-corner qr-corner-bl"></span>
+            <span class="qr-corner qr-corner-br"></span>
             <div id="hall-qr-container" class="flex items-center justify-center"></div>
           </div>
 
@@ -1157,28 +1212,29 @@
   </div>
 
   <!-- ==================== FULLSCREEN LED PRESENTATION OVERLAY ==================== -->
-  <div id="presentation-overlay" class="fixed inset-0 z-50 hidden bg-navy-950 tech-grid flex flex-col justify-between p-6 sm:p-12 overflow-y-auto">
+  <div id="presentation-overlay" class="fixed inset-0 z-50 hidden bg-transparent flex flex-col justify-between p-5 sm:p-8 lg:p-10 overflow-y-auto">
     <!-- Top Bar -->
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="px-5 py-2 rounded-full bg-slate-900/90 border border-cyan-500/40 shadow-glow">
-          <span class="font-display font-extrabold tracking-widest text-base sm:text-xl">
-            <span class="text-blue-400">MOBIFONE</span>
-            <span class="text-slate-400 mx-2">×</span>
-            <span class="text-cyan-300">BETATECH</span>
+        <div class="px-6 py-2.5 rounded-full bg-slate-900/85 backdrop-blur-md border-2 border-cyan-400/60 shadow-glow-lg flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_12px_#22d3ee]"></span>
+          <span class="font-display font-extrabold tracking-[0.16em] text-lg sm:text-2xl lg:text-3xl">
+            <span class="text-blue-400 drop-shadow-[0_0_14px_rgba(59,130,246,0.75)]">MOBIFONE</span>
+            <span class="text-white/90 mx-2.5 font-bold">&amp;</span>
+            <span class="text-cyan-300 drop-shadow-[0_0_14px_rgba(34,211,238,0.8)]">BETATECH</span>
           </span>
         </div>
       </div>
 
       <div class="flex items-center gap-4">
         <div class="hidden sm:block text-right">
-          <p id="presentation-clock" class="font-mono text-2xl font-bold text-cyan-300">--:--:--</p>
-          <p id="presentation-date" class="text-xs text-slate-400"></p>
+          <p id="presentation-clock" class="font-mono text-2xl lg:text-3xl font-bold text-cyan-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.6)]">--:--:--</p>
+          <p id="presentation-date" class="text-xs sm:text-sm text-slate-300"></p>
         </div>
         <button
           type="button"
           onclick="exitPresentationMode()"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 transition"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900/85 hover:bg-slate-800 text-slate-200 border border-slate-600/80 backdrop-blur-md transition"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1189,27 +1245,32 @@
     </div>
 
     <!-- Center QR Presentation -->
-    <div class="my-auto py-6 flex flex-col items-center text-center">
-      <p class="text-xs sm:text-base font-semibold uppercase tracking-[0.28em] text-cyan-400 mb-2">
+    <div class="my-auto py-3 flex flex-col items-center text-center">
+      <p class="text-xs sm:text-base lg:text-lg font-bold uppercase tracking-[0.32em] text-cyan-300 mb-2 drop-shadow-[0_0_12px_rgba(34,211,238,0.5)]">
         Hội Nghị Chuyển Đổi Số &amp; Quản Lý Hành Chính
       </p>
-      <h1 class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight max-w-4xl">
-        QUÉT MÃ QR ĐỂ ĐIỂM DANH ĐẠI BIỂU
+      <h1 class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-blue-200 tracking-tight drop-shadow-[0_4px_24px_rgba(6,182,212,0.4)]">
+        QUÉT MÃ QR ĐIỂM DANH ĐẠI BIỂU
       </h1>
 
-      <div class="my-8 p-6 sm:p-8 rounded-[2rem] bg-white shadow-glow-lg border-8 border-cyan-400/50">
-        <div id="presentation-qr-container"></div>
+      <!-- Huge High-Contrast Glowing QR Spotlight -->
+      <div class="my-6 sm:my-7 p-5 sm:p-7 rounded-[2.25rem] qr-spotlight-frame">
+        <span class="qr-corner qr-corner-tl"></span>
+        <span class="qr-corner qr-corner-tr"></span>
+        <span class="qr-corner qr-corner-bl"></span>
+        <span class="qr-corner qr-corner-br"></span>
+        <div id="presentation-qr-container" class="flex items-center justify-center"></div>
       </div>
 
-      <p class="text-sm sm:text-lg text-slate-300 max-w-2xl">
-        Mở <strong class="text-white">Camera điện thoại</strong> hoặc <strong class="text-cyan-300">Zalo</strong>, quét mã QR phía trên để xác thực tham dự và nhận <strong class="text-white">Thẻ Đại Biểu Điện Tử</strong>.
+      <p class="text-sm sm:text-lg lg:text-xl text-slate-200 max-w-3xl bg-slate-950/55 backdrop-blur-md px-6 py-2.5 rounded-full border border-cyan-500/25">
+        Mở <strong class="text-white">Camera điện thoại</strong> hoặc <strong class="text-cyan-300">Zalo</strong> để quét mã QR và nhận ngay <strong class="text-white">Thẻ Đại Biểu Điện Tử</strong>
       </p>
     </div>
 
     <!-- Bottom Bar -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-slate-400 border-t border-cyan-500/15 pt-4">
-      <span>Hệ thống Điểm danh Điện tử Thông minh — Tài trợ bởi MOBIFONE × BETATECH</span>
-      <span id="presentation-url" class="font-mono text-cyan-400/90 truncate max-w-md"></span>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-slate-300 border-t border-cyan-500/20 pt-3">
+      <span>Hệ thống Điểm danh Điện tử Thông minh — Tài trợ bởi <strong class="text-blue-400">MOBIFONE</strong> &amp; <strong class="text-cyan-300">BETATECH</strong></span>
+      <span id="presentation-url" class="font-mono text-cyan-300 font-semibold truncate max-w-md"></span>
     </div>
   </div>
 
@@ -1275,6 +1336,7 @@
       initGPSCheck();
       updateDataSourcePill();
       initLuckyDrawState();
+      init3DBackground();
 
       // Escape key exits presentation mode or lucky fullscreen
       document.addEventListener("keydown", (e) => {
@@ -1290,6 +1352,7 @@
 
       document.addEventListener("fullscreenchange", () => {
         if (!document.fullscreenElement) {
+          document.body.classList.remove("presentation-led-mode");
           document.getElementById("presentation-overlay").classList.add("hidden");
           stopPresentationClock();
           if (isLuckyFullscreen) {
@@ -2022,8 +2085,8 @@
       document.getElementById("qr-url-text").textContent = liveUrl;
       document.getElementById("presentation-url").textContent = liveUrl;
 
-      renderQRCodeInto(document.getElementById("hall-qr-container"), liveUrl, 260);
-      renderQRCodeInto(document.getElementById("presentation-qr-container"), liveUrl, 340);
+      renderQRCodeInto(document.getElementById("hall-qr-container"), liveUrl, 320);
+      renderQRCodeInto(document.getElementById("presentation-qr-container"), liveUrl, 460);
     }
 
     function copyLiveUrl() {
@@ -2040,6 +2103,7 @@
         generateHallQRCodes();
         qrInitialized = true;
       }
+      document.body.classList.add("presentation-led-mode");
       const overlay = document.getElementById("presentation-overlay");
       overlay.classList.remove("hidden");
       startPresentationClock();
@@ -2052,6 +2116,7 @@
     }
 
     function exitPresentationMode() {
+      document.body.classList.remove("presentation-led-mode");
       document.getElementById("presentation-overlay").classList.add("hidden");
       stopPresentationClock();
       if (document.fullscreenElement && document.exitFullscreen) {
@@ -2912,6 +2977,180 @@
       if (document.fullscreenElement && document.exitFullscreen) {
         document.exitFullscreen().catch(() => {});
       }
+    }
+
+    /* =========================================================================
+     * HIỆU ỨNG NỀN CHUYỂN ĐỘNG 3D (PERSPECTIVE CYBER WAVE + FLOATING 3D NETWORK)
+     * ========================================================================= */
+    function init3DBackground() {
+      const canvas = document.getElementById("bg-3d-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      let width = 0;
+      let height = 0;
+      let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+      const COLS = 30;
+      const ROWS = 22;
+      const SPACING_X = 72;
+      const SPACING_Z = 56;
+      const SKY_PARTICLES = 42;
+
+      const particles = Array.from({ length: SKY_PARTICLES }, () => ({
+        x: (Math.random() - 0.5) * 1800,
+        y: (Math.random() - 0.65) * 900,
+        z: Math.random() * 1100 + 180,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.35,
+        vz: -(Math.random() * 0.9 + 0.35),
+        hue: Math.random() > 0.45 ? "34, 211, 238" : "59, 130, 246",
+      }));
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      resize();
+      window.addEventListener("resize", resize);
+
+      let time = 0;
+
+      function render3D() {
+        time += 0.016;
+        ctx.clearRect(0, 0, width, height);
+
+        // Nền sâu công nghệ cao với nguồn sáng trung tâm chuyển động nhẹ
+        const cx = width * 0.5 + Math.sin(time * 0.35) * 60;
+        const cy = height * 0.42 + Math.cos(time * 0.28) * 30;
+        const bgGrad = ctx.createRadialGradient(cx, cy, 40, width * 0.5, height * 0.5, Math.max(width, height) * 0.78);
+        bgGrad.addColorStop(0, "#0b2249");
+        bgGrad.addColorStop(0.45, "#061229");
+        bgGrad.addColorStop(1, "#030712");
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        const fov = Math.min(width, height) * 0.85;
+        const horizonY = height * 0.56;
+        const camY = 175;
+        const zOffset = (time * 32) % SPACING_Z;
+
+        // 1. Sóng lưới điểm 3D phối cảnh (3D Perspective Cyber Wave)
+        const projectedGrid = [];
+        for (let r = 0; r < ROWS; r++) {
+          const rowPoints = [];
+          const z = (r + 1) * SPACING_Z - zOffset;
+          if (z <= 12) {
+            projectedGrid.push(rowPoints);
+            continue;
+          }
+          const scale = fov / (z + 240);
+
+          for (let c = 0; c < COLS; c++) {
+            const worldX = (c - (COLS - 1) / 2) * SPACING_X;
+            const waveY =
+              Math.sin(c * 0.32 + time * 1.35) * 28 +
+              Math.cos((r * SPACING_Z - zOffset) * 0.012 - time * 1.1) * 24;
+            const worldY = camY + waveY;
+
+            const screenX = width * 0.5 + worldX * scale;
+            const screenY = horizonY + worldY * scale;
+            const depthAlpha = Math.max(0, Math.min(1, 1 - z / (ROWS * SPACING_Z)));
+
+            rowPoints.push({ x: screenX, y: screenY, scale, alpha: depthAlpha });
+          }
+          projectedGrid.push(rowPoints);
+        }
+
+        // Vẽ các đường kết nối lưới 3D mềm mại
+        ctx.lineWidth = 0.75;
+        for (let r = 0; r < projectedGrid.length; r++) {
+          const row = projectedGrid[r];
+          if (!row.length) continue;
+          for (let c = 0; c < row.length; c++) {
+            const p = row[c];
+            if (p.alpha < 0.04) continue;
+
+            if (c + 1 < row.length) {
+              const right = row[c + 1];
+              ctx.strokeStyle = `rgba(34, 211, 238, ${(p.alpha * 0.16).toFixed(3)})`;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(right.x, right.y);
+              ctx.stroke();
+            }
+
+            if (r + 1 < projectedGrid.length && projectedGrid[r + 1][c]) {
+              const back = projectedGrid[r + 1][c];
+              ctx.strokeStyle = `rgba(59, 130, 246, ${(p.alpha * 0.18).toFixed(3)})`;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(back.x, back.y);
+              ctx.stroke();
+            }
+
+            // Điểm nút phát sáng trên sóng 3D
+            const dotRadius = Math.max(0.8, p.scale * 2.4);
+            ctx.fillStyle = `rgba(56, 189, 248, ${(p.alpha * 0.75).toFixed(3)})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, dotRadius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        // 2. Mạng lưới hạt không gian 3D bay phía trên
+        const projectedSky = [];
+        for (const pt of particles) {
+          pt.x += pt.vx;
+          pt.y += pt.vy;
+          pt.z += pt.vz;
+
+          if (pt.z < 120) {
+            pt.z = 1200;
+            pt.x = (Math.random() - 0.5) * 1800;
+            pt.y = (Math.random() - 0.65) * 900;
+          }
+
+          const s = fov / (pt.z + 200);
+          const sx = width * 0.5 + pt.x * s;
+          const sy = height * 0.44 + pt.y * s;
+          const alpha = Math.max(0.05, Math.min(0.85, 1 - pt.z / 1280));
+          projectedSky.push({ x: sx, y: sy, r: Math.max(1.1, s * 3.1), alpha, hue: pt.hue });
+        }
+
+        // Kết nối các hạt gần nhau tạo chiều sâu mạng số
+        for (let i = 0; i < projectedSky.length; i++) {
+          const a = projectedSky[i];
+          for (let j = i + 1; j < projectedSky.length; j++) {
+            const b = projectedSky[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const distSq = dx * dx + dy * dy;
+            if (distSq < 21000) {
+              const lineAlpha = (1 - distSq / 21000) * Math.min(a.alpha, b.alpha) * 0.28;
+              ctx.strokeStyle = `rgba(34, 211, 238, ${lineAlpha.toFixed(3)})`;
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+          }
+
+          ctx.fillStyle = `rgba(${a.hue}, ${a.alpha.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(render3D);
+      }
+
+      requestAnimationFrame(render3D);
     }
   </script>
 </body>
