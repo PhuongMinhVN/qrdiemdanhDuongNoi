@@ -666,18 +666,95 @@
             </button>
           </div>
 
+          <!-- STEP 0: 2-BUTTON CHECK-IN MODE CHOOSER -->
+          <div id="checkin-mode-chooser" class="space-y-3.5">
+            <p class="text-center text-xs sm:text-sm font-semibold uppercase tracking-widest text-slate-300 mb-1">
+              Chọn hình thức điểm danh
+            </p>
+
+            <!-- Nút 1: Check-in qua CCCD (Ưu tiên / Khuyên dùng) -->
+            <button
+              type="button"
+              onclick="selectCheckinMode('cccd')"
+              class="w-full text-left p-5 rounded-2xl bg-gradient-to-br from-blue-600/35 via-cyan-600/30 to-teal-500/25 hover:from-blue-500/45 hover:to-cyan-400/35 border-2 border-cyan-400/70 shadow-glow hover:shadow-glow-lg transition-all active:scale-[0.99] group"
+            >
+              <div class="flex items-start gap-4">
+                <div class="w-13 h-13 p-3 rounded-2xl bg-cyan-400/20 border border-cyan-300/50 text-cyan-200 shrink-0 group-hover:scale-105 transition">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400/25 text-amber-300 border border-amber-400/55 uppercase tracking-wider">★ Khuyên dùng • Nhanh 3 giây</span>
+                  </div>
+                  <h2 class="font-display text-lg sm:text-xl font-extrabold text-white tracking-tight">
+                    CHECK IN QUA CCCD
+                  </h2>
+                  <p class="text-xs sm:text-sm text-cyan-100/85 mt-1 leading-relaxed">
+                    Chụp ảnh mặt trước CCCD hoặc chọn từ Album — tự động nhận diện thông tin, không cần nhập tay.
+                  </p>
+                </div>
+                <svg class="w-5 h-5 text-cyan-300 shrink-0 self-center group-hover:translate-x-1 transition" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </div>
+            </button>
+
+            <!-- Nút 2: Tự điền thông tin -->
+            <button
+              type="button"
+              onclick="selectCheckinMode('manual')"
+              class="w-full text-left p-5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/85 border border-slate-600/70 hover:border-cyan-500/45 transition-all active:scale-[0.99] group"
+            >
+              <div class="flex items-start gap-4">
+                <div class="w-13 h-13 p-3 rounded-2xl bg-slate-800 border border-slate-600/80 text-slate-200 shrink-0 group-hover:text-cyan-300 transition">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h2 class="font-display text-lg sm:text-xl font-extrabold text-white tracking-tight">
+                    TỰ ĐIỀN THÔNG TIN
+                  </h2>
+                  <p class="text-xs sm:text-sm text-slate-400 mt-1 leading-relaxed">
+                    Dành cho đại biểu không mang CCCD — nhập đầy đủ Họ tên, Chức vụ, Cơ quan/Đơn vị và Số điện thoại.
+                  </p>
+                </div>
+                <svg class="w-5 h-5 text-slate-400 group-hover:text-cyan-300 shrink-0 self-center group-hover:translate-x-1 transition" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </div>
+            </button>
+          </div>
+
+          <!-- Back to Mode Chooser Bar -->
+          <div id="checkin-back-bar" class="hidden mb-4 flex items-center justify-between">
+            <button
+              type="button"
+              onclick="selectCheckinMode('choose')"
+              class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-cyan-300 hover:text-cyan-200 transition"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+              <span>Quay lại chọn cách điểm danh</span>
+            </button>
+            <span id="checkin-mode-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-400/30"></span>
+          </div>
+
           <!-- CCCD Photo / Album Quick-Fill Helper (Auto QR + Vietnamese OCR) -->
-          <div class="mb-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-950/85 via-navy-800/85 to-cyan-950/80 border-2 border-cyan-400/50 shadow-glow">
+          <div id="cccd-helper-box" class="hidden mb-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-950/85 via-navy-800/85 to-cyan-950/80 border-2 border-cyan-400/50 shadow-glow">
             <div class="flex flex-col gap-3">
               <div>
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/50 uppercase tracking-wider whitespace-nowrap shrink-0">★ Khuyên dùng • Nhanh 3 giây</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/50 uppercase tracking-wider whitespace-nowrap shrink-0">★ Nhanh 3 giây</span>
                   <h2 class="text-sm sm:text-base font-bold text-white">Chụp hoặc chọn ảnh CCCD</h2>
                 </div>
                 <div class="mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-400/30 text-xs text-amber-100 leading-relaxed flex items-start gap-2">
                   <span class="text-amber-300 text-sm leading-none mt-0.5 shrink-0">⚡</span>
                   <span>
-                    <strong class="text-amber-300">Lưu ý:</strong> Kính đề nghị Quý đại biểu <strong class="text-white">ưu tiên chụp ảnh CCCD</strong> (hoặc chọn từ Album) để xác thực nhanh chỉ 1 chạm — <strong class="text-cyan-300">không cần nhập tay</strong> các mục bên dưới.
+                    Chụp thẳng mặt trước thẻ CCCD (hoặc chọn từ Album). Hệ thống sẽ tự động lấy thông tin để bạn bấm <strong class="text-cyan-300">Xác nhận điểm danh</strong> ngay.
                   </span>
                 </div>
               </div>
@@ -703,17 +780,8 @@
             <div id="cccd-feedback" class="hidden mt-2.5 text-xs px-3 py-2 rounded-lg"></div>
           </div>
 
-          <!-- Divider between CCCD Quick Check-in and Manual Entry -->
-          <div class="relative flex items-center justify-center my-4">
-            <div class="w-full border-t border-slate-700/70"></div>
-            <span class="px-3 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-400 bg-navy-900/90 whitespace-nowrap">
-              Hoặc nhập thủ công (nếu không mang CCCD)
-            </span>
-            <div class="w-full border-t border-slate-700/70"></div>
-          </div>
-
-          <!-- Check-in Form -->
-          <form id="checkin-form" onsubmit="handleCheckinSubmit(event)" class="space-y-4">
+          <!-- Check-in Form (Shown after CCCD capture or when Manual mode is chosen) -->
+          <form id="checkin-form" onsubmit="handleCheckinSubmit(event)" class="hidden space-y-4">
             <!-- Họ và tên -->
             <div>
               <label for="input-fullname" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
@@ -2154,17 +2222,59 @@
       });
     }
 
+    let checkinEntryMode = "choose"; // 'choose' | 'cccd' | 'manual'
+
+    function selectCheckinMode(mode) {
+      checkinEntryMode = mode;
+      const chooser = document.getElementById("checkin-mode-chooser");
+      const backBar = document.getElementById("checkin-back-bar");
+      const modeBadge = document.getElementById("checkin-mode-badge");
+      const cccdBox = document.getElementById("cccd-helper-box");
+      const form = document.getElementById("checkin-form");
+      showFormError("");
+
+      if (mode === "choose") {
+        chooser.classList.remove("hidden");
+        backBar.classList.add("hidden");
+        cccdBox.classList.add("hidden");
+        form.classList.add("hidden");
+        document.getElementById("cccd-feedback").classList.add("hidden");
+        setCCCDVerifiedMode(false, "");
+      } else if (mode === "cccd") {
+        chooser.classList.add("hidden");
+        backBar.classList.remove("hidden");
+        modeBadge.textContent = "Check-in qua CCCD";
+        cccdBox.classList.remove("hidden");
+        // Chỉ hiện form xác nhận sau khi đã chụp/chọn ảnh CCCD
+        if (isCCCDVerified) {
+          form.classList.remove("hidden");
+        } else {
+          form.classList.add("hidden");
+        }
+      } else if (mode === "manual") {
+        chooser.classList.add("hidden");
+        backBar.classList.remove("hidden");
+        modeBadge.textContent = "Tự điền thông tin";
+        cccdBox.classList.add("hidden");
+        setCCCDVerifiedMode(false, "");
+        form.classList.remove("hidden");
+        document.getElementById("input-fullname").focus();
+      }
+    }
+
     function applyCCCDName(fullName, sourceLabel, cccdNumber = "") {
       const nameInput = document.getElementById("input-fullname");
       nameInput.value = fullName;
       setCCCDVerifiedMode(true, cccdNumber);
       showFormError("");
+      const formEl = document.getElementById("checkin-form");
+      if (formEl) formEl.classList.remove("hidden");
+
       const cccdNote = cccdNumber ? ` (Số CCCD: ${cccdNumber})` : "";
       showCCCDFeedback(
         "success",
         `✓ Đã xác thực CCCD (${sourceLabel}): ${fullName}${cccdNote}. Kiểm tra thông tin bên dưới và nhấn "XÁC NHẬN ĐIỂM DANH".`
       );
-      const formEl = document.getElementById("checkin-form");
       if (formEl) {
         formEl.scrollIntoView({ behavior: "smooth", block: "center" });
       }
@@ -2416,6 +2526,8 @@
         } else {
           // Vẫn ghi nhận đã chụp ảnh CCCD (không bắt chụp lại lần 2): mở khóa form nhanh chỉ cần kiểm tra/nhập Họ tên
           setCCCDVerifiedMode(true, extracted ? extracted.cccdNumber : "");
+          const formEl = document.getElementById("checkin-form");
+          if (formEl) formEl.classList.remove("hidden");
           showCCCDFeedback(
             "success",
             "✓ Đã ghi nhận ảnh CCCD. Do ảnh hơi lóa nên không đọc rõ chữ — bạn chỉ cần nhập Họ và tên rồi nhấn \"XÁC NHẬN ĐIỂM DANH\" (không cần chụp lại, các mục dưới không bắt buộc)."
@@ -2427,6 +2539,8 @@
       } catch (err) {
         console.error(err);
         setCCCDVerifiedMode(true, "");
+        const formEl = document.getElementById("checkin-form");
+        if (formEl) formEl.classList.remove("hidden");
         showCCCDFeedback(
           false,
           "Đã nhận ảnh CCCD nhưng không trích xuất tự động được. Bạn chỉ cần nhập Họ và tên rồi nhấn \"XÁC NHẬN ĐIỂM DANH\"."
@@ -2889,6 +3003,8 @@
       currentBadgeRecord = null;
       setEBadgeFullscreen(false);
       setCCCDVerifiedMode(false, "");
+      document.getElementById("checkin-form").reset();
+      selectCheckinMode("choose");
       document.getElementById("ebadge-wrapper").classList.add("hidden");
       document.getElementById("checkin-form-wrapper").classList.remove("hidden");
       showFormError("");
