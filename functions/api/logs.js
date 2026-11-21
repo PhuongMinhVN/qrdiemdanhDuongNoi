@@ -6,7 +6,7 @@
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, X-Admin-Password",
   "Content-Type": "application/json; charset=utf-8",
 };
@@ -140,25 +140,9 @@ export async function onRequestGet({ request, env }) {
   }
 }
 
-export async function onRequestDelete({ request, env }) {
-  if (!env || !env.CHECKINS_KV) {
-    return jsonResponse({ status: "unconfigured" }, 503);
-  }
-  const pwd = request.headers.get("X-Admin-Password");
-  if (pwd !== "betatech1") {
-    return jsonResponse({ status: "unauthorized" }, 401);
-  }
-
-  try {
-    let cursor = undefined;
-    do {
-      const list = await env.CHECKINS_KV.list({ prefix: "log:", cursor });
-      await Promise.all(list.keys.map((k) => env.CHECKINS_KV.delete(k.name)));
-      cursor = list.list_complete ? undefined : list.cursor;
-    } while (cursor);
-
-    return jsonResponse({ status: "success", cleared: true });
-  } catch (err) {
-    return jsonResponse({ status: "error", message: String(err) }, 500);
-  }
+export async function onRequestDelete() {
+  return jsonResponse(
+    { status: "forbidden", message: "Nhật ký hệ thống được bảo vệ, không cho phép xóa." },
+    405
+  );
 }

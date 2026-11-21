@@ -1498,13 +1498,9 @@
                   </svg>
                   <span>Tải File Log (.log)</span>
                 </button>
-                <button
-                  type="button"
-                  onclick="clearActivityLogs()"
-                  class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/35 transition"
-                >
-                  <span>Xóa Log</span>
-                </button>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-slate-900/90 text-slate-400 border border-slate-700/80">
+                  🔒 Nhật ký bảo vệ (không thể xóa)
+                </span>
               </div>
             </div>
 
@@ -5398,20 +5394,6 @@
       link.click();
       document.body.removeChild(link);
       setTimeout(() => URL.revokeObjectURL(url), 4000);
-    }
-
-    async function clearActivityLogs() {
-      if (!confirm("Bạn có chắc muốn xóa toàn bộ lịch sử vết hành động (Log)?")) return;
-      if (window.location.protocol.startsWith("http")) {
-        try {
-          await fetch("/api/logs", {
-            method: "DELETE",
-            headers: { "X-Admin-Password": ADMIN_PASSWORD },
-          });
-        } catch (_) {}
-      }
-      localStorage.removeItem(STORAGE_KEY_LOCAL_LOGS);
-      loadAdminLogs();
     }
   </script>
 </body>
