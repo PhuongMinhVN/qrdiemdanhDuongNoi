@@ -292,11 +292,26 @@
         width: 92vw !important;
         max-width: 92vw !important;
       }
+      .pass-3d-scene,
+      .pass-actions-wrap {
+        width: 90vw !important;
+        max-width: 90vw !important;
+      }
+      #badge-mini-qr canvas,
+      #badge-mini-qr img {
+        width: 96px !important;
+        height: 96px !important;
+      }
     }
     @media (min-width: 720px) and (max-width: 1024px) and (orientation: portrait) {
-      /* Khi điện thoại bị bật "Desktop site" (~980px dọc), phóng to chữ & ô nhập cho dễ đọc */
+      /* Khi điện thoại bị bật "Desktop site" (~980px dọc), phóng to chữ & thẻ cho đầy màn hình */
       html {
-        font-size: 20px;
+        font-size: 24px;
+      }
+      #badge-mini-qr canvas,
+      #badge-mini-qr img {
+        width: 140px !important;
+        height: 140px !important;
       }
     }
 
@@ -784,7 +799,7 @@
           </div>
 
           <!-- Action Controls Below 3D Pass -->
-          <div class="mt-4 w-full max-w-[420px] mx-auto flex flex-col items-center gap-3">
+          <div class="pass-actions-wrap mt-4 w-full max-w-[420px] mx-auto flex flex-col items-center gap-3">
             <!-- Prominent Full-Width Download Pass Button -->
             <button
               type="button"
@@ -3657,10 +3672,10 @@
         draw3DOrbitalRing(ringBase * 1.22, -0.95, 1.1, -0.22, "rgba(59, 130, 246, 0.26)");
 
         const fov = Math.min(width, height) * 0.88;
-        const camY = 175;
-        const zOffset = (time * 48) % SPACING_Z;
+        const camY = 185;
+        const zOffset = (time * 22) % SPACING_Z;
 
-        // 2. Sóng lưới điểm 3D phối cảnh (3D Perspective Cyber Wave)
+        // 2. Sóng lưới điểm 3D phối cảnh (nhẹ nhàng, tinh tế)
         const projectedGrid = [];
         for (let r = 0; r < ROWS; r++) {
           const rowPoints = [];
@@ -3674,8 +3689,8 @@
           for (let c = 0; c < COLS; c++) {
             const worldX = (c - (COLS - 1) / 2) * SPACING_X;
             const waveY =
-              Math.sin(c * 0.35 + time * 1.6) * 34 +
-              Math.cos((r * SPACING_Z - zOffset) * 0.013 - time * 1.35) * 28;
+              Math.sin(c * 0.32 + time * 0.95) * 18 +
+              Math.cos((r * SPACING_Z - zOffset) * 0.012 - time * 0.85) * 14;
             const worldY = camY + waveY;
 
             const screenX = width * 0.5 + worldX * scale;
@@ -3687,17 +3702,17 @@
           projectedGrid.push(rowPoints);
         }
 
-        ctx.lineWidth = 1.15;
+        ctx.lineWidth = 0.8;
         for (let r = 0; r < projectedGrid.length; r++) {
           const row = projectedGrid[r];
           if (!row.length) continue;
           for (let c = 0; c < row.length; c++) {
             const p = row[c];
-            if (p.alpha < 0.05) continue;
+            if (p.alpha < 0.06) continue;
 
             if (c + 1 < row.length) {
               const right = row[c + 1];
-              ctx.strokeStyle = `rgba(34, 211, 238, ${(p.alpha * 0.42).toFixed(3)})`;
+              ctx.strokeStyle = `rgba(34, 211, 238, ${(p.alpha * 0.14).toFixed(3)})`;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(right.x, right.y);
@@ -3706,15 +3721,15 @@
 
             if (r + 1 < projectedGrid.length && projectedGrid[r + 1][c]) {
               const back = projectedGrid[r + 1][c];
-              ctx.strokeStyle = `rgba(59, 130, 246, ${(p.alpha * 0.45).toFixed(3)})`;
+              ctx.strokeStyle = `rgba(59, 130, 246, ${(p.alpha * 0.16).toFixed(3)})`;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(back.x, back.y);
               ctx.stroke();
             }
 
-            const dotRadius = Math.max(1.2, p.scale * 3.4);
-            ctx.fillStyle = `rgba(125, 211, 252, ${(p.alpha * 0.92).toFixed(3)})`;
+            const dotRadius = Math.max(0.8, p.scale * 1.9);
+            ctx.fillStyle = `rgba(125, 211, 252, ${(p.alpha * 0.4).toFixed(3)})`;
             ctx.beginPath();
             ctx.arc(p.x, p.y, dotRadius, 0, Math.PI * 2);
             ctx.fill();
