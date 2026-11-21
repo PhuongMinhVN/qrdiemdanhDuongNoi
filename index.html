@@ -259,13 +259,25 @@
 
     #presentation-qr-container canvas,
     #presentation-qr-container img {
-      width: min(460px, 50vh) !important;
-      height: min(460px, 50vh) !important;
+      width: min(560px, 60vh) !important;
+      height: min(560px, 60vh) !important;
     }
     #hall-qr-container canvas,
     #hall-qr-container img {
-      width: min(320px, 72vw) !important;
-      height: min(320px, 72vw) !important;
+      width: min(380px, 78vw) !important;
+      height: min(380px, 78vw) !important;
+    }
+    @keyframes qrRadar {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      100% { transform: scale(1.18); opacity: 0; }
+    }
+    .qr-radar-ring {
+      position: absolute;
+      inset: -14px;
+      border-radius: 2.6rem;
+      border: 2px solid rgba(34, 211, 238, 0.75);
+      pointer-events: none;
+      animation: qrRadar 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
     }
 
     /* QR Code container image styling */
@@ -308,7 +320,7 @@
             <div>
               <div class="flex items-center gap-1.5 font-display font-extrabold tracking-wide text-sm sm:text-base leading-none">
                 <span class="text-blue-400">MOBIFONE</span>
-                <span class="text-slate-500 font-normal">×</span>
+                <span class="text-cyan-200 font-bold">&amp;</span>
                 <span class="text-cyan-400">BETATECH</span>
               </div>
               <p class="text-[11px] text-slate-400 tracking-wider uppercase mt-1">Điểm Danh Hội Nghị Số</p>
@@ -389,7 +401,7 @@
             <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
             <span class="font-display font-extrabold tracking-widest text-xs sm:text-sm">
               <span class="text-blue-400">MOBIFONE</span>
-              <span class="text-slate-400 mx-1.5">×</span>
+              <span class="text-cyan-200 mx-1.5">&amp;</span>
               <span class="text-cyan-300">BETATECH</span>
             </span>
           </div>
@@ -1254,7 +1266,8 @@
       </h1>
 
       <!-- Huge High-Contrast Glowing QR Spotlight -->
-      <div class="my-6 sm:my-7 p-5 sm:p-7 rounded-[2.25rem] qr-spotlight-frame">
+      <div class="my-4 sm:my-5 p-4 sm:p-6 rounded-[2.25rem] qr-spotlight-frame">
+        <span class="qr-radar-ring"></span>
         <span class="qr-corner qr-corner-tl"></span>
         <span class="qr-corner qr-corner-tr"></span>
         <span class="qr-corner qr-corner-bl"></span>
@@ -2085,8 +2098,8 @@
       document.getElementById("qr-url-text").textContent = liveUrl;
       document.getElementById("presentation-url").textContent = liveUrl;
 
-      renderQRCodeInto(document.getElementById("hall-qr-container"), liveUrl, 320);
-      renderQRCodeInto(document.getElementById("presentation-qr-container"), liveUrl, 460);
+      renderQRCodeInto(document.getElementById("hall-qr-container"), liveUrl, 380);
+      renderQRCodeInto(document.getElementById("presentation-qr-container"), liveUrl, 560);
     }
 
     function copyLiveUrl() {
@@ -2980,7 +2993,7 @@
     }
 
     /* =========================================================================
-     * HIỆU ỨNG NỀN CHUYỂN ĐỘNG 3D (PERSPECTIVE CYBER WAVE + FLOATING 3D NETWORK)
+     * HIỆU ỨNG NỀN CHUYỂN ĐỘNG 3D RÕ NÉT (3D CYBER WAVE + ORBITAL RINGS + STARFIELD)
      * ========================================================================= */
     function init3DBackground() {
       const canvas = document.getElementById("bg-3d-canvas");
@@ -2991,20 +3004,20 @@
       let height = 0;
       let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
-      const COLS = 30;
-      const ROWS = 22;
-      const SPACING_X = 72;
-      const SPACING_Z = 56;
-      const SKY_PARTICLES = 42;
+      const COLS = 28;
+      const ROWS = 20;
+      const SPACING_X = 78;
+      const SPACING_Z = 58;
+      const SKY_PARTICLES = 68;
 
       const particles = Array.from({ length: SKY_PARTICLES }, () => ({
-        x: (Math.random() - 0.5) * 1800,
-        y: (Math.random() - 0.65) * 900,
-        z: Math.random() * 1100 + 180,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.35,
-        vz: -(Math.random() * 0.9 + 0.35),
-        hue: Math.random() > 0.45 ? "34, 211, 238" : "59, 130, 246",
+        x: (Math.random() - 0.5) * 2000,
+        y: (Math.random() - 0.6) * 1100,
+        z: Math.random() * 1150 + 120,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.45,
+        vz: -(Math.random() * 2.2 + 0.9),
+        hue: Math.random() > 0.4 ? "34, 211, 238" : "59, 130, 246",
       }));
 
       function resize() {
@@ -3020,26 +3033,74 @@
 
       let time = 0;
 
+      function draw3DOrbitalRing(radius, tiltX, tiltY, rotSpeed, colorRgba, segments = 64) {
+        const fov = Math.min(width, height) * 0.9;
+        const centerX = width * 0.5;
+        const centerY = height * 0.48;
+        const cosX = Math.cos(tiltX);
+        const sinX = Math.sin(tiltX);
+        const angleY = tiltY + time * rotSpeed;
+        const cosY = Math.cos(angleY);
+        const sinY = Math.sin(angleY);
+
+        ctx.beginPath();
+        for (let i = 0; i <= segments; i++) {
+          const theta = (i / segments) * Math.PI * 2;
+          let x = Math.cos(theta) * radius;
+          let y = Math.sin(theta) * radius;
+          let z = 0;
+
+          // Xoay quanh trục X
+          const y1 = y * cosX - z * sinX;
+          const z1 = y * sinX + z * cosX;
+          // Xoay quanh trục Y
+          const x2 = x * cosY + z1 * sinY;
+          const z2 = -x * sinY + z1 * cosY;
+
+          const s = fov / (z2 + 760);
+          const sx = centerX + x2 * s;
+          const sy = centerY + y1 * s;
+          if (i === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+        ctx.strokeStyle = colorRgba;
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+      }
+
       function render3D() {
-        time += 0.016;
+        time += 0.018;
         ctx.clearRect(0, 0, width, height);
 
-        // Nền sâu công nghệ cao với nguồn sáng trung tâm chuyển động nhẹ
-        const cx = width * 0.5 + Math.sin(time * 0.35) * 60;
-        const cy = height * 0.42 + Math.cos(time * 0.28) * 30;
-        const bgGrad = ctx.createRadialGradient(cx, cy, 40, width * 0.5, height * 0.5, Math.max(width, height) * 0.78);
-        bgGrad.addColorStop(0, "#0b2249");
-        bgGrad.addColorStop(0.45, "#061229");
-        bgGrad.addColorStop(1, "#030712");
+        // Nền xanh công nghệ sâu + hào quang chuyển động rõ nét
+        const cx = width * 0.5 + Math.sin(time * 0.45) * 90;
+        const cy = height * 0.42 + Math.cos(time * 0.35) * 45;
+        const bgGrad = ctx.createRadialGradient(cx, cy, 40, width * 0.5, height * 0.5, Math.max(width, height) * 0.8);
+        bgGrad.addColorStop(0, "#10326b");
+        bgGrad.addColorStop(0.42, "#071a3d");
+        bgGrad.addColorStop(1, "#030816");
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, width, height);
 
-        const fov = Math.min(width, height) * 0.85;
-        const horizonY = height * 0.56;
-        const camY = 175;
-        const zOffset = (time * 32) % SPACING_Z;
+        // Vầng sáng chân trời (Horizon Aurora Glow)
+        const horizonY = height * 0.54;
+        const aurora = ctx.createRadialGradient(width * 0.5, horizonY, 20, width * 0.5, horizonY, width * 0.55);
+        aurora.addColorStop(0, "rgba(34, 211, 238, 0.24)");
+        aurora.addColorStop(0.5, "rgba(0, 96, 175, 0.14)");
+        aurora.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = aurora;
+        ctx.fillRect(0, 0, width, height);
 
-        // 1. Sóng lưới điểm 3D phối cảnh (3D Perspective Cyber Wave)
+        // 1. Vòng quỹ đạo 3D xoay quanh sân khấu trung tâm
+        const ringBase = Math.min(width, height) * 0.44;
+        draw3DOrbitalRing(ringBase, 1.15, 0.3, 0.28, "rgba(34, 211, 238, 0.28)");
+        draw3DOrbitalRing(ringBase * 1.22, -0.95, 1.1, -0.22, "rgba(59, 130, 246, 0.26)");
+
+        const fov = Math.min(width, height) * 0.88;
+        const camY = 175;
+        const zOffset = (time * 48) % SPACING_Z;
+
+        // 2. Sóng lưới điểm 3D phối cảnh (3D Perspective Cyber Wave)
         const projectedGrid = [];
         for (let r = 0; r < ROWS; r++) {
           const rowPoints = [];
@@ -3048,13 +3109,13 @@
             projectedGrid.push(rowPoints);
             continue;
           }
-          const scale = fov / (z + 240);
+          const scale = fov / (z + 220);
 
           for (let c = 0; c < COLS; c++) {
             const worldX = (c - (COLS - 1) / 2) * SPACING_X;
             const waveY =
-              Math.sin(c * 0.32 + time * 1.35) * 28 +
-              Math.cos((r * SPACING_Z - zOffset) * 0.012 - time * 1.1) * 24;
+              Math.sin(c * 0.35 + time * 1.6) * 34 +
+              Math.cos((r * SPACING_Z - zOffset) * 0.013 - time * 1.35) * 28;
             const worldY = camY + waveY;
 
             const screenX = width * 0.5 + worldX * scale;
@@ -3066,18 +3127,17 @@
           projectedGrid.push(rowPoints);
         }
 
-        // Vẽ các đường kết nối lưới 3D mềm mại
-        ctx.lineWidth = 0.75;
+        ctx.lineWidth = 1.15;
         for (let r = 0; r < projectedGrid.length; r++) {
           const row = projectedGrid[r];
           if (!row.length) continue;
           for (let c = 0; c < row.length; c++) {
             const p = row[c];
-            if (p.alpha < 0.04) continue;
+            if (p.alpha < 0.05) continue;
 
             if (c + 1 < row.length) {
               const right = row[c + 1];
-              ctx.strokeStyle = `rgba(34, 211, 238, ${(p.alpha * 0.16).toFixed(3)})`;
+              ctx.strokeStyle = `rgba(34, 211, 238, ${(p.alpha * 0.42).toFixed(3)})`;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(right.x, right.y);
@@ -3086,43 +3146,41 @@
 
             if (r + 1 < projectedGrid.length && projectedGrid[r + 1][c]) {
               const back = projectedGrid[r + 1][c];
-              ctx.strokeStyle = `rgba(59, 130, 246, ${(p.alpha * 0.18).toFixed(3)})`;
+              ctx.strokeStyle = `rgba(59, 130, 246, ${(p.alpha * 0.45).toFixed(3)})`;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(back.x, back.y);
               ctx.stroke();
             }
 
-            // Điểm nút phát sáng trên sóng 3D
-            const dotRadius = Math.max(0.8, p.scale * 2.4);
-            ctx.fillStyle = `rgba(56, 189, 248, ${(p.alpha * 0.75).toFixed(3)})`;
+            const dotRadius = Math.max(1.2, p.scale * 3.4);
+            ctx.fillStyle = `rgba(125, 211, 252, ${(p.alpha * 0.92).toFixed(3)})`;
             ctx.beginPath();
             ctx.arc(p.x, p.y, dotRadius, 0, Math.PI * 2);
             ctx.fill();
           }
         }
 
-        // 2. Mạng lưới hạt không gian 3D bay phía trên
+        // 3. Không gian hạt 3D bay tới trước & kết nối mạng số
         const projectedSky = [];
         for (const pt of particles) {
           pt.x += pt.vx;
           pt.y += pt.vy;
           pt.z += pt.vz;
 
-          if (pt.z < 120) {
-            pt.z = 1200;
-            pt.x = (Math.random() - 0.5) * 1800;
-            pt.y = (Math.random() - 0.65) * 900;
+          if (pt.z < 100) {
+            pt.z = 1220;
+            pt.x = (Math.random() - 0.5) * 2000;
+            pt.y = (Math.random() - 0.6) * 1100;
           }
 
-          const s = fov / (pt.z + 200);
+          const s = fov / (pt.z + 180);
           const sx = width * 0.5 + pt.x * s;
           const sy = height * 0.44 + pt.y * s;
-          const alpha = Math.max(0.05, Math.min(0.85, 1 - pt.z / 1280));
-          projectedSky.push({ x: sx, y: sy, r: Math.max(1.1, s * 3.1), alpha, hue: pt.hue });
+          const alpha = Math.max(0.12, Math.min(0.95, 1 - pt.z / 1280));
+          projectedSky.push({ x: sx, y: sy, r: Math.max(1.6, s * 4.2), alpha, hue: pt.hue });
         }
 
-        // Kết nối các hạt gần nhau tạo chiều sâu mạng số
         for (let i = 0; i < projectedSky.length; i++) {
           const a = projectedSky[i];
           for (let j = i + 1; j < projectedSky.length; j++) {
@@ -3130,10 +3188,10 @@
             const dx = a.x - b.x;
             const dy = a.y - b.y;
             const distSq = dx * dx + dy * dy;
-            if (distSq < 21000) {
-              const lineAlpha = (1 - distSq / 21000) * Math.min(a.alpha, b.alpha) * 0.28;
+            if (distSq < 26000) {
+              const lineAlpha = (1 - distSq / 26000) * Math.min(a.alpha, b.alpha) * 0.45;
               ctx.strokeStyle = `rgba(34, 211, 238, ${lineAlpha.toFixed(3)})`;
-              ctx.lineWidth = 0.8;
+              ctx.lineWidth = 1.0;
               ctx.beginPath();
               ctx.moveTo(a.x, a.y);
               ctx.lineTo(b.x, b.y);
