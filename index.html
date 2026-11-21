@@ -48,6 +48,8 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <!-- Canvas Confetti CDN (Lucky Draw Celebration) -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- html2canvas CDN (Pixel-Perfect 3D Access Pass PNG Export) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     :root {
@@ -2867,129 +2869,102 @@
       }
     }
 
-    function downloadPassAsPNG() {
+    async function downloadPassAsPNG() {
       if (!currentBadgeRecord) return;
       const r = currentBadgeRecord;
+      const card = document.getElementById("pass-3d-card");
+      const btnLabel = document.getElementById("download-pass-label");
+      const fileName = `TheRaVao_${(r.id || "MB").replace(/[^A-Za-z0-9_-]/g, "")}.png`;
+
+      if (btnLabel) btnLabel.textContent = "⏳ ĐANG TẠO ẢNH THẺ SẮC NÉT...";
+
+      try {
+        if (typeof html2canvas === "function" && card) {
+          const glare = card.querySelector(".pass-glare");
+          const holoLayer = card.querySelector(".holo-badge");
+          const prevTransform = card.style.transform;
+          const prevAnim = card.style.animation;
+
+          // Tạm phẳng thẻ & tắt lớp lóa mix-blend-mode để chụp chuẩn 100% như giao diện
+          card.style.transform = "none";
+          card.style.animation = "none";
+          if (glare) glare.style.display = "none";
+          if (holoLayer) holoLayer.style.display = "none";
+
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+
+          const captured = await html2canvas(card, {
+            scale: 3,
+            backgroundColor: null,
+            useCORS: true,
+            logging: false,
+          });
+
+          // Khôi phục hiệu ứng 3D ngay lập tức
+          card.style.transform = prevTransform;
+          card.style.animation = prevAnim;
+          if (glare) glare.style.display = "";
+          if (holoLayer) holoLayer.style.display = "";
+
+          // Đặt thẻ sắc nét vào khung nền công nghệ đồng bộ (giữ nguyên bo góc & hào quang)
+          const padX = Math.round(captured.width * 0.08);
+          const padY = Math.round(captured.height * 0.06);
+          const outCanvas = document.createElement("canvas");
+          outCanvas.width = captured.width + padX * 2;
+          outCanvas.height = captured.height + padY * 2;
+          const octx = outCanvas.getContext("2d");
+
+          const bg = octx.createLinearGradient(0, 0, outCanvas.width, outCanvas.height);
+          bg.addColorStop(0, "#081c40");
+          bg.addColorStop(0.5, "#040b1a");
+          bg.addColorStop(1, "#06233d");
+          octx.fillStyle = bg;
+          octx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+
+          const halo = octx.createRadialGradient(
+            outCanvas.width / 2,
+            outCanvas.height * 0.35,
+            20,
+            outCanvas.width / 2,
+            outCanvas.height * 0.45,
+            outCanvas.width * 0.7
+          );
+          halo.addColorStop(0, "rgba(34, 211, 238, 0.28)");
+          halo.addColorStop(1, "rgba(0, 0, 0, 0)");
+          octx.fillStyle = halo;
+          octx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+
+          octx.drawImage(captured, padX, padY);
+          triggerCanvasPNGDownload(outCanvas, fileName, btnLabel);
+          return;
+        }
+      } catch (err) {
+        console.error("html2canvas fallback:", err);
+      }
+
+      // Fallback nếu html2canvas không tải được
       const c = document.createElement("canvas");
       c.width = 1080;
       c.height = 1920;
       const ctx = c.getContext("2d");
-
-      // Nền dọc 9:16 công nghệ cao
       const bg = ctx.createLinearGradient(0, 0, 1080, 1920);
       bg.addColorStop(0, "#0b2452");
       bg.addColorStop(0.5, "#051026");
       bg.addColorStop(1, "#072e4d");
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, 1080, 1920);
-
-      // Hào quang phát sáng
-      const glow = ctx.createRadialGradient(540, 560, 40, 540, 560, 540);
-      glow.addColorStop(0, "rgba(34, 211, 238, 0.25)");
-      glow.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, 1080, 1920);
-
-      // Khung thẻ bo góc
-      ctx.strokeStyle = "rgba(56, 189, 248, 0.65)";
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.roundRect(70, 90, 940, 1740, 64);
-      ctx.stroke();
-
-      // Khe dây đeo thẻ
-      ctx.fillStyle = "#020617";
-      ctx.beginPath();
-      ctx.roundRect(450, 140, 180, 32, 16);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(148, 163, 184, 0.5)";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      // Thương hiệu UBND PHƯỜNG DƯƠNG NỘI
       ctx.textAlign = "center";
-      ctx.font = "800 44px 'Plus Jakarta Sans', Inter, sans-serif";
+      ctx.font = "800 44px Inter, sans-serif";
       ctx.fillStyle = "#67e8f9";
       ctx.fillText("UBND PHƯỜNG DƯƠNG NỘI", 540, 275);
-      ctx.font = "600 26px Inter, sans-serif";
-      ctx.fillStyle = "#a5f3fc";
-      ctx.fillText("THẺ RA VÀO HỘI NGHỊ ĐIỆN TỬ", 540, 325);
-
-      // Huy hiệu ĐÃ ĐIỂM DANH
-      ctx.fillStyle = "rgba(16, 185, 129, 0.2)";
-      ctx.beginPath();
-      ctx.roundRect(350, 375, 380, 64, 32);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(52, 211, 153, 0.7)";
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-      ctx.font = "700 28px Inter, sans-serif";
-      ctx.fillStyle = "#6ee7b7";
-      ctx.fillText("✓  ĐÃ ĐIỂM DANH", 540, 417);
-
-      // Họ và tên nổi bật
-      ctx.font = "600 24px Inter, sans-serif";
-      ctx.fillStyle = "#67e8f9";
-      ctx.fillText("ĐẠI BIỂU THAM DỰ", 540, 560);
-      ctx.font = "800 62px 'Plus Jakarta Sans', Inter, sans-serif";
+      ctx.font = "800 62px Inter, sans-serif";
       ctx.fillStyle = "#ffffff";
       ctx.fillText(String(r.fullName || "").toUpperCase(), 540, 645);
-      ctx.font = "600 34px Inter, sans-serif";
-      ctx.fillStyle = "#22d3ee";
-      ctx.fillText(r.position || "", 540, 705);
+      triggerCanvasPNGDownload(c, fileName, btnLabel);
+    }
 
-      // Bảng chi tiết
-      ctx.fillStyle = "rgba(2, 6, 23, 0.65)";
-      ctx.beginPath();
-      ctx.roundRect(130, 780, 820, 480, 36);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(34, 211, 238, 0.3)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      const rows = [
-        ["Đơn vị / CCCD", r.organization || "—"],
-        ["Số điện thoại", r.phone || "—"],
-        ["Thời gian vào", r.timestamp || "—"],
-        ["Trạng thái", "✓ Hợp lệ — Tham dự hội nghị"],
-      ];
-      rows.forEach(([k, v], i) => {
-        const y = 875 + i * 105;
-        ctx.textAlign = "left";
-        ctx.font = "500 28px Inter, sans-serif";
-        ctx.fillStyle = "#94a3b8";
-        ctx.fillText(k, 175, y);
-        ctx.textAlign = "right";
-        ctx.font = "700 28px Inter, sans-serif";
-        ctx.fillStyle = i === 2 ? "#22d3ee" : "#ffffff";
-        ctx.fillText(String(v).slice(0, 34), 905, y);
-      });
-
-      // Vẽ lại mã QR xác thực từ mini QR
-      const qrCanvas = document.querySelector("#badge-mini-qr canvas");
-      if (qrCanvas) {
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.roundRect(390, 1340, 300, 300, 28);
-        ctx.fill();
-        ctx.drawImage(qrCanvas, 412, 1362, 256, 256);
-      }
-
-      ctx.textAlign = "center";
-      ctx.font = "700 30px monospace";
-      ctx.fillStyle = "#67e8f9";
-      ctx.fillText(`MÃ THẺ: #${r.id || "MB-PASS"}`, 540, 1700);
-      ctx.font = "500 23px Inter, sans-serif";
-      ctx.fillStyle = "#cbd5e1";
-      ctx.fillText("Xuất trình thẻ ra vào này tại cửa kiểm soát hội trường", 540, 1746);
-      ctx.font = "700 22px Inter, sans-serif";
-      ctx.fillStyle = "#94a3b8";
-      ctx.fillText("Tài trợ công nghệ: mobifone  •  BETATECH", 540, 1796);
-
-      const fileName = `TheRaVao_${(r.id || "MB").replace(/[^A-Za-z0-9_-]/g, "")}.png`;
-      const btnLabel = document.getElementById("download-pass-label");
-
-      c.toBlob((blob) => {
+    function triggerCanvasPNGDownload(canvasEl, fileName, btnLabel) {
+      canvasEl.toBlob((blob) => {
         if (blob) {
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
@@ -3002,7 +2977,7 @@
         } else {
           const link = document.createElement("a");
           link.download = fileName;
-          link.href = c.toDataURL("image/png");
+          link.href = canvasEl.toDataURL("image/png");
           link.click();
         }
         if (btnLabel) {
