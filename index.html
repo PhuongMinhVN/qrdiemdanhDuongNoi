@@ -180,16 +180,95 @@
       transition: all 0.35s ease;
     }
     .lucky-stage-box.is-spinning {
-      border-color: rgba(34, 211, 238, 0.85);
-      box-shadow: 0 0 55px -5px rgba(34, 211, 238, 0.55), inset 0 0 30px rgba(34, 211, 238, 0.12);
+      border-color: rgba(34, 211, 238, 0.9);
+      box-shadow: 0 0 65px -5px rgba(34, 211, 238, 0.6), inset 0 0 40px rgba(34, 211, 238, 0.14);
+    }
+    .lucky-stage-box.is-final-lock {
+      border-color: rgba(250, 204, 21, 0.9);
+      box-shadow: 0 0 80px -5px rgba(250, 204, 21, 0.55), inset 0 0 45px rgba(250, 204, 21, 0.14);
     }
     .lucky-stage-box.is-winner {
-      border-color: rgba(250, 204, 21, 0.85);
-      box-shadow: 0 0 65px -5px rgba(250, 204, 21, 0.45), 0 0 35px -5px rgba(34, 211, 238, 0.35), inset 0 0 35px rgba(250, 204, 21, 0.1);
+      border-color: rgba(250, 204, 21, 0.95);
+      box-shadow: 0 0 90px -5px rgba(250, 204, 21, 0.6), 0 0 45px -5px rgba(34, 211, 238, 0.45), inset 0 0 55px rgba(250, 204, 21, 0.15);
+    }
+    @keyframes spinSlowCW {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    @keyframes spinSlowCCW {
+      from { transform: translate(-50%, -50%) rotate(360deg); }
+      to { transform: translate(-50%, -50%) rotate(0deg); }
+    }
+    .lucky-sunburst {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 140%;
+      aspect-ratio: 1 / 1;
+      background: repeating-conic-gradient(
+        from 0deg,
+        rgba(250, 204, 21, 0.14) 0deg 10deg,
+        transparent 10deg 24deg
+      );
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      animation: spinSlowCW 22s linear infinite;
+    }
+    .lucky-stage-box.is-winner .lucky-sunburst {
+      opacity: 1;
+    }
+    .lucky-cyber-ring-1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 390px;
+      height: 390px;
+      border-radius: 9999px;
+      border: 1.5px dashed rgba(34, 211, 238, 0.22);
+      pointer-events: none;
+      animation: spinSlowCW 18s linear infinite;
+    }
+    .lucky-cyber-ring-2 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 500px;
+      height: 500px;
+      border-radius: 9999px;
+      border: 1px solid rgba(59, 130, 246, 0.16);
+      border-top-color: rgba(34, 211, 238, 0.55);
+      border-bottom-color: rgba(34, 211, 238, 0.55);
+      pointer-events: none;
+      animation: spinSlowCCW 12s linear infinite;
+    }
+    .lucky-stage-box.is-spinning .lucky-cyber-ring-1 {
+      animation-duration: 3.5s;
+      border-color: rgba(34, 211, 238, 0.5);
+    }
+    .lucky-stage-box.is-spinning .lucky-cyber-ring-2 {
+      animation-duration: 2.5s;
+      border-top-color: rgba(250, 204, 21, 0.8);
+      border-bottom-color: rgba(34, 211, 238, 0.8);
+    }
+    .lucky-stage-box.is-winner .lucky-cyber-ring-1,
+    .lucky-stage-box.is-winner .lucky-cyber-ring-2 {
+      border-color: rgba(250, 204, 21, 0.45);
+    }
+    @keyframes winnerAvatarGlow {
+      0%, 100% { box-shadow: 0 0 30px rgba(250, 204, 21, 0.55), 0 0 65px rgba(34, 211, 238, 0.35); }
+      50% { box-shadow: 0 0 50px rgba(250, 204, 21, 0.85), 0 0 95px rgba(34, 211, 238, 0.55); }
+    }
+    .winner-avatar-halo {
+      position: relative;
+      border-radius: 9999px;
+      padding: 4px;
+      background: linear-gradient(135deg, #fde047 0%, #22d3ee 48%, #f59e0b 100%);
+      animation: winnerAvatarGlow 2.4s ease-in-out infinite;
     }
     @keyframes winnerPop {
-      0% { transform: scale(0.92); opacity: 0.7; }
-      60% { transform: scale(1.04); opacity: 1; }
+      0% { transform: scale(0.84); opacity: 0.4; }
+      65% { transform: scale(1.06); opacity: 1; }
       100% { transform: scale(1); opacity: 1; }
     }
     .animate-winner-pop {
@@ -1232,6 +1311,21 @@
                     class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white font-mono placeholder-slate-500"
                   />
                 </div>
+
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Ảnh chân dung đại biểu (tùy chọn — hiển thị nổi bật trên màn hình LED khi trúng giải)</label>
+                  <div class="flex flex-wrap items-center gap-3">
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-400/35 cursor-pointer transition">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z" />
+                      </svg>
+                      <span>Tải ảnh chân dung</span>
+                      <input type="file" id="alloc-photo-input" accept="image/*" class="hidden" onchange="handleAllocPhotoUpload(event)" />
+                    </label>
+                    <img id="alloc-photo-preview" src="" alt="" class="hidden w-11 h-11 rounded-full object-cover border-2 border-amber-400/70" />
+                    <span id="alloc-photo-status" class="text-xs text-slate-400">Chưa chọn ảnh (sẽ hiện huy hiệu 3D theo tên viết tắt)</span>
+                  </div>
+                </div>
               </div>
 
               <div class="flex justify-end">
@@ -1438,43 +1532,90 @@
             </div>
           </div>
 
-          <!-- Central Slot-Machine / Randomizer LED Stage -->
+          <!-- Central High-Tech Cyber Randomizer LED Stage -->
           <div id="lucky-stage-box" class="lucky-stage-box rounded-3xl p-6 sm:p-9 text-center relative overflow-hidden">
+            <!-- Animated Sunburst & Counter-Rotating Cyber Rings -->
+            <div class="lucky-sunburst"></div>
+            <div class="lucky-cyber-ring-1"></div>
+            <div class="lucky-cyber-ring-2"></div>
+
+            <!-- High-Tech HUD Telemetry Header -->
+            <div class="relative z-10 flex items-center justify-between text-[10px] sm:text-xs font-mono tracking-widest text-cyan-400/70 mb-4 px-1">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span>QUANTUM DRAW // AI-SYNC</span>
+              </span>
+              <span id="stage-hud-phase" class="px-2.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">STANDBY</span>
+            </div>
+
             <!-- Prize Banner -->
-            <div class="flex flex-col items-center gap-1.5 mb-5">
-              <div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 font-display font-bold text-xs sm:text-sm uppercase tracking-[0.2em]">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <div class="relative z-10 flex flex-col items-center gap-1.5 mb-4">
+              <div class="inline-flex items-center gap-2 px-6 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/50 text-amber-300 font-display font-extrabold text-xs sm:text-base uppercase tracking-[0.22em] shadow-[0_0_20px_rgba(250,204,21,0.2)]">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
                 </svg>
                 <span id="stage-prize-label">GIẢI KHUYẾN KHÍCH</span>
               </div>
-              <p id="stage-prize-gift" class="hidden text-xs sm:text-sm font-semibold text-cyan-300/90"></p>
+              <p id="stage-prize-gift" class="hidden text-xs sm:text-base font-bold text-cyan-300"></p>
             </div>
 
-            <!-- Rolling Attendee Display -->
-            <div id="stage-result-content" class="min-h-[175px] sm:min-h-[205px] flex flex-col items-center justify-center">
-              <p id="stage-status-subtitle" class="text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-400/80 font-semibold mb-2.5">
+            <!-- Rolling Attendee & Winner Portrait Spotlight Display -->
+            <div id="stage-result-content" class="relative z-10 min-h-[240px] sm:min-h-[280px] flex flex-col items-center justify-center">
+              <p id="stage-status-subtitle" class="text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-400/85 font-bold mb-3">
                 Sẵn sàng tìm chủ nhân may mắn
               </p>
-              <h2 id="stage-winner-name" class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight break-words max-w-4xl">
-                MOBIFONE × BETATECH
+
+              <!-- Prominent Winner Portrait / 3D Holographic Medallion -->
+              <div id="stage-winner-avatar-wrap" class="hidden mb-4 relative">
+                <div class="winner-avatar-halo w-28 h-28 sm:w-36 sm:h-36 mx-auto">
+                  <div class="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-blue-900 via-navy-900 to-cyan-900 flex items-center justify-center relative">
+                    <img id="stage-winner-photo" src="" alt="Ảnh đại biểu trúng giải" class="hidden w-full h-full object-cover" />
+                    <span id="stage-winner-initials" class="font-display text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-amber-200 via-white to-cyan-300 tracking-wider">
+                      MB
+                    </span>
+                  </div>
+                </div>
+                <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-display font-extrabold text-[10px] sm:text-xs uppercase tracking-widest shadow-lg whitespace-nowrap">
+                  ★ WINNER ★
+                </span>
+              </div>
+
+              <!-- 3-Line Cyber Drum Illusion (Prev / Active / Next) -->
+              <p id="stage-reel-prev" class="hidden text-sm sm:text-xl font-semibold text-slate-500/45 blur-[0.6px] tracking-wide mb-1 select-none truncate max-w-2xl"></p>
+
+              <h2 id="stage-winner-name" class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight break-words max-w-4xl drop-shadow-[0_4px_24px_rgba(34,211,238,0.35)]">
+                MOBIFONE &amp; BETATECH
               </h2>
+
+              <p id="stage-reel-next" class="hidden text-sm sm:text-xl font-semibold text-slate-500/45 blur-[0.6px] tracking-wide mt-1 select-none truncate max-w-2xl"></p>
+
               <p id="stage-winner-position" class="text-base sm:text-2xl font-semibold text-cyan-300 mt-2.5">
                 Nhấn nút bên dưới để bắt đầu quay số
               </p>
               <p id="stage-winner-org" class="text-sm sm:text-lg text-slate-300 mt-1 max-w-3xl">
                 —
               </p>
-              <div id="stage-winner-phone-badge" class="hidden mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900/90 border border-cyan-500/35">
-                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+              <div id="stage-winner-phone-badge" class="hidden mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900/90 border border-amber-400/45 shadow-glow">
+                <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
                 </svg>
                 <span id="stage-winner-phone" class="font-mono text-lg sm:text-2xl font-bold tracking-widest text-amber-300"></span>
               </div>
             </div>
 
+            <!-- Live High-Tech Suspense Progress Bar -->
+            <div id="lucky-progress-wrap" class="relative z-10 hidden max-w-lg mx-auto mt-5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-cyan-300 mb-1.5">
+                <span id="lucky-progress-text">ĐANG TĂNG TỐC QUÉT NGẪU NHIÊN...</span>
+                <span id="lucky-progress-pct">0%</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-900/90 border border-cyan-500/30 overflow-hidden">
+                <div id="lucky-progress-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-blue-500 via-cyan-400 to-amber-400 transition-all duration-75"></div>
+              </div>
+            </div>
+
             <!-- Spin Action Buttons (Real Spin + Demo Spin) -->
-            <div class="mt-6 flex flex-col items-center gap-3">
+            <div class="relative z-10 mt-6 flex flex-col items-center gap-3">
               <div class="flex flex-wrap items-center justify-center gap-3">
                 <button
                   type="button"
@@ -1501,7 +1642,7 @@
                   <span>QUAY MẪU (DEMO)</span>
                 </button>
               </div>
-              <p id="lucky-spin-hint" class="text-xs text-slate-400">Thời gian quay 4 giây với hiệu ứng giảm tốc tự động • Dùng "Quay Mẫu" để chạy thử sân khấu</p>
+              <p id="lucky-spin-hint" class="text-xs text-slate-400">Hiệu ứng quay hồi hộp 8 giây • Dùng "Quay Mẫu" để chạy thử sân khấu</p>
             </div>
           </div>
 
@@ -3541,6 +3682,35 @@
       document.getElementById("alloc-target-cccd").value = cccdMatch;
     }
 
+    let pendingAllocPhotoDataUrl = "";
+
+    function handleAllocPhotoUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        // Cắt vuông trung tâm & nén 300x300 JPEG nhẹ (~15KB) để lưu mượt trên Cloudflare KV
+        const size = 300;
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        const minSide = Math.min(img.width, img.height);
+        const sx = (img.width - minSide) / 2;
+        const sy = (img.height - minSide) / 2;
+        ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+        pendingAllocPhotoDataUrl = canvas.toDataURL("image/jpeg", 0.82);
+
+        const prev = document.getElementById("alloc-photo-preview");
+        prev.src = pendingAllocPhotoDataUrl;
+        prev.classList.remove("hidden");
+        document.getElementById("alloc-photo-status").textContent = "✓ Đã tải ảnh chân dung sẵn sàng hiển thị lên LED";
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
+
     function handleAddAllocation(event) {
       event.preventDefault();
       const prizeTier = document.getElementById("alloc-prize-select").value;
@@ -3557,13 +3727,24 @@
         prizeTier,
         targetName,
         targetCCCD,
+        photoUrl: pendingAllocPhotoDataUrl || "",
         used: false,
       });
 
+      pendingAllocPhotoDataUrl = "";
       saveLuckyAllocationsToStorage();
       document.getElementById("alloc-target-name").value = "";
       document.getElementById("alloc-target-cccd").value = "";
       document.getElementById("alloc-attendee-quick").value = "";
+      const prev = document.getElementById("alloc-photo-preview");
+      if (prev) {
+        prev.src = "";
+        prev.classList.add("hidden");
+      }
+      const photoInput = document.getElementById("alloc-photo-input");
+      if (photoInput) photoInput.value = "";
+      const statusEl = document.getElementById("alloc-photo-status");
+      if (statusEl) statusEl.textContent = "Chưa chọn ảnh (sẽ hiện huy hiệu 3D theo tên viết tắt)";
       renderAdminAllocationsUI();
     }
 
@@ -3807,6 +3988,13 @@
       return luckyAudioCtx;
     }
 
+    function getVietnameseInitials(fullName) {
+      const parts = String(fullName || "").trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 0) return "MB";
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[parts.length - 2][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
     function playSpinTickSound(progress) {
       if (isLuckyMuted) return;
       const ctx = getLuckyAudioContext();
@@ -3816,15 +4004,27 @@
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(340 + progress * 260, now);
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.06);
+      // Giai đoạn cuối (hồi hộp > 75%): tiếng trống tim trầm và vang hơn
+      if (progress > 0.75) {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(190 + (progress - 0.75) * 320, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + 0.14);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.16);
+      } else {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(320 + progress * 380, now);
+        gain.gain.setValueAtTime(0.075, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.055);
+      }
     }
 
     function playWinnerFanfareSound() {
@@ -3834,26 +4034,27 @@
 
       const now = ctx.currentTime;
       const notes = [
-        { freq: 523.25, start: 0.0, dur: 0.18 },
-        { freq: 659.25, start: 0.12, dur: 0.18 },
-        { freq: 783.99, start: 0.24, dur: 0.22 },
-        { freq: 1046.5, start: 0.38, dur: 0.75 },
+        { freq: 523.25, start: 0.0, dur: 0.22 },
+        { freq: 659.25, start: 0.11, dur: 0.22 },
+        { freq: 783.99, start: 0.22, dur: 0.24 },
+        { freq: 1046.5, start: 0.34, dur: 0.95 },
+        { freq: 1318.5, start: 0.42, dur: 0.9 },
       ];
 
       notes.forEach((n) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = "sine";
+        osc.type = "triangle";
         osc.frequency.setValueAtTime(n.freq, now + n.start);
 
         gain.gain.setValueAtTime(0.001, now + n.start);
-        gain.gain.linearRampToValueAtTime(0.16, now + n.start + 0.03);
+        gain.gain.linearRampToValueAtTime(0.15, now + n.start + 0.03);
         gain.gain.exponentialRampToValueAtTime(0.001, now + n.start + n.dur);
 
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start(now + n.start);
-        osc.stop(now + n.start + n.dur + 0.05);
+        osc.stop(now + n.start + n.dur + 0.06);
       });
     }
 
@@ -3908,7 +4109,7 @@
       }, 220);
     }
 
-    /* ----- Slot-Machine Smooth Deceleration Spin (~4 seconds, supports Demo Mode) ----- */
+    /* ----- High-Tech 3-Phase Suspenseful Spin (8 seconds) ----- */
     function startLuckyDrawSpin(isDemo = false) {
       if (isLuckySpinning) return;
 
@@ -3929,7 +4130,6 @@
         if (allocatedMatch) {
           finalWinner = allocatedMatch.candidate;
         } else {
-          // Loại trừ những người đang được cơ cấu cho hạng mục giải khác để không bao giờ trúng nhầm giải
           const nonReservedPool = activePool.filter(
             (c) => !isCandidateReservedForOtherPrize(c, selectedPrizeTier)
           );
@@ -3954,28 +4154,50 @@
       const resultContent = document.getElementById("stage-result-content");
       const subtitle = document.getElementById("stage-status-subtitle");
       const phoneBadge = document.getElementById("stage-winner-phone-badge");
+      const avatarWrap = document.getElementById("stage-winner-avatar-wrap");
+      const avatarPhoto = document.getElementById("stage-winner-photo");
+      const avatarInitials = document.getElementById("stage-winner-initials");
+      const reelPrev = document.getElementById("stage-reel-prev");
+      const reelNext = document.getElementById("stage-reel-next");
+      const hudPhase = document.getElementById("stage-hud-phase");
+      const progressWrap = document.getElementById("lucky-progress-wrap");
+      const progressBar = document.getElementById("lucky-progress-bar");
+      const progressPct = document.getElementById("lucky-progress-pct");
+      const progressText = document.getElementById("lucky-progress-text");
 
       spinBtn.disabled = true;
       demoBtn.disabled = true;
       spinLabel.textContent = isDemo ? "ĐANG QUAY MẪU..." : "ĐANG QUAY SỐ...";
       spinIcon.classList.add("animate-spin");
-      stageBox.classList.remove("is-winner");
+      stageBox.classList.remove("is-winner", "is-final-lock");
       stageBox.classList.add("is-spinning");
       resultContent.classList.remove("animate-winner-pop");
+      avatarWrap.classList.add("hidden");
+      reelPrev.classList.remove("hidden");
+      reelNext.classList.remove("hidden");
+      progressWrap.classList.remove("hidden");
+      progressBar.style.width = "0%";
+      progressPct.textContent = "0%";
+      hudPhase.textContent = "HYPER-SPIN";
       subtitle.textContent = isDemo
-        ? "[CHẾ ĐỘ QUAY MẪU] Đang chạy thử hiệu ứng quay số..."
-        : "Đang lựa chọn ngẫu nhiên đại biểu may mắn...";
-      subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-300 font-semibold mb-2.5 animate-pulse";
+        ? "[CHẾ ĐỘ QUAY MẪU] Đang chạy hệ thống quay thưởng 3D..."
+        : "Đang quét ngẫu nhiên danh sách đại biểu...";
+      subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-300 font-bold mb-3 animate-pulse";
       phoneBadge.classList.remove("hidden");
 
-      const totalDurationMs = 4000;
+      const totalDurationMs = 8000;
       const startTime = performance.now();
       let lastIndex = -1;
 
-      function displayCandidate(candidate) {
+      function displayCandidate(candidate, idx = 0) {
         document.getElementById("stage-winner-name").textContent = candidate.fullName;
         document.getElementById("stage-winner-position").textContent = candidate.position || "Đại biểu tham dự";
         document.getElementById("stage-winner-org").textContent = maskCCCDInText(candidate.organization || "");
+
+        const prevC = activePool[(idx - 1 + activePool.length) % activePool.length];
+        const nextC = activePool[(idx + 1) % activePool.length];
+        reelPrev.textContent = prevC ? prevC.fullName : "";
+        reelNext.textContent = nextC ? nextC.fullName : "";
 
         const cccdInOrg = (String(candidate.organization || "").match(/\b\d{9,12}\b/) || [])[0];
         if (/^CCCD-/i.test(String(candidate.phone || "")) && cccdInOrg) {
@@ -3988,6 +4210,9 @@
       function tick() {
         const elapsed = performance.now() - startTime;
         const progress = Math.min(elapsed / totalDurationMs, 1);
+        const pct = Math.round(progress * 100);
+        progressBar.style.width = `${pct}%`;
+        progressPct.textContent = `${pct}%`;
 
         if (progress < 1) {
           let randomIdx = Math.floor(Math.random() * activePool.length);
@@ -3995,24 +4220,59 @@
             randomIdx = (randomIdx + 1) % activePool.length;
           }
           lastIndex = randomIdx;
-          displayCandidate(activePool[randomIdx]);
+          displayCandidate(activePool[randomIdx], randomIdx);
           playSpinTickSound(progress);
 
-          const eased = Math.pow(progress, 3);
-          const nextDelay = Math.round(45 + eased * 325);
+          let nextDelay = 42;
+          if (progress < 0.42) {
+            hudPhase.textContent = "HYPER-SPIN";
+            progressText.textContent = "ĐANG TĂNG TỐC QUÉT NGẪU NHIÊN...";
+            nextDelay = 40 + Math.round(progress * 45);
+          } else if (progress < 0.76) {
+            hudPhase.textContent = "DECELERATING";
+            progressText.textContent = "ĐANG GIẢM TỐC — CHUẨN BỊ CHỐT KẾT QUẢ...";
+            const localP = (progress - 0.42) / 0.34;
+            nextDelay = Math.round(68 + Math.pow(localP, 2) * 200);
+          } else {
+            stageBox.classList.add("is-final-lock");
+            hudPhase.textContent = "FINAL LOCK";
+            progressText.textContent = "🔥 KHOẢNH KHẮC QUYẾT ĐỊNH...";
+            subtitle.textContent = "SẮP TÌM RA CHỦ NHÂN MAY MẮN...";
+            const localP = (progress - 0.76) / 0.24;
+            nextDelay = Math.round(280 + Math.pow(localP, 2) * 390);
+          }
+
           setTimeout(tick, nextDelay);
         } else {
-          displayCandidate(finalWinner);
-          stageBox.classList.remove("is-spinning");
+          // Chốt kết quả & bật khung chân dung nổi bật người trúng giải
+          displayCandidate(finalWinner, 0);
+          reelPrev.classList.add("hidden");
+          reelNext.classList.add("hidden");
+          progressWrap.classList.add("hidden");
+          stageBox.classList.remove("is-spinning", "is-final-lock");
           stageBox.classList.add("is-winner");
+          hudPhase.textContent = "WINNER LOCKED";
+
+          // Hiển thị ảnh chân dung (nếu có) hoặc huy hiệu 3D tên viết tắt nổi bật
+          const winnerPhotoUrl = (allocatedMatch && allocatedMatch.rule && allocatedMatch.rule.photoUrl) || finalWinner.photoUrl || "";
+          if (winnerPhotoUrl) {
+            avatarPhoto.src = winnerPhotoUrl;
+            avatarPhoto.classList.remove("hidden");
+            avatarInitials.classList.add("hidden");
+          } else {
+            avatarPhoto.classList.add("hidden");
+            avatarInitials.textContent = getVietnameseInitials(finalWinner.fullName);
+            avatarInitials.classList.remove("hidden");
+          }
+          avatarWrap.classList.remove("hidden");
           resultContent.classList.add("animate-winner-pop");
 
           if (isDemo) {
             subtitle.textContent = "✨ KẾT QUẢ QUAY MẪU (DEMO — KHÔNG LƯU DANH SÁCH) ✨";
-            subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.2em] text-cyan-300 font-bold mb-2.5";
+            subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.2em] text-cyan-300 font-bold mb-3";
           } else {
             subtitle.textContent = "🎉 CHÚC MỪNG ĐẠI BIỂU TRÚNG THƯỞNG 🎉";
-            subtitle.className = "text-xs sm:text-base uppercase tracking-[0.25em] text-amber-300 font-extrabold mb-2.5";
+            subtitle.className = "text-xs sm:text-base uppercase tracking-[0.25em] text-amber-300 font-extrabold mb-3";
 
             const prizeLabelForRecord = selectedPrizeGift
               ? `${selectedPrizeTier} (${selectedPrizeGift})`
@@ -4040,6 +4300,7 @@
 
           playWinnerFanfareSound();
           fireLuckyConfetti();
+          setTimeout(fireLuckyConfetti, 650);
 
           isLuckySpinning = false;
           spinIcon.classList.remove("animate-spin");
