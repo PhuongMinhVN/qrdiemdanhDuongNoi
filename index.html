@@ -42,8 +42,8 @@
 
   <!-- jsQR CDN (CCCD QR Code Scanning) -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-  <!-- QRCode.js CDN (Hall QR Code Generation) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- QRious CDN (Hall QR Code Generation - Zero length-overflow bugs) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
   <!-- SheetJS (xlsx) CDN (Excel Export) -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <!-- Canvas Confetti CDN (Lucky Draw Celebration) -->
@@ -156,13 +156,13 @@
       animation: shake 0.35s ease-in-out;
     }
 
-    /* Smooth fade-in */
+    /* Smooth fade-in (no persistent transform so position:fixed children stay viewport-relative) */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .fade-up {
-      animation: fadeUp 0.35s ease-out forwards;
+      animation: fadeUp 0.25s ease-out;
     }
 
     /* Lucky Draw Stage Glow & Winner Pulse */
@@ -189,10 +189,17 @@
     .animate-winner-pop {
       animation: winnerPop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
+    body.lucky-led-mode {
+      overflow: hidden !important;
+    }
+    body.lucky-led-mode > header,
+    body.lucky-led-mode > footer {
+      display: none !important;
+    }
     .lucky-fullscreen-active {
       position: fixed !important;
       inset: 0 !important;
-      z-index: 50 !important;
+      z-index: 9999 !important;
       overflow-y: auto !important;
       background-color: #040914 !important;
       background-image:
@@ -201,7 +208,17 @@
         linear-gradient(to right, rgba(56, 189, 248, 0.045) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(56, 189, 248, 0.045) 1px, transparent 1px) !important;
       background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px !important;
-      padding: 1.5rem 2rem !important;
+      padding: 1.25rem 2rem 2rem !important;
+    }
+    .lucky-fullscreen-active .lucky-inner-wrap {
+      max-width: 72rem !important;
+      gap: 1rem !important;
+    }
+    .lucky-fullscreen-active #lucky-stage-box {
+      padding: 2rem 2.5rem !important;
+    }
+    .lucky-fullscreen-active #stage-result-content {
+      min-height: 170px !important;
     }
 
     /* QR Code container image styling */
@@ -849,11 +866,11 @@
       </div>
 
       <!-- Authenticated Lucky Draw LED Stage -->
-      <div id="lucky-stage-container" class="hidden space-y-6">
-        <div class="max-w-5xl mx-auto space-y-6">
+      <div id="lucky-stage-container" class="hidden space-y-5">
+        <div class="lucky-inner-wrap max-w-5xl mx-auto flex flex-col gap-5">
 
           <!-- Top Stage Bar: Branding + Controls -->
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div class="flex items-center gap-3 flex-wrap">
               <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/35 shadow-glow">
                 <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
@@ -911,7 +928,7 @@
           </div>
 
           <!-- Live Eligible Pool Counter -->
-          <div class="glass-panel rounded-2xl px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div class="glass-panel rounded-2xl px-5 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div class="flex items-center gap-2.5">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <p class="text-sm sm:text-base font-semibold text-slate-200">
@@ -923,56 +940,82 @@
             <span class="text-xs text-slate-400">Tự động lọc trùng SĐT &amp; loại trừ đại biểu đã trúng giải</span>
           </div>
 
-          <!-- Prize Tier Selector -->
+          <!-- Prize Tier Selector & Add Prize Manager -->
           <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Chọn hạng mục giải thưởng</span>
-              <span id="lucky-active-prize-preview" class="text-xs font-bold text-amber-300">Giải Khuyến Khích</span>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Chọn hạng mục giải thưởng</span>
+                <span id="lucky-active-prize-preview" class="text-xs font-bold text-amber-300">Giải Khuyến Khích</span>
+              </div>
+              <button
+                type="button"
+                onclick="toggleAddPrizeForm()"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-400/35 transition"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Thêm giải thưởng</span>
+              </button>
             </div>
-            <div id="prize-tier-pills" class="flex flex-wrap gap-2">
-              <button type="button" onclick="selectPrizeTier('Giải Khuyến Khích', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Khuyến Khích</button>
-              <button type="button" onclick="selectPrizeTier('Giải Ba', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Ba</button>
-              <button type="button" onclick="selectPrizeTier('Giải Nhì', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Nhì</button>
-              <button type="button" onclick="selectPrizeTier('Giải Nhất', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Nhất</button>
-              <button type="button" onclick="selectPrizeTier('Giải Đặc Biệt', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Đặc Biệt</button>
-              <button type="button" onclick="selectPrizeTier('__CUSTOM__', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">+ Giải tùy chỉnh</button>
-            </div>
-            <div id="custom-prize-wrapper" class="hidden pt-1">
-              <input
-                type="text"
-                id="custom-prize-input"
-                oninput="updateCustomPrizeName()"
-                placeholder="Nhập tên giải thưởng tùy chỉnh (VD: Giải Tài Trợ Mobifone, Quà Tặng Đặc Biệt...)"
-                class="glass-input w-full px-4 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
-              />
+
+            <!-- Dynamic Prize Pills -->
+            <div id="prize-tier-pills" class="flex flex-wrap gap-2"></div>
+
+            <!-- Inline Add New Prize Form -->
+            <div id="add-prize-form" class="hidden pt-2 border-t border-slate-800/80">
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                <input
+                  type="text"
+                  id="new-prize-name"
+                  placeholder="Tên giải mới (VD: Giải Tài Trợ Mobifone, Giải Tư...)"
+                  class="glass-input sm:col-span-5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500"
+                />
+                <input
+                  type="text"
+                  id="new-prize-gift"
+                  placeholder="Quà tặng / Mô tả (không bắt buộc, VD: iPhone 16, Voucher 2 triệu)"
+                  class="glass-input sm:col-span-5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500"
+                />
+                <button
+                  type="button"
+                  onclick="addNewPrizeTier()"
+                  class="sm:col-span-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 transition"
+                >
+                  Lưu giải
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- Central Slot-Machine / Randomizer LED Stage -->
-          <div id="lucky-stage-box" class="lucky-stage-box rounded-3xl p-6 sm:p-10 lg:p-12 text-center relative overflow-hidden">
+          <div id="lucky-stage-box" class="lucky-stage-box rounded-3xl p-6 sm:p-9 text-center relative overflow-hidden">
             <!-- Prize Banner -->
-            <div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 font-display font-bold text-xs sm:text-sm uppercase tracking-[0.2em] mb-6">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
-              </svg>
-              <span id="stage-prize-label">GIẢI KHUYẾN KHÍCH</span>
+            <div class="flex flex-col items-center gap-1.5 mb-5">
+              <div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 font-display font-bold text-xs sm:text-sm uppercase tracking-[0.2em]">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
+                </svg>
+                <span id="stage-prize-label">GIẢI KHUYẾN KHÍCH</span>
+              </div>
+              <p id="stage-prize-gift" class="hidden text-xs sm:text-sm font-semibold text-cyan-300/90"></p>
             </div>
 
             <!-- Rolling Attendee Display -->
-            <div id="stage-result-content" class="min-h-[190px] sm:min-h-[230px] flex flex-col items-center justify-center">
-              <p id="stage-status-subtitle" class="text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-400/80 font-semibold mb-3">
+            <div id="stage-result-content" class="min-h-[175px] sm:min-h-[205px] flex flex-col items-center justify-center">
+              <p id="stage-status-subtitle" class="text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-400/80 font-semibold mb-2.5">
                 Sẵn sàng tìm chủ nhân may mắn
               </p>
               <h2 id="stage-winner-name" class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight break-words max-w-4xl">
                 MOBIFONE × BETATECH
               </h2>
-              <p id="stage-winner-position" class="text-base sm:text-2xl font-semibold text-cyan-300 mt-3">
+              <p id="stage-winner-position" class="text-base sm:text-2xl font-semibold text-cyan-300 mt-2.5">
                 Nhấn nút bên dưới để bắt đầu quay số
               </p>
-              <p id="stage-winner-org" class="text-sm sm:text-lg text-slate-300 mt-1.5 max-w-3xl">
+              <p id="stage-winner-org" class="text-sm sm:text-lg text-slate-300 mt-1 max-w-3xl">
                 —
               </p>
-              <div id="stage-winner-phone-badge" class="hidden mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900/90 border border-cyan-500/35">
+              <div id="stage-winner-phone-badge" class="hidden mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900/90 border border-cyan-500/35">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                 </svg>
@@ -980,20 +1023,35 @@
               </div>
             </div>
 
-            <!-- Spin Action Button -->
-            <div class="mt-8 flex flex-col items-center gap-3">
-              <button
-                type="button"
-                id="lucky-spin-btn"
-                onclick="startLuckyDrawSpin()"
-                class="group relative inline-flex items-center justify-center gap-3 px-10 sm:px-14 py-4 sm:py-5 rounded-2xl font-display font-extrabold text-base sm:text-xl tracking-wider text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 hover:from-blue-500 hover:via-cyan-400 hover:to-emerald-400 shadow-glow-lg transition-all duration-200 active:scale-[0.98] disabled:opacity-45 disabled:cursor-not-allowed"
-              >
-                <svg id="spin-btn-icon" class="w-6 h-6 transition-transform group-hover:rotate-180 duration-500" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                </svg>
-                <span id="lucky-spin-label">QUAY SỐ NGAY</span>
-              </button>
-              <p id="lucky-spin-hint" class="text-xs text-slate-400">Thời gian quay 4 giây với hiệu ứng giảm tốc tự động</p>
+            <!-- Spin Action Buttons (Real Spin + Demo Spin) -->
+            <div class="mt-6 flex flex-col items-center gap-3">
+              <div class="flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  id="lucky-spin-btn"
+                  onclick="startLuckyDrawSpin(false)"
+                  class="group relative inline-flex items-center justify-center gap-3 px-9 sm:px-12 py-3.5 sm:py-4 rounded-2xl font-display font-extrabold text-base sm:text-xl tracking-wider text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 hover:from-blue-500 hover:via-cyan-400 hover:to-emerald-400 shadow-glow-lg transition-all duration-200 active:scale-[0.98] disabled:opacity-45 disabled:cursor-not-allowed"
+                >
+                  <svg id="spin-btn-icon" class="w-6 h-6 transition-transform group-hover:rotate-180 duration-500" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  <span id="lucky-spin-label">QUAY SỐ NGAY</span>
+                </button>
+
+                <button
+                  type="button"
+                  id="lucky-demo-btn"
+                  onclick="startLuckyDrawSpin(true)"
+                  class="inline-flex items-center justify-center gap-2 px-5 py-3.5 sm:py-4 rounded-2xl font-display font-bold text-sm sm:text-base text-amber-200 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/45 transition-all active:scale-[0.98] disabled:opacity-45 disabled:cursor-not-allowed"
+                  title="Chạy thử hiệu ứng quay số bằng dữ liệu mẫu (không lưu vào danh sách trúng thưởng)"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                  </svg>
+                  <span>QUAY MẪU (DEMO)</span>
+                </button>
+              </div>
+              <p id="lucky-spin-hint" class="text-xs text-slate-400">Thời gian quay 4 giây với hiệu ứng giảm tốc tự động • Dùng "Quay Mẫu" để chạy thử sân khấu</p>
             </div>
           </div>
 
@@ -1780,32 +1838,38 @@
       return window.location.href.split("#")[0];
     }
 
+    function renderQRCodeInto(containerEl, text, size) {
+      containerEl.innerHTML = "";
+      if (typeof QRious === "function") {
+        const canvas = document.createElement("canvas");
+        new QRious({
+          element: canvas,
+          value: text,
+          size: size,
+          level: "H",
+          foreground: "#040914",
+          background: "#ffffff",
+          padding: 8,
+        });
+        containerEl.appendChild(canvas);
+      } else {
+        // Fallback nếu CDN bị chặn mạng
+        const img = document.createElement("img");
+        img.width = size;
+        img.height = size;
+        img.alt = "QR Code Điểm Danh";
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&ecc=H&margin=8&data=${encodeURIComponent(text)}`;
+        containerEl.appendChild(img);
+      }
+    }
+
     function generateHallQRCodes() {
       const liveUrl = getLiveCheckinUrl();
       document.getElementById("qr-url-text").textContent = liveUrl;
       document.getElementById("presentation-url").textContent = liveUrl;
 
-      const hallBox = document.getElementById("hall-qr-container");
-      hallBox.innerHTML = "";
-      new QRCode(hallBox, {
-        text: liveUrl,
-        width: 260,
-        height: 260,
-        colorDark: "#040914",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H,
-      });
-
-      const presBox = document.getElementById("presentation-qr-container");
-      presBox.innerHTML = "";
-      new QRCode(presBox, {
-        text: liveUrl,
-        width: 340,
-        height: 340,
-        colorDark: "#040914",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H,
-      });
+      renderQRCodeInto(document.getElementById("hall-qr-container"), liveUrl, 260);
+      renderQRCodeInto(document.getElementById("presentation-qr-container"), liveUrl, 340);
     }
 
     function copyLiveUrl() {
@@ -2130,24 +2194,173 @@
     /* =========================================================================
      * TAB 4: QUAY SỐ TRÚNG THƯỞNG (LUCKY DRAW - LED STAGE)
      * ========================================================================= */
+    const STORAGE_KEY_LUCKY_PRIZES = "mb_bt_lucky_prizes_v1";
+    const DEFAULT_PRIZE_TIERS = [
+      { id: "p-kk", name: "Giải Khuyến Khích", gift: "", custom: false },
+      { id: "p-3", name: "Giải Ba", gift: "", custom: false },
+      { id: "p-2", name: "Giải Nhì", gift: "", custom: false },
+      { id: "p-1", name: "Giải Nhất", gift: "", custom: false },
+      { id: "p-db", name: "Giải Đặc Biệt", gift: "", custom: false },
+    ];
+
+    const DEMO_PARTICIPANTS = [
+      { fullName: "Nguyễn Minh Tuấn", position: "Phó Giám đốc", organization: "Sở Thông tin và Truyền thông Hà Nội", phone: "0912345678" },
+      { fullName: "Trần Thị Thu Hương", position: "Trưởng phòng Văn hóa - Xã hội", organization: "UBND Phường Dương Nội", phone: "0987654321" },
+      { fullName: "Lê Quang Dũng", position: "Chuyên viên chính", organization: "Văn phòng UBND Quận Hà Đông", phone: "0904112233" },
+      { fullName: "Phạm Hoàng Nam", position: "Phó Chủ tịch UBND", organization: "UBND Phường Dương Nội", phone: "0936889900" },
+      { fullName: "Đỗ Thị Ngọc Lan", position: "Cán bộ Chuyển đổi số", organization: "Trung tâm Phục vụ Hành chính công", phone: "0975443322" },
+      { fullName: "Vũ Đức Anh", position: "Giám đốc Trung tâm", organization: "Mobifone Khu vực Hà Nội", phone: "0903778899" },
+      { fullName: "Hoàng Thị Mai Phương", position: "Phó Trưởng phòng", organization: "Phòng Tài chính - Kế hoạch", phone: "0918223344" },
+      { fullName: "Bùi Tiến Đạt", position: "Kỹ sư Giải pháp", organization: "Công ty Công nghệ Betatech", phone: "0962556677" },
+    ];
+
+    let luckyPrizeTiers = [...DEFAULT_PRIZE_TIERS];
+    let selectedPrizeGift = "";
+
     function initLuckyDrawState() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_LUCKY_WINNERS);
-        luckyWinners = saved ? JSON.parse(saved) : [];
+        const savedWinners = localStorage.getItem(STORAGE_KEY_LUCKY_WINNERS);
+        luckyWinners = savedWinners ? JSON.parse(savedWinners) : [];
         if (!Array.isArray(luckyWinners)) luckyWinners = [];
       } catch (_) {
         luckyWinners = [];
       }
 
-      const firstPill = document.querySelector("#prize-tier-pills .prize-pill");
-      if (firstPill) {
-        selectPrizeTier("Giải Khuyến Khích", firstPill);
+      try {
+        const savedPrizes = localStorage.getItem(STORAGE_KEY_LUCKY_PRIZES);
+        if (savedPrizes) {
+          const parsed = JSON.parse(savedPrizes);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            luckyPrizeTiers = parsed;
+          }
+        }
+      } catch (_) {
+        luckyPrizeTiers = [...DEFAULT_PRIZE_TIERS];
       }
+
+      selectedPrizeTier = luckyPrizeTiers[0].name;
+      selectedPrizeGift = luckyPrizeTiers[0].gift || "";
+      renderPrizeTierPills();
+      updateStagePrizeLabel();
       renderWinnersBoard();
     }
 
     function saveLuckyWinnersToStorage() {
       localStorage.setItem(STORAGE_KEY_LUCKY_WINNERS, JSON.stringify(luckyWinners));
+    }
+
+    function saveLuckyPrizesToStorage() {
+      localStorage.setItem(STORAGE_KEY_LUCKY_PRIZES, JSON.stringify(luckyPrizeTiers));
+    }
+
+    function toggleAddPrizeForm() {
+      const form = document.getElementById("add-prize-form");
+      form.classList.toggle("hidden");
+      if (!form.classList.contains("hidden")) {
+        document.getElementById("new-prize-name").focus();
+      }
+    }
+
+    function addNewPrizeTier() {
+      const nameInput = document.getElementById("new-prize-name");
+      const giftInput = document.getElementById("new-prize-gift");
+      const name = (nameInput.value || "").trim();
+      const gift = (giftInput.value || "").trim();
+
+      if (!name) {
+        alert("Vui lòng nhập tên giải thưởng mới.");
+        nameInput.focus();
+        return;
+      }
+
+      const newPrize = {
+        id: `p-custom-${Date.now()}`,
+        name,
+        gift,
+        custom: true,
+      };
+
+      luckyPrizeTiers.push(newPrize);
+      saveLuckyPrizesToStorage();
+
+      selectedPrizeTier = newPrize.name;
+      selectedPrizeGift = newPrize.gift;
+      nameInput.value = "";
+      giftInput.value = "";
+      document.getElementById("add-prize-form").classList.add("hidden");
+
+      renderPrizeTierPills();
+      updateStagePrizeLabel();
+    }
+
+    function removeCustomPrizeTier(prizeId, event) {
+      if (event) event.stopPropagation();
+      const idx = luckyPrizeTiers.findIndex((p) => p.id === prizeId);
+      if (idx === -1) return;
+
+      const removed = luckyPrizeTiers[idx];
+      luckyPrizeTiers.splice(idx, 1);
+      saveLuckyPrizesToStorage();
+
+      if (selectedPrizeTier === removed.name && luckyPrizeTiers.length > 0) {
+        selectedPrizeTier = luckyPrizeTiers[0].name;
+        selectedPrizeGift = luckyPrizeTiers[0].gift || "";
+      }
+      renderPrizeTierPills();
+      updateStagePrizeLabel();
+    }
+
+    function renderPrizeTierPills() {
+      const container = document.getElementById("prize-tier-pills");
+      if (!container) return;
+
+      container.innerHTML = luckyPrizeTiers
+        .map((p) => {
+          const isActive = p.name === selectedPrizeTier;
+          const activeClass = isActive
+            ? "bg-gradient-to-r from-amber-500/25 to-cyan-500/25 border-amber-400/70 text-amber-200 font-bold shadow-glow"
+            : "bg-slate-900/80 border-slate-700 text-slate-300 font-semibold hover:border-cyan-500/40 hover:text-white";
+          const giftBadge = p.gift ? `<span class="text-[11px] opacity-75 font-normal">(${escapeHtml(p.gift)})</span>` : "";
+          const deleteBtn = p.custom
+            ? `<span onclick="removeCustomPrizeTier('${escapeHtml(p.id)}', event)" title="Xóa giải này" class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 text-[11px] leading-none">&times;</span>`
+            : "";
+
+          return `
+            <button
+              type="button"
+              onclick="selectPrizeById('${escapeHtml(p.id)}')"
+              class="prize-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm border transition ${activeClass}"
+            >
+              <span>${escapeHtml(p.name)}</span>
+              ${giftBadge}
+              ${deleteBtn}
+            </button>
+          `;
+        })
+        .join("");
+    }
+
+    function selectPrizeById(prizeId) {
+      const found = luckyPrizeTiers.find((p) => p.id === prizeId);
+      if (!found) return;
+      selectedPrizeTier = found.name;
+      selectedPrizeGift = found.gift || "";
+      renderPrizeTierPills();
+      updateStagePrizeLabel();
+    }
+
+    function updateStagePrizeLabel() {
+      const preview = selectedPrizeGift ? `${selectedPrizeTier} — ${selectedPrizeGift}` : selectedPrizeTier;
+      document.getElementById("lucky-active-prize-preview").textContent = preview;
+      document.getElementById("stage-prize-label").textContent = selectedPrizeTier.toUpperCase();
+
+      const giftEl = document.getElementById("stage-prize-gift");
+      if (selectedPrizeGift) {
+        giftEl.textContent = `Phần thưởng: ${selectedPrizeGift}`;
+        giftEl.classList.remove("hidden");
+      } else {
+        giftEl.classList.add("hidden");
+      }
     }
 
     function normalizePhoneKey(phone) {
@@ -2212,42 +2425,6 @@
       renderWinnersBoard();
     }
 
-    function selectPrizeTier(tier, btnEl) {
-      const pills = document.querySelectorAll("#prize-tier-pills .prize-pill");
-      pills.forEach((p) => {
-        p.className = "prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition bg-slate-900/80 border-slate-700 text-slate-300 hover:border-cyan-500/40 hover:text-white";
-      });
-
-      if (btnEl) {
-        btnEl.className = "prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-gradient-to-r from-amber-500/25 to-cyan-500/25 border-amber-400/70 text-amber-200 shadow-glow";
-      }
-
-      const customWrapper = document.getElementById("custom-prize-wrapper");
-      if (tier === "__CUSTOM__") {
-        isCustomPrizeMode = true;
-        customWrapper.classList.remove("hidden");
-        const customInput = document.getElementById("custom-prize-input");
-        customInput.focus();
-        updateCustomPrizeName();
-      } else {
-        isCustomPrizeMode = false;
-        customWrapper.classList.add("hidden");
-        selectedPrizeTier = tier;
-        updateStagePrizeLabel();
-      }
-    }
-
-    function updateCustomPrizeName() {
-      const val = (document.getElementById("custom-prize-input").value || "").trim();
-      selectedPrizeTier = val || "Giải Thưởng Đặc Biệt";
-      updateStagePrizeLabel();
-    }
-
-    function updateStagePrizeLabel() {
-      document.getElementById("lucky-active-prize-preview").textContent = selectedPrizeTier;
-      document.getElementById("stage-prize-label").textContent = selectedPrizeTier.toUpperCase();
-    }
-
     /* ----- Web Audio API Synthesized Sound Effects (Offline, Zero External Audio) ----- */
     function getLuckyAudioContext() {
       if (!luckyAudioCtx) {
@@ -2270,7 +2447,6 @@
       const gain = ctx.createGain();
 
       osc.type = "triangle";
-      // Tần số tăng nhẹ theo tiến độ giảm tốc để tạo cảm giác hồi hộp
       osc.frequency.setValueAtTime(340 + progress * 260, now);
       gain.gain.setValueAtTime(0.08, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
@@ -2287,7 +2463,6 @@
       if (!ctx) return;
 
       const now = ctx.currentTime;
-      // Arpeggio chiến thắng (C5 - E5 - G5 - C6)
       const notes = [
         { freq: 523.25, start: 0.0, dur: 0.18 },
         { freq: 659.25, start: 0.12, dur: 0.18 },
@@ -2339,6 +2514,7 @@
         particleCount: 90,
         spread: 80,
         origin: { y: 0.6 },
+        zIndex: 10000,
         colors,
       });
 
@@ -2348,6 +2524,7 @@
           angle: 60,
           spread: 55,
           origin: { x: 0.08, y: 0.68 },
+          zIndex: 10000,
           colors,
         });
         confetti({
@@ -2355,25 +2532,27 @@
           angle: 120,
           spread: 55,
           origin: { x: 0.92, y: 0.68 },
+          zIndex: 10000,
           colors,
         });
       }, 220);
     }
 
-    /* ----- Slot-Machine Smooth Deceleration Spin (~4 seconds) ----- */
-    function startLuckyDrawSpin() {
+    /* ----- Slot-Machine Smooth Deceleration Spin (~4 seconds, supports Demo Mode) ----- */
+    function startLuckyDrawSpin(isDemo = false) {
       if (isLuckySpinning) return;
 
-      if (luckyEligiblePool.length === 0) {
-        alert("Không còn đại biểu hợp lệ nào trong danh sách quay thưởng.");
+      const activePool = isDemo ? DEMO_PARTICIPANTS : luckyEligiblePool;
+      if (activePool.length === 0) {
+        alert("Chưa có đại biểu hợp lệ nào trong danh sách. Hãy bấm 'QUAY MẪU (DEMO)' để chạy thử sân khấu.");
         return;
       }
 
-      // Khởi tạo AudioContext theo thao tác người dùng
       if (!isLuckyMuted) getLuckyAudioContext();
 
       isLuckySpinning = true;
       const spinBtn = document.getElementById("lucky-spin-btn");
+      const demoBtn = document.getElementById("lucky-demo-btn");
       const spinLabel = document.getElementById("lucky-spin-label");
       const spinIcon = document.getElementById("spin-btn-icon");
       const stageBox = document.getElementById("lucky-stage-box");
@@ -2382,18 +2561,20 @@
       const phoneBadge = document.getElementById("stage-winner-phone-badge");
 
       spinBtn.disabled = true;
-      spinLabel.textContent = "ĐANG QUAY SỐ...";
+      demoBtn.disabled = true;
+      spinLabel.textContent = isDemo ? "ĐANG QUAY MẪU..." : "ĐANG QUAY SỐ...";
       spinIcon.classList.add("animate-spin");
       stageBox.classList.remove("is-winner");
       stageBox.classList.add("is-spinning");
       resultContent.classList.remove("animate-winner-pop");
-      subtitle.textContent = "Đang lựa chọn ngẫu nhiên đại biểu may mắn...";
-      subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-300 font-semibold mb-3 animate-pulse";
+      subtitle.textContent = isDemo
+        ? "[CHẾ ĐỘ QUAY MẪU] Đang chạy thử hiệu ứng quay số..."
+        : "Đang lựa chọn ngẫu nhiên đại biểu may mắn...";
+      subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-300 font-semibold mb-2.5 animate-pulse";
       phoneBadge.classList.remove("hidden");
 
-      // Chọn ngẫu nhiên người trúng giải trước bằng crypto.getRandomValues nếu có
-      const winnerIndex = getSecureRandomInt(luckyEligiblePool.length);
-      const finalWinner = luckyEligiblePool[winnerIndex];
+      const winnerIndex = getSecureRandomInt(activePool.length);
+      const finalWinner = activePool[winnerIndex];
 
       const totalDurationMs = 4000;
       const startTime = performance.now();
@@ -2411,40 +2592,48 @@
         const progress = Math.min(elapsed / totalDurationMs, 1);
 
         if (progress < 1) {
-          let randomIdx = Math.floor(Math.random() * luckyEligiblePool.length);
-          if (luckyEligiblePool.length > 1 && randomIdx === lastIndex) {
-            randomIdx = (randomIdx + 1) % luckyEligiblePool.length;
+          let randomIdx = Math.floor(Math.random() * activePool.length);
+          if (activePool.length > 1 && randomIdx === lastIndex) {
+            randomIdx = (randomIdx + 1) % activePool.length;
           }
           lastIndex = randomIdx;
-          displayCandidate(luckyEligiblePool[randomIdx]);
+          displayCandidate(activePool[randomIdx]);
           playSpinTickSound(progress);
 
-          // Vật lý giảm tốc mượt (ease-out cubic: từ 45ms tăng dần lên ~370ms)
           const eased = Math.pow(progress, 3);
           const nextDelay = Math.round(45 + eased * 325);
           setTimeout(tick, nextDelay);
         } else {
-          // Chốt kết quả người thắng cuộc
           displayCandidate(finalWinner);
           stageBox.classList.remove("is-spinning");
           stageBox.classList.add("is-winner");
           resultContent.classList.add("animate-winner-pop");
-          subtitle.textContent = "🎉 CHÚC MỪNG ĐẠI BIỂU TRÚNG THƯỞNG 🎉";
-          subtitle.className = "text-xs sm:text-base uppercase tracking-[0.25em] text-amber-300 font-extrabold mb-3";
 
-          const winnerEntry = {
-            id: `WIN-${Date.now()}`,
-            prizeTier: selectedPrizeTier,
-            drawnAt: formatVietnameseTimestamp(new Date()),
-            fullName: finalWinner.fullName,
-            position: finalWinner.position,
-            organization: finalWinner.organization,
-            phone: finalWinner.phone,
-          };
+          if (isDemo) {
+            subtitle.textContent = "✨ KẾT QUẢ QUAY MẪU (DEMO — KHÔNG LƯU DANH SÁCH) ✨";
+            subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.2em] text-cyan-300 font-bold mb-2.5";
+          } else {
+            subtitle.textContent = "🎉 CHÚC MỪNG ĐẠI BIỂU TRÚNG THƯỞNG 🎉";
+            subtitle.className = "text-xs sm:text-base uppercase tracking-[0.25em] text-amber-300 font-extrabold mb-2.5";
 
-          luckyWinners.unshift(winnerEntry);
-          saveLuckyWinnersToStorage();
-          rebuildLuckyEligiblePool();
+            const prizeLabelForRecord = selectedPrizeGift
+              ? `${selectedPrizeTier} (${selectedPrizeGift})`
+              : selectedPrizeTier;
+
+            const winnerEntry = {
+              id: `WIN-${Date.now()}`,
+              prizeTier: prizeLabelForRecord,
+              drawnAt: formatVietnameseTimestamp(new Date()),
+              fullName: finalWinner.fullName,
+              position: finalWinner.position,
+              organization: finalWinner.organization,
+              phone: finalWinner.phone,
+            };
+
+            luckyWinners.unshift(winnerEntry);
+            saveLuckyWinnersToStorage();
+            rebuildLuckyEligiblePool();
+          }
 
           playWinnerFanfareSound();
           fireLuckyConfetti();
@@ -2453,6 +2642,7 @@
           spinIcon.classList.remove("animate-spin");
           spinLabel.textContent = "QUAY SỐ NGAY";
           spinBtn.disabled = luckyEligiblePool.length === 0;
+          demoBtn.disabled = false;
         }
       }
 
@@ -2523,15 +2713,15 @@
         return;
       }
 
-      // Đánh dấu vắng mặt để không quay trúng lại người đã rời hội trường
       const phoneKey = normalizePhoneKey(target.phone);
       if (phoneKey) luckyAbsentPhones.add(phoneKey);
 
       luckyWinners.splice(idx, 1);
       saveLuckyWinnersToStorage();
 
-      // Tự động đặt lại hạng mục giải vừa hủy để MC quay lại ngay
       selectedPrizeTier = target.prizeTier;
+      selectedPrizeGift = "";
+      renderPrizeTierPills();
       updateStagePrizeLabel();
       rebuildLuckyEligiblePool();
     }
@@ -2547,7 +2737,9 @@
 
     function enterLuckyFullscreen() {
       const container = document.getElementById("lucky-stage-container");
+      document.body.classList.add("lucky-led-mode");
       container.classList.add("lucky-fullscreen-active");
+      container.scrollTop = 0;
       isLuckyFullscreen = true;
       document.getElementById("lucky-fullscreen-label").textContent = "Thoát Toàn Màn Hình";
 
@@ -2558,6 +2750,7 @@
 
     function exitLuckyFullscreen() {
       const container = document.getElementById("lucky-stage-container");
+      document.body.classList.remove("lucky-led-mode");
       container.classList.remove("lucky-fullscreen-active");
       isLuckyFullscreen = false;
       document.getElementById("lucky-fullscreen-label").textContent = "Toàn Màn Hình LED";
