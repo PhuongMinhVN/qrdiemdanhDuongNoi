@@ -1159,6 +1159,15 @@
           >
             Cơ cấu trúng thưởng
           </button>
+          <button
+            type="button"
+            id="admin-subtab-logs"
+            onclick="switchAdminSubTab('logs')"
+            class="admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-400 hover:text-white flex items-center gap-1.5"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Nhật ký &amp; Truy cập (Log)</span>
+          </button>
         </div>
 
         <!-- ===== ADMIN SUB-TAB 1: DANH SÁCH ĐIỂM DANH ===== -->
@@ -1451,6 +1460,101 @@
                   </tr>
                 </thead>
                 <tbody id="admin-allocations-tbody" class="divide-y divide-slate-800/70 text-xs sm:text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ADMIN SUB-TAB 4: NHẬT KÝ TRUY CẬP & VẾT HÀNH ĐỘNG (LOG) ===== -->
+        <div id="admin-panel-logs" class="hidden space-y-5">
+          <!-- Active Visitors Online Card -->
+          <div class="glass-panel rounded-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+                <div>
+                  <h3 class="font-display font-bold text-base text-white">
+                    Thiết Bị Đang Truy Cập Trực Tuyến:
+                    <span id="log-online-count" class="text-emerald-400 font-mono text-lg ml-1">0</span>
+                  </h3>
+                  <p class="text-xs text-slate-400">Hiển thị các phiên đang hoạt động trong vòng 2 phút gần nhất</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onclick="loadAdminLogs()"
+                  class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                >
+                  <span>Làm mới Log</span>
+                </button>
+                <button
+                  type="button"
+                  onclick="downloadActivityLogFile()"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-glow transition"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  <span>Tải File Log (.log)</span>
+                </button>
+                <button
+                  type="button"
+                  onclick="clearActivityLogs()"
+                  class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/35 transition"
+                >
+                  <span>Xóa Log</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/90 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    <th class="py-3 px-4 whitespace-nowrap">Phiên (Session)</th>
+                    <th class="py-3 px-4 whitespace-nowrap">Địa chỉ IP</th>
+                    <th class="py-3 px-4 whitespace-nowrap">Thiết bị / Trình duyệt</th>
+                    <th class="py-3 px-4 whitespace-nowrap">Màn hình</th>
+                    <th class="py-3 px-4 whitespace-nowrap">Hành động gần nhất</th>
+                    <th class="py-3 px-4 whitespace-nowrap">Cập nhật lúc</th>
+                  </tr>
+                </thead>
+                <tbody id="log-online-tbody" class="divide-y divide-slate-800/70 text-xs sm:text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Action Trail Log Table -->
+          <div class="glass-panel rounded-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 class="font-display font-bold text-base text-white">Nhật Ký Vết Hành Động (Audit Trail)</h3>
+                <p class="text-xs text-slate-400">Ghi nhận chi tiết truy cập, quét CCCD, Check-in, đăng nhập Quản trị, thay đổi cơ cấu &amp; quay số</p>
+              </div>
+              <div class="relative w-full sm:w-72">
+                <input
+                  type="text"
+                  id="log-search-input"
+                  oninput="renderAdminLogsTable()"
+                  placeholder="Lọc theo hành động, IP, tên..."
+                  class="glass-input w-full px-3.5 py-2 rounded-xl text-xs text-white placeholder-slate-500"
+                />
+              </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[480px] overflow-y-auto">
+              <table class="w-full text-left border-collapse">
+                <thead class="sticky top-0 bg-slate-900 z-10">
+                  <tr class="border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    <th class="py-3 px-4 whitespace-nowrap">Thời gian</th>
+                    <th class="py-3 px-4 whitespace-nowrap">IP / Phiên</th>
+                    <th class="py-3 px-4 whitespace-nowrap">Thiết bị</th>
+                    <th class="py-3 px-4 whitespace-nowrap">Hành động</th>
+                    <th class="py-3 px-4">Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody id="log-events-tbody" class="divide-y divide-slate-800/70 text-xs"></tbody>
               </table>
             </div>
           </div>
@@ -2006,6 +2110,7 @@
       updateDataSourcePill();
       initLuckyDrawState();
       init3DBackground();
+      initActivityLogger();
 
       // Escape key exits presentation mode or lucky fullscreen
       document.addEventListener("keydown", (e) => {
@@ -2070,6 +2175,10 @@
       if (tabName === "lucky") {
         syncAuthGatesUI();
         if (isAdminAuthenticated) refreshLuckyPool();
+      }
+
+      if (typeof sendPresenceHeartbeat === "function") {
+        sendPresenceHeartbeat(`TAB:${tabName.toUpperCase()}`);
       }
     }
 
@@ -2314,6 +2423,11 @@
         form.classList.remove("hidden");
         document.getElementById("input-fullname").focus();
       }
+      if (mode === "cccd") {
+        recordActionLog("SELECT_MODE", "Chọn hình thức Check-in qua CCCD");
+      } else if (mode === "manual") {
+        recordActionLog("SELECT_MODE", "Chọn hình thức Tự điền thông tin");
+      }
     }
 
     function applyCCCDName(fullName, sourceLabel, cccdNumber = "") {
@@ -2325,6 +2439,7 @@
       if (formEl) formEl.classList.remove("hidden");
 
       const cccdNote = cccdNumber ? ` (Số CCCD: ${cccdNumber})` : "";
+      recordActionLog("CCCD_SCAN", `Đọc CCCD thành công (${sourceLabel}): ${fullName}${cccdNote}`);
       showCCCDFeedback(
         "success",
         `✓ Đã xác thực CCCD (${sourceLabel}): ${fullName}${cccdNote}. Kiểm tra thông tin bên dưới và nhấn "XÁC NHẬN CHECK-IN".`
@@ -2764,6 +2879,7 @@
 
       try {
         await saveCheckinRecord(record);
+        recordActionLog("CHECKIN_SUCCESS", `${record.fullName} | ${record.position} | ${record.organization} | ${record.id}`);
         // Lưu cờ khóa thiết bị vào localStorage
         localStorage.setItem(STORAGE_KEY_DEVICE_LOCK, JSON.stringify(record));
         renderDigitalEBadge(record);
@@ -2902,6 +3018,7 @@
       const card = document.getElementById("pass-3d-card");
       const btnLabel = document.getElementById("download-pass-label");
       const fileName = `TheRaVao_${(r.id || "MB").replace(/[^A-Za-z0-9_-]/g, "")}.png`;
+      recordActionLog("PASS_DOWNLOAD", `Tải ảnh thẻ ra vào: ${r.fullName} (#${r.id})`);
 
       if (btnLabel) btnLabel.textContent = "⏳ ĐANG TẠO ẢNH THẺ SẮC NÉT...";
 
@@ -3285,9 +3402,11 @@
         isAdminAuthenticated = true;
         errorEl.classList.add("hidden");
         input.value = "";
+        recordActionLog("ADMIN_LOGIN_OK", "Đăng nhập Quản Trị thành công");
         syncAuthGatesUI();
         loadAdminData();
       } else {
+        recordActionLog("ADMIN_LOGIN_FAIL", "Nhập sai mật khẩu Quản Trị");
         errorEl.classList.remove("hidden");
         gate.classList.remove("animate-shake");
         void gate.offsetWidth;
@@ -3306,9 +3425,11 @@
         isAdminAuthenticated = true;
         errorEl.classList.add("hidden");
         input.value = "";
+        recordActionLog("ADMIN_LOGIN_OK", "Đăng nhập khu vực Quay Số thành công");
         syncAuthGatesUI();
         refreshLuckyPool();
       } else {
+        recordActionLog("ADMIN_LOGIN_FAIL", "Nhập sai mật khẩu khu vực Quay Số");
         errorEl.classList.remove("hidden");
         gate.classList.remove("animate-shake");
         void gate.offsetWidth;
@@ -3507,6 +3628,7 @@
       const fileName = `DiemDanh_Mobifone_Betatech_${dateStr}.xlsx`;
 
       XLSX.writeFile(workbook, fileName);
+      recordActionLog("EXCEL_EXPORT", `Xuất file ${fileName} (${adminRecords.length} đại biểu, ${luckyWinners.length} trúng thưởng)`);
     }
 
     async function clearLocalTestData() {
@@ -3517,6 +3639,7 @@
       if (!confirm(msg)) {
         return;
       }
+      recordActionLog("CLEAR_DATA", `Xóa dữ liệu Check-in (${activeStorageMode})`);
       if (activeStorageMode === "cloudflare_kv") {
         try {
           await fetch("/api/checkins", {
@@ -3574,22 +3697,24 @@
     }
 
     function switchAdminSubTab(subTab) {
-      const panels = ["attendees", "prizes", "allocations"];
+      const panels = ["attendees", "prizes", "allocations", "logs"];
       panels.forEach((p) => {
         const panel = document.getElementById(`admin-panel-${p}`);
         const btn = document.getElementById(`admin-subtab-${p}`);
         if (!panel || !btn) return;
+        const extraFlex = p === "logs" ? " flex items-center gap-1.5" : "";
         if (p === subTab) {
           panel.classList.remove("hidden");
-          btn.className = "admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow";
+          btn.className = `admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow${extraFlex}`;
         } else {
           panel.classList.add("hidden");
-          btn.className = "admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-400 hover:text-white";
+          btn.className = `admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-400 hover:text-white${extraFlex}`;
         }
       });
 
       if (subTab === "prizes") renderAdminPrizesTable();
       if (subTab === "allocations") renderAdminAllocationsUI();
+      if (subTab === "logs") loadAdminLogs();
     }
 
     async function syncConfigFromCloudflareKV() {
@@ -4033,6 +4158,7 @@
 
       pendingAllocPhotoDataUrl = "";
       saveLuckyAllocationsToStorage();
+      recordActionLog("ALLOCATION_ADD", `Thêm cơ cấu ${prizeTier} -> ${targetName || targetCCCD}`);
       document.getElementById("alloc-target-name").value = "";
       document.getElementById("alloc-target-cccd").value = "";
       clearAllocationSearch();
@@ -4051,6 +4177,7 @@
     function deleteAllocationRule(ruleId) {
       luckyAllocations = luckyAllocations.filter((a) => a.id !== ruleId);
       saveLuckyAllocationsToStorage();
+      recordActionLog("ALLOCATION_DELETE", `Xóa cấu hình cơ cấu (${ruleId})`);
       renderAdminAllocationsUI();
     }
 
@@ -4655,6 +4782,7 @@
 
             luckyWinners.unshift(winnerEntry);
             saveLuckyWinnersToStorage();
+            recordActionLog("LUCKY_SPIN", `Quay trúng ${winnerEntry.prizeTier}: ${winnerEntry.fullName}`);
             if (allocatedMatch && allocatedMatch.rule) {
               allocatedMatch.rule.used = true;
               saveLuckyAllocationsToStorage();
@@ -4763,6 +4891,7 @@
       luckyAllocations.forEach((a) => (a.used = false));
       saveLuckyWinnersToStorage();
       saveLuckyAllocationsToStorage();
+      recordActionLog("LUCKY_RESET", "Đặt lại toàn bộ Danh Sách Trúng Thưởng & vòng quay");
       syncUpcomingPrizeBanner();
       renderAdminPrizesTable();
       renderAdminAllocationsUI();
@@ -5020,6 +5149,269 @@
       }
 
       requestAnimationFrame(render3D);
+    }
+
+    /* =========================================================================
+     * HỆ THỐNG GHI LOG TRUY CẬP TRỰC TUYẾN & VẾT HÀNH ĐỘNG (AUDIT LOG)
+     * ========================================================================= */
+    const STORAGE_KEY_LOCAL_LOGS = "mb_bt_activity_logs_v1";
+    let adminLogEvents = [];
+    let adminActiveSessions = [];
+    let visitorSessionId = "";
+
+    function getOrCreateSessionId() {
+      if (visitorSessionId) return visitorSessionId;
+      try {
+        let existing = sessionStorage.getItem("mb_bt_session_id");
+        if (!existing) {
+          existing = `SES-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+          sessionStorage.setItem("mb_bt_session_id", existing);
+        }
+        visitorSessionId = existing;
+      } catch (_) {
+        visitorSessionId = `SES-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+      }
+      return visitorSessionId;
+    }
+
+    function getClientDeviceSummary() {
+      const ua = navigator.userAgent || "";
+      const type = /Mobi|Android|iPhone|iPad/i.test(ua) ? "Mobile" : "Desktop";
+      const os = /iPhone|iPad/i.test(ua)
+        ? "iOS"
+        : /Android/i.test(ua)
+        ? "Android"
+        : /Windows/i.test(ua)
+        ? "Windows"
+        : /Mac/i.test(ua)
+        ? "macOS"
+        : "Khác";
+      return `${type} • ${os}`;
+    }
+
+    function initActivityLogger() {
+      getOrCreateSessionId();
+      recordActionLog("PAGE_VISIT", `Mở trang ${window.location.pathname || "/"}`);
+      setInterval(() => {
+        if (!document.hidden) {
+          sendPresenceHeartbeat("ONLINE");
+        }
+      }, 45000);
+    }
+
+    function sendPresenceHeartbeat(actionLabel = "ONLINE") {
+      if (!window.location.protocol.startsWith("http")) return;
+      const payload = {
+        type: "HEARTBEAT",
+        sessionId: getOrCreateSessionId(),
+        tab: currentTab,
+        action: actionLabel,
+        time: formatVietnameseTimestamp(new Date()),
+      };
+      fetch("/api/logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch(() => {});
+    }
+
+    function recordActionLog(action, detail = "") {
+      const now = new Date();
+      const entry = {
+        type: "EVENT",
+        time: formatVietnameseTimestamp(now),
+        isoTime: now.toISOString(),
+        ts: now.getTime(),
+        sessionId: getOrCreateSessionId(),
+        ip: "local",
+        device: getClientDeviceSummary(),
+        tab: currentTab,
+        action: String(action || "EVENT"),
+        detail: String(detail || ""),
+      };
+
+      // Lưu dự phòng cục bộ
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_LOCAL_LOGS);
+        const arr = raw ? JSON.parse(raw) : [];
+        arr.unshift(entry);
+        localStorage.setItem(STORAGE_KEY_LOCAL_LOGS, JSON.stringify(arr.slice(0, 200)));
+      } catch (_) {}
+
+      // Gửi về Cloudflare KV (/api/logs) không chặn luồng người dùng
+      if (window.location.protocol.startsWith("http")) {
+        fetch("/api/logs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entry),
+          keepalive: true,
+        }).catch(() => {});
+      }
+    }
+
+    async function loadAdminLogs() {
+      if (!isAdminAuthenticated) return;
+      let loadedFromKV = false;
+
+      if (window.location.protocol.startsWith("http")) {
+        try {
+          const res = await fetch("/api/logs", {
+            method: "GET",
+            headers: { "X-Admin-Password": ADMIN_PASSWORD },
+            cache: "no-store",
+          });
+          if (res.ok) {
+            const json = await res.json();
+            if (json && json.status === "success") {
+              adminActiveSessions = Array.isArray(json.activeSessions) ? json.activeSessions : [];
+              adminLogEvents = Array.isArray(json.logs) ? json.logs : [];
+              loadedFromKV = true;
+            }
+          }
+        } catch (_) {}
+      }
+
+      if (!loadedFromKV) {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_LOCAL_LOGS);
+          adminLogEvents = raw ? JSON.parse(raw) : [];
+        } catch (_) {
+          adminLogEvents = [];
+        }
+        adminActiveSessions = [
+          {
+            sessionId: getOrCreateSessionId(),
+            ip: "Local",
+            device: getClientDeviceSummary(),
+            tab: currentTab,
+            lastAction: "ONLINE",
+            lastSeen: formatVietnameseTimestamp(new Date()),
+          },
+        ];
+      }
+
+      renderAdminOnlineTable();
+      renderAdminLogsTable();
+    }
+
+    function renderAdminOnlineTable() {
+      const countEl = document.getElementById("log-online-count");
+      const tbody = document.getElementById("log-online-tbody");
+      if (!countEl || !tbody) return;
+
+      countEl.textContent = adminActiveSessions.length;
+      if (adminActiveSessions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500">Chưa ghi nhận thiết bị đang truy cập.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = adminActiveSessions
+        .map(
+          (s) => `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-4 font-mono text-xs text-emerald-300 font-bold whitespace-nowrap">
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span>${escapeHtml(s.sessionId)}
+            </td>
+            <td class="py-2.5 px-4 font-mono text-xs text-cyan-300 whitespace-nowrap">${escapeHtml(s.ip || "—")}</td>
+            <td class="py-2.5 px-4 text-slate-200 whitespace-nowrap">${escapeHtml(s.device || "—")}</td>
+            <td class="py-2.5 px-4 text-xs uppercase font-semibold text-amber-300 whitespace-nowrap">${escapeHtml(s.tab || "checkin")}</td>
+            <td class="py-2.5 px-4 text-slate-300 whitespace-nowrap">${escapeHtml(s.lastAction || "ONLINE")}</td>
+            <td class="py-2.5 px-4 font-mono text-xs text-slate-400 whitespace-nowrap">${escapeHtml(s.lastSeen || "")}</td>
+          </tr>`
+        )
+        .join("");
+    }
+
+    function getActionBadgeHtml(action) {
+      const a = String(action || "EVENT");
+      if (a.includes("FAIL") || a.includes("CLEAR")) {
+        return `<span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/35">${escapeHtml(a)}</span>`;
+      }
+      if (a.includes("CHECKIN") || a.includes("LUCKY_SPIN")) {
+        return `<span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/35">${escapeHtml(a)}</span>`;
+      }
+      if (a.includes("ADMIN") || a.includes("ALLOCATION") || a.includes("EXCEL")) {
+        return `<span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/35">${escapeHtml(a)}</span>`;
+      }
+      return `<span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">${escapeHtml(a)}</span>`;
+    }
+
+    function renderAdminLogsTable() {
+      const tbody = document.getElementById("log-events-tbody");
+      if (!tbody) return;
+      const q = normalizeVietnameseSearch((document.getElementById("log-search-input") || {}).value || "");
+
+      const filtered = adminLogEvents.filter((l) => {
+        if (!q) return true;
+        return normalizeVietnameseSearch(`${l.time} ${l.ip} ${l.sessionId} ${l.device} ${l.action} ${l.detail}`).includes(q);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">Chưa có bản ghi log nào phù hợp.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered
+        .map(
+          (l) => `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-4 font-mono text-cyan-300 whitespace-nowrap">${escapeHtml(l.time)}</td>
+            <td class="py-2.5 px-4 font-mono text-slate-300 whitespace-nowrap">${escapeHtml(l.ip || "—")} <span class="text-slate-500">(${escapeHtml(l.sessionId || "")})</span></td>
+            <td class="py-2.5 px-4 text-slate-300 whitespace-nowrap">${escapeHtml(l.device || "—")}</td>
+            <td class="py-2.5 px-4 whitespace-nowrap">${getActionBadgeHtml(l.action)}</td>
+            <td class="py-2.5 px-4 text-slate-200">${escapeHtml(l.detail || "—")}</td>
+          </tr>`
+        )
+        .join("");
+    }
+
+    function downloadActivityLogFile() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+      const headerLines = [
+        "================================================================================",
+        `NHAT KY TRUY CAP & VET HANH DONG - UBND PHUONG DUONG NOI`,
+        `Xuat luc: ${formatVietnameseTimestamp(now)}`,
+        `Thiet bi dang truc tuyen: ${adminActiveSessions.length} | Tong ban ghi log: ${adminLogEvents.length}`,
+        "================================================================================",
+        "",
+        "--- [1] THIET BI DANG TRUY CAP TRUC TUYEN ---",
+        ...adminActiveSessions.map(
+          (s) => `[ONLINE] ${s.lastSeen} | IP=${s.ip} | Session=${s.sessionId} | Device=${s.device} | Tab=${s.tab} | Action=${s.lastAction}`
+        ),
+        "",
+        "--- [2] LICH SU VET HANH DONG (AUDIT TRAIL) ---",
+        ...adminLogEvents.map(
+          (l) => `[${l.time}] [${l.action}] IP=${l.ip} | Session=${l.sessionId} | Device=${l.device} | Tab=${l.tab} | Detail=${l.detail}`
+        ),
+      ];
+
+      const blob = new Blob([headerLines.join("\r\n")], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `NhatKyTruyCap_UBND_DuongNoi_${dateStr}.log`;
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }
+
+    async function clearActivityLogs() {
+      if (!confirm("Bạn có chắc muốn xóa toàn bộ lịch sử vết hành động (Log)?")) return;
+      if (window.location.protocol.startsWith("http")) {
+        try {
+          await fetch("/api/logs", {
+            method: "DELETE",
+            headers: { "X-Admin-Password": ADMIN_PASSWORD },
+          });
+        } catch (_) {}
+      }
+      localStorage.removeItem(STORAGE_KEY_LOCAL_LOGS);
+      loadAdminLogs();
     }
   </script>
 </body>
