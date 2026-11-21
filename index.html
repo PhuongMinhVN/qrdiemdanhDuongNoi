@@ -4134,9 +4134,7 @@
             (c) => !isCandidateReservedForOtherPrize(c, selectedPrizeTier)
           );
           if (nonReservedPool.length === 0) {
-            alert(
-              `Các đại biểu còn lại đang được cơ cấu cho hạng mục giải khác (không phải "${selectedPrizeTier}"). Vui lòng chọn đúng hạng mục giải đã cơ cấu để quay!`
-            );
+            alert("Chưa có thêm đại biểu hợp lệ cho lượt quay này.");
             return;
           }
           finalWinner = nonReservedPool[getSecureRandomInt(nonReservedPool.length)];
