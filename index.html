@@ -300,6 +300,113 @@
       }
     }
 
+    /* ==================== 3D FULLSCREEN VERTICAL ACCESS PASS ==================== */
+    body.ebadge-fullscreen-mode > header,
+    body.ebadge-fullscreen-mode > footer,
+    body.ebadge-fullscreen-mode #checkin-hero-header {
+      display: none !important;
+    }
+    .ebadge-fullscreen-stage {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 45 !important;
+      overflow-y: auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 1rem 0.9rem 1.4rem !important;
+      background: radial-gradient(circle at 50% 25%, rgba(6, 182, 212, 0.14), rgba(4, 9, 20, 0.45)) !important;
+    }
+    .pass-3d-scene {
+      perspective: 1100px;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    @keyframes passIdle3D {
+      0%, 100% { transform: rotateX(2.5deg) rotateY(-4deg) translateY(0px); }
+      50% { transform: rotateX(-2.5deg) rotateY(4deg) translateY(-6px); }
+    }
+    .pass-3d-card {
+      position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
+      border-radius: 2rem;
+      background:
+        radial-gradient(circle at 85% 12%, rgba(34, 211, 238, 0.22), transparent 45%),
+        radial-gradient(circle at 12% 88%, rgba(0, 96, 175, 0.34), transparent 50%),
+        linear-gradient(160deg, rgba(12, 28, 66, 0.96) 0%, rgba(5, 13, 32, 0.98) 52%, rgba(7, 40, 68, 0.96) 100%);
+      border: 1.5px solid rgba(56, 189, 248, 0.55);
+      box-shadow:
+        0 30px 70px -15px rgba(0, 0, 0, 0.9),
+        0 0 45px -8px rgba(34, 211, 238, 0.45),
+        inset 0 1px 1px rgba(255, 255, 255, 0.28),
+        inset 0 -1px 1px rgba(6, 182, 212, 0.25);
+      overflow: hidden;
+      animation: passIdle3D 6.5s ease-in-out infinite;
+      transition: transform 0.14s ease-out;
+    }
+    .pass-3d-card.is-tilting {
+      animation: none;
+    }
+    .pass-glare {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+      background: radial-gradient(
+        circle at var(--glare-x, 50%) var(--glare-y, 35%),
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(34, 211, 238, 0.14) 22%,
+        rgba(168, 85, 247, 0.08) 42%,
+        transparent 68%
+      );
+      mix-blend-mode: screen;
+    }
+    .pass-lanyard-slot {
+      width: 68px;
+      height: 12px;
+      border-radius: 9999px;
+      background: #030712;
+      border: 1.5px solid rgba(148, 163, 184, 0.45);
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(255, 255, 255, 0.2);
+      margin: 0 auto;
+    }
+    .pass-smart-chip {
+      width: 44px;
+      height: 32px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #fde047 0%, #eab308 45%, #fef08a 70%, #ca8a04 100%);
+      border: 1px solid rgba(254, 240, 138, 0.7);
+      box-shadow: 0 2px 10px rgba(234, 179, 8, 0.35), inset 0 0 0 1px rgba(113, 63, 18, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .pass-smart-chip::before,
+    .pass-smart-chip::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(113, 63, 18, 0.45);
+    }
+    .pass-smart-chip::before {
+      inset: 6px 0;
+      border-left: 0;
+      border-right: 0;
+    }
+    .pass-smart-chip::after {
+      inset: 0 13px;
+      border-top: 0;
+      border-bottom: 0;
+    }
+    #badge-mini-qr canvas,
+    #badge-mini-qr img {
+      width: 74px !important;
+      height: 74px !important;
+      border-radius: 0.45rem;
+      display: block;
+    }
+
     /* QR Code container image styling */
     #hall-qr-container img,
     #hall-qr-container canvas,
@@ -416,7 +523,7 @@
       <div class="checkin-mobile-wrap w-[92vw] sm:w-full max-w-2xl mx-auto">
 
         <!-- Co-branding Hero Header -->
-        <div class="text-center mb-6">
+        <div id="checkin-hero-header" class="text-center mb-6">
           <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 shadow-glow mb-4">
             <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
             <span class="font-display font-extrabold tracking-widest text-xs sm:text-sm">
@@ -580,78 +687,128 @@
           </form>
         </div>
 
-        <!-- ==================== DIGITAL E-BADGE (POST CHECK-IN) ==================== -->
+        <!-- ==================== 3D FULL-SCREEN VERTICAL ACCESS PASS (POST CHECK-IN) ==================== -->
         <div id="ebadge-wrapper" class="hidden fade-up">
-          <div class="holo-badge rounded-3xl p-6 sm:p-8 text-white">
-            <!-- Top Badge Strip -->
-            <div class="relative z-10 flex items-center justify-between border-b border-cyan-400/20 pb-4 mb-6">
-              <div>
-                <div class="font-display font-extrabold tracking-widest text-sm sm:text-base">
-                  <span class="text-blue-400">MOBIFONE</span>
-                  <span class="text-slate-400 mx-1">×</span>
-                  <span class="text-cyan-300">BETATECH</span>
+          <div class="pass-3d-scene">
+            <div id="pass-3d-card" class="pass-3d-card p-5 sm:p-6 text-white">
+              <!-- Interactive Specular Hologram Glare -->
+              <div class="pass-glare"></div>
+              <!-- Holographic Sweep Layer -->
+              <div class="holo-badge absolute inset-0 opacity-30 pointer-events-none border-0 shadow-none"></div>
+
+              <!-- Lanyard Punch-Hole Slot -->
+              <div class="relative z-10 pb-3.5">
+                <div class="pass-lanyard-slot"></div>
+              </div>
+
+              <!-- Top Brand & Verified Status -->
+              <div class="relative z-10 flex items-center justify-between border-b border-cyan-400/25 pb-3.5 mb-4">
+                <div>
+                  <div class="font-display font-extrabold tracking-[0.14em] text-sm sm:text-base">
+                    <span class="text-blue-400">MOBIFONE</span>
+                    <span class="text-cyan-200 mx-1">&amp;</span>
+                    <span class="text-cyan-300">BETATECH</span>
+                  </div>
+                  <p class="text-[10px] uppercase tracking-[0.22em] text-cyan-200/80 mt-0.5 font-semibold">Thẻ Ra Vào Hội Nghị</p>
                 </div>
-                <p class="text-[11px] uppercase tracking-[0.2em] text-cyan-200/80 mt-0.5">Thẻ Đại Biểu Điện Tử</p>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-[11px] font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span>ĐÃ ĐIỂM DANH</span>
+                </div>
               </div>
-              <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>ĐÃ ĐIỂM DANH</span>
-              </div>
-            </div>
 
-            <!-- Verified Emblem & Attendee Name -->
-            <div class="relative z-10 text-center mb-6">
-              <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-emerald-400/25 to-cyan-500/25 border border-emerald-400/40 flex items-center justify-center shadow-glow">
-                <svg class="w-9 h-9 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-                </svg>
+              <!-- Smart Chip + NFC + VIP Pass Label -->
+              <div class="relative z-10 flex items-center justify-between mb-5 px-1">
+                <div class="flex items-center gap-2.5">
+                  <div class="pass-smart-chip"></div>
+                  <svg class="w-5 h-5 text-cyan-300/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" />
+                  </svg>
+                </div>
+                <span class="text-[10px] font-mono uppercase tracking-[0.25em] px-2.5 py-1 rounded-md bg-cyan-500/15 border border-cyan-400/30 text-cyan-200 font-bold">
+                  ACCESS PASS 2026
+                </span>
               </div>
-              <p class="text-[11px] uppercase tracking-[0.22em] text-cyan-300/80 font-semibold">Đại Biểu Tham Dự</p>
-              <h2 id="badge-name" class="font-display text-2xl sm:text-3xl font-extrabold text-white mt-1 tracking-tight break-words">
-                —
-              </h2>
-              <p id="badge-position" class="text-sm sm:text-base font-semibold text-cyan-300 mt-1">
-                —
-              </p>
-            </div>
 
-            <!-- Details Grid -->
-            <div class="relative z-10 space-y-3 bg-slate-950/55 rounded-2xl p-4 border border-cyan-500/20">
-              <div class="flex items-start justify-between gap-4 border-b border-slate-800/80 pb-2.5">
-                <span class="text-xs text-slate-400 shrink-0">Cơ quan / Đơn vị</span>
-                <span id="badge-org" class="text-xs sm:text-sm font-semibold text-white text-right">—</span>
+              <!-- Verified Emblem & Attendee Identity -->
+              <div class="relative z-10 text-center mb-5">
+                <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-emerald-400/30 via-cyan-500/25 to-blue-600/30 border border-emerald-400/50 flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.35)]">
+                  <svg class="w-9 h-9 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                  </svg>
+                </div>
+                <p class="text-[10px] uppercase tracking-[0.28em] text-cyan-300/85 font-bold">Đại Biểu Tham Dự</p>
+                <h2 id="badge-name" class="font-display text-2xl sm:text-3xl font-extrabold text-white mt-1 tracking-tight break-words uppercase drop-shadow-[0_2px_12px_rgba(34,211,238,0.35)]">
+                  —
+                </h2>
+                <p id="badge-position" class="text-sm font-semibold text-cyan-300 mt-1">
+                  —
+                </p>
               </div>
-              <div class="flex items-center justify-between gap-4 border-b border-slate-800/80 pb-2.5">
-                <span class="text-xs text-slate-400 shrink-0">Số điện thoại</span>
-                <span id="badge-phone" class="text-xs sm:text-sm font-mono font-semibold text-slate-200 text-right">—</span>
-              </div>
-              <div class="flex items-center justify-between gap-4 border-b border-slate-800/80 pb-2.5">
-                <span class="text-xs text-slate-400 shrink-0">Thời gian điểm danh</span>
-                <span id="badge-time" class="text-xs sm:text-sm font-mono font-semibold text-cyan-300 text-right">—</span>
-              </div>
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-xs text-slate-400 shrink-0">Trạng thái GPS</span>
-                <span id="badge-gps" class="text-xs font-semibold text-right">—</span>
-              </div>
-            </div>
 
-            <!-- Reception Instruction Footer -->
-            <div class="relative z-10 mt-5 pt-4 border-t border-cyan-400/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-              <p class="text-xs text-slate-300">
-                Vui lòng xuất trình thẻ điện tử này tại bàn lễ tân hội trường.
-              </p>
-              <span id="badge-code" class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/25 text-cyan-300 shrink-0">
-                #MB-0000
-              </span>
+              <!-- Info Table -->
+              <div class="relative z-10 space-y-2.5 bg-slate-950/60 backdrop-blur-md rounded-2xl p-4 border border-cyan-500/25 mb-5">
+                <div class="flex items-start justify-between gap-3 border-b border-slate-800/80 pb-2">
+                  <span class="text-xs text-slate-400 shrink-0">Đơn vị / CCCD</span>
+                  <span id="badge-org" class="text-xs sm:text-sm font-semibold text-white text-right break-words">—</span>
+                </div>
+                <div class="flex items-center justify-between gap-3 border-b border-slate-800/80 pb-2">
+                  <span class="text-xs text-slate-400 shrink-0">Số điện thoại</span>
+                  <span id="badge-phone" class="text-xs sm:text-sm font-mono font-semibold text-slate-200 text-right">—</span>
+                </div>
+                <div class="flex items-center justify-between gap-3 border-b border-slate-800/80 pb-2">
+                  <span class="text-xs text-slate-400 shrink-0">Thời gian vào</span>
+                  <span id="badge-time" class="text-xs sm:text-sm font-mono font-semibold text-cyan-300 text-right">—</span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-xs text-slate-400 shrink-0">Trạng thái GPS</span>
+                  <span id="badge-gps" class="text-xs font-semibold text-right">—</span>
+                </div>
+              </div>
+
+              <!-- Bottom Security Strip with Mini Verification QR -->
+              <div class="relative z-10 pt-3.5 border-t border-cyan-400/25 flex items-center justify-between gap-3">
+                <div class="text-left min-w-0">
+                  <span id="badge-code" class="inline-block text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-cyan-500/15 border border-cyan-400/35 text-cyan-200 mb-1.5">
+                    #MB-0000
+                  </span>
+                  <p class="text-[11px] text-slate-300 leading-snug">
+                    Xuất trình thẻ ra vào điện tử này tại cửa kiểm soát hội trường.
+                  </p>
+                </div>
+                <div class="p-1.5 rounded-xl bg-white shadow-glow shrink-0">
+                  <div id="badge-mini-qr"></div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Subtle Reset Link for Device Lock -->
-          <div class="text-center mt-5">
+          <!-- Action Controls Below 3D Pass -->
+          <div class="mt-4 w-full max-w-[420px] mx-auto flex flex-col items-center gap-2.5">
+            <div class="grid grid-cols-2 gap-2.5 w-full">
+              <button
+                type="button"
+                onclick="downloadPassAsPNG()"
+                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-glow transition"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                <span>Lưu ảnh thẻ (.PNG)</span>
+              </button>
+              <button
+                type="button"
+                id="toggle-ebadge-menu-btn"
+                onclick="toggleEBadgeFullscreen()"
+                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 transition"
+              >
+                <span id="toggle-ebadge-menu-label">Hiện thanh menu</span>
+              </button>
+            </div>
             <button
               type="button"
               onclick="resetDeviceLock()"
-              class="text-xs text-slate-400 hover:text-cyan-300 underline underline-offset-4 transition"
+              class="text-xs text-slate-400 hover:text-cyan-300 underline underline-offset-4 transition pt-0.5"
             >
               Điểm danh cho đại biểu khác
             </button>
@@ -1400,6 +1557,9 @@
      * ========================================================================= */
     function switchTab(tabName) {
       currentTab = tabName;
+      if (tabName !== "checkin" && isEBadgeFullscreen) {
+        setEBadgeFullscreen(false);
+      }
       const tabs = ["checkin", "qr", "admin", "lucky"];
 
       tabs.forEach((t) => {
@@ -2113,7 +2273,12 @@
       document.getElementById("ebadge-wrapper").classList.add("hidden");
     }
 
+    let currentBadgeRecord = null;
+    let isEBadgeFullscreen = false;
+    let passTiltInitialized = false;
+
     function renderDigitalEBadge(record) {
+      currentBadgeRecord = record;
       document.getElementById("badge-name").textContent = record.fullName;
       document.getElementById("badge-position").textContent = record.position;
       document.getElementById("badge-org").textContent = record.organization;
@@ -2133,12 +2298,217 @@
         gpsEl.textContent = record.gpsLabel || "Chế độ tiêu chuẩn";
       }
 
+      // Tạo mã QR xác thực mini trên thẻ ra vào
+      const miniQrBox = document.getElementById("badge-mini-qr");
+      if (miniQrBox) {
+        const verifyPayload = `${record.id || "MB"}|${record.fullName}|${record.timestamp}`;
+        renderQRCodeInto(miniQrBox, verifyPayload, 140);
+      }
+
       document.getElementById("checkin-form-wrapper").classList.add("hidden");
       document.getElementById("ebadge-wrapper").classList.remove("hidden");
+
+      // Mặc định bật chế độ thẻ ra vào dọc toàn màn hình 3D trên điện thoại
+      setEBadgeFullscreen(true);
+      init3DPassTilt();
+    }
+
+    function setEBadgeFullscreen(active) {
+      const wrapper = document.getElementById("ebadge-wrapper");
+      const label = document.getElementById("toggle-ebadge-menu-label");
+      isEBadgeFullscreen = Boolean(active);
+
+      if (isEBadgeFullscreen && currentTab === "checkin") {
+        document.body.classList.add("ebadge-fullscreen-mode");
+        wrapper.classList.add("ebadge-fullscreen-stage");
+        if (label) label.textContent = "Hiện thanh menu";
+      } else {
+        document.body.classList.remove("ebadge-fullscreen-mode");
+        wrapper.classList.remove("ebadge-fullscreen-stage");
+        if (label) label.textContent = "Toàn màn hình 3D";
+      }
+    }
+
+    function toggleEBadgeFullscreen() {
+      setEBadgeFullscreen(!isEBadgeFullscreen);
+    }
+
+    function init3DPassTilt() {
+      if (passTiltInitialized) return;
+      const card = document.getElementById("pass-3d-card");
+      if (!card) return;
+      passTiltInitialized = true;
+
+      const applyTilt = (rx, ry, gx, gy) => {
+        card.classList.add("is-tilting");
+        card.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
+        card.style.setProperty("--glare-x", `${gx.toFixed(1)}%`);
+        card.style.setProperty("--glare-y", `${gy.toFixed(1)}%`);
+      };
+
+      const resetTilt = () => {
+        card.style.transform = "";
+        card.classList.remove("is-tilting");
+      };
+
+      const handlePointer = (clientX, clientY) => {
+        const rect = card.getBoundingClientRect();
+        const px = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const py = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+        const ry = (px - 0.5) * 20;
+        const rx = (0.5 - py) * 18;
+        applyTilt(rx, ry, px * 100, py * 100);
+      };
+
+      card.addEventListener("mousemove", (e) => handlePointer(e.clientX, e.clientY));
+      card.addEventListener("mouseleave", resetTilt);
+      card.addEventListener("touchmove", (e) => {
+        if (e.touches && e.touches[0]) {
+          handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+      card.addEventListener("touchend", resetTilt);
+
+      // Hỗ trợ cảm biến nghiêng con quay hồi chuyển trên điện thoại
+      if (window.DeviceOrientationEvent) {
+        window.addEventListener("deviceorientation", (e) => {
+          if (!currentBadgeRecord || document.getElementById("ebadge-wrapper").classList.contains("hidden")) return;
+          if (typeof e.beta !== "number" || typeof e.gamma !== "number") return;
+          const ry = Math.max(-14, Math.min(14, e.gamma * 0.45));
+          const rx = Math.max(-12, Math.min(12, (e.beta - 45) * 0.35));
+          const gx = 50 + (ry / 14) * 35;
+          const gy = 45 - (rx / 12) * 30;
+          applyTilt(rx, ry, gx, gy);
+        });
+      }
+    }
+
+    function downloadPassAsPNG() {
+      if (!currentBadgeRecord) return;
+      const r = currentBadgeRecord;
+      const c = document.createElement("canvas");
+      c.width = 1080;
+      c.height = 1920;
+      const ctx = c.getContext("2d");
+
+      // Nền dọc 9:16 công nghệ cao
+      const bg = ctx.createLinearGradient(0, 0, 1080, 1920);
+      bg.addColorStop(0, "#0b2452");
+      bg.addColorStop(0.5, "#051026");
+      bg.addColorStop(1, "#072e4d");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      // Hào quang phát sáng
+      const glow = ctx.createRadialGradient(540, 560, 40, 540, 560, 540);
+      glow.addColorStop(0, "rgba(34, 211, 238, 0.25)");
+      glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      // Khung thẻ bo góc
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.65)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(70, 90, 940, 1740, 64);
+      ctx.stroke();
+
+      // Khe dây đeo thẻ
+      ctx.fillStyle = "#020617";
+      ctx.beginPath();
+      ctx.roundRect(450, 140, 180, 32, 16);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.5)";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Thương hiệu MOBIFONE & BETATECH
+      ctx.textAlign = "center";
+      ctx.font = "800 44px 'Plus Jakarta Sans', Inter, sans-serif";
+      ctx.fillStyle = "#60a5fa";
+      ctx.fillText("MOBIFONE  &  BETATECH", 540, 275);
+      ctx.font = "600 26px Inter, sans-serif";
+      ctx.fillStyle = "#a5f3fc";
+      ctx.fillText("THẺ RA VÀO HỘI NGHỊ ĐIỆN TỬ", 540, 325);
+
+      // Huy hiệu ĐÃ ĐIỂM DANH
+      ctx.fillStyle = "rgba(16, 185, 129, 0.2)";
+      ctx.beginPath();
+      ctx.roundRect(350, 375, 380, 64, 32);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(52, 211, 153, 0.7)";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.font = "700 28px Inter, sans-serif";
+      ctx.fillStyle = "#6ee7b7";
+      ctx.fillText("✓  ĐÃ ĐIỂM DANH", 540, 417);
+
+      // Họ và tên nổi bật
+      ctx.font = "600 24px Inter, sans-serif";
+      ctx.fillStyle = "#67e8f9";
+      ctx.fillText("ĐẠI BIỂU THAM DỰ", 540, 560);
+      ctx.font = "800 62px 'Plus Jakarta Sans', Inter, sans-serif";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(String(r.fullName || "").toUpperCase(), 540, 645);
+      ctx.font = "600 34px Inter, sans-serif";
+      ctx.fillStyle = "#22d3ee";
+      ctx.fillText(r.position || "", 540, 705);
+
+      // Bảng chi tiết
+      ctx.fillStyle = "rgba(2, 6, 23, 0.65)";
+      ctx.beginPath();
+      ctx.roundRect(130, 780, 820, 480, 36);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(34, 211, 238, 0.3)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      const rows = [
+        ["Đơn vị / CCCD", r.organization || "—"],
+        ["Số điện thoại", r.phone || "—"],
+        ["Thời gian vào", r.timestamp || "—"],
+        ["Trạng thái GPS", r.gpsLabel || "Chế độ tiêu chuẩn"],
+      ];
+      rows.forEach(([k, v], i) => {
+        const y = 875 + i * 105;
+        ctx.textAlign = "left";
+        ctx.font = "500 28px Inter, sans-serif";
+        ctx.fillStyle = "#94a3b8";
+        ctx.fillText(k, 175, y);
+        ctx.textAlign = "right";
+        ctx.font = "700 28px Inter, sans-serif";
+        ctx.fillStyle = i === 2 ? "#22d3ee" : "#ffffff";
+        ctx.fillText(String(v).slice(0, 34), 905, y);
+      });
+
+      // Vẽ lại mã QR xác thực từ mini QR
+      const qrCanvas = document.querySelector("#badge-mini-qr canvas");
+      if (qrCanvas) {
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.roundRect(390, 1340, 300, 300, 28);
+        ctx.fill();
+        ctx.drawImage(qrCanvas, 412, 1362, 256, 256);
+      }
+
+      ctx.textAlign = "center";
+      ctx.font = "700 30px monospace";
+      ctx.fillStyle = "#67e8f9";
+      ctx.fillText(`MÃ THẺ: #${r.id || "MB-PASS"}`, 540, 1715);
+      ctx.font = "500 24px Inter, sans-serif";
+      ctx.fillStyle = "#cbd5e1";
+      ctx.fillText("Xuất trình thẻ ra vào này tại cửa kiểm soát hội trường", 540, 1765);
+
+      const link = document.createElement("a");
+      link.download = `TheRaVao_${(r.id || "MB").replace(/[^A-Za-z0-9_-]/g, "")}.png`;
+      link.href = c.toDataURL("image/png");
+      link.click();
     }
 
     function resetDeviceLock() {
       localStorage.removeItem(STORAGE_KEY_DEVICE_LOCK);
+      currentBadgeRecord = null;
+      setEBadgeFullscreen(false);
       setCCCDVerifiedMode(false, "");
       document.getElementById("ebadge-wrapper").classList.add("hidden");
       document.getElementById("checkin-form-wrapper").classList.remove("hidden");
