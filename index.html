@@ -1604,14 +1604,33 @@
                 Sẵn sàng tìm chủ nhân may mắn
               </p>
 
-              <!-- Prominent Winner Portrait / 3D Holographic Medallion -->
+              <!-- Prominent Winner Medallion (Uploaded Photo or Vietnam National Flag) -->
               <div id="stage-winner-avatar-wrap" class="hidden mb-4 relative">
                 <div class="winner-avatar-halo w-28 h-28 sm:w-36 sm:h-36 mx-auto">
-                  <div class="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-blue-900 via-navy-900 to-cyan-900 flex items-center justify-center relative">
+                  <div class="w-full h-full rounded-full overflow-hidden bg-[#DA251D] flex items-center justify-center relative shadow-inner">
                     <img id="stage-winner-photo" src="" alt="Ảnh đại biểu trúng giải" class="hidden w-full h-full object-cover" />
-                    <span id="stage-winner-initials" class="font-display text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-amber-200 via-white to-cyan-300 tracking-wider">
-                      MB
-                    </span>
+                    <div id="stage-winner-flag" class="w-full h-full flex items-center justify-center relative">
+                      <svg class="w-full h-full" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-label="Quốc kỳ Việt Nam">
+                        <defs>
+                          <radialGradient id="vnFlagRed" cx="45%" cy="35%" r="70%">
+                            <stop offset="0%" stop-color="#EF2B2D" />
+                            <stop offset="65%" stop-color="#DA251D" />
+                            <stop offset="100%" stop-color="#A81410" />
+                          </radialGradient>
+                          <linearGradient id="vnStarGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FFF275" />
+                            <stop offset="55%" stop-color="#FFDE00" />
+                            <stop offset="100%" stop-color="#F5B700" />
+                          </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="60" r="60" fill="url(#vnFlagRed)" />
+                        <polygon
+                          points="60,22 69.2,49.2 98,49.2 74.8,66.2 83.6,93.6 60,76.8 36.4,93.6 45.2,66.2 22,49.2 50.8,49.2"
+                          fill="url(#vnStarGold)"
+                        />
+                        <ellipse cx="46" cy="30" rx="34" ry="18" fill="rgba(255,255,255,0.12)" transform="rotate(-18 46 30)" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
                 <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-display font-extrabold text-[10px] sm:text-xs uppercase tracking-widest shadow-lg whitespace-nowrap">
@@ -4495,7 +4514,7 @@
       const phoneBadge = document.getElementById("stage-winner-phone-badge");
       const avatarWrap = document.getElementById("stage-winner-avatar-wrap");
       const avatarPhoto = document.getElementById("stage-winner-photo");
-      const avatarInitials = document.getElementById("stage-winner-initials");
+      const avatarFlag = document.getElementById("stage-winner-flag");
       const reelPrev = document.getElementById("stage-reel-prev");
       const reelNext = document.getElementById("stage-reel-next");
       const hudPhase = document.getElementById("stage-hud-phase");
@@ -4597,11 +4616,10 @@
           if (winnerPhotoUrl) {
             avatarPhoto.src = winnerPhotoUrl;
             avatarPhoto.classList.remove("hidden");
-            avatarInitials.classList.add("hidden");
+            if (avatarFlag) avatarFlag.classList.add("hidden");
           } else {
             avatarPhoto.classList.add("hidden");
-            avatarInitials.textContent = getVietnameseInitials(finalWinner.fullName);
-            avatarInitials.classList.remove("hidden");
+            if (avatarFlag) avatarFlag.classList.remove("hidden");
           }
           avatarWrap.classList.remove("hidden");
           resultContent.classList.add("animate-winner-pop");
