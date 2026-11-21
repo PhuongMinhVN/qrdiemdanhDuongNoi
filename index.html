@@ -1,0 +1,2571 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Điểm Danh Đại Biểu Điện Tử | MOBIFONE × BETATECH</title>
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans (Full Vietnamese Support) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              950: '#040914',
+              900: '#071126',
+              800: '#0C1C3D',
+              700: '#132A5A',
+            },
+            mobifone: '#0060AF',
+            betatech: '#06B6D4',
+          },
+          boxShadow: {
+            glow: '0 0 30px -5px rgba(6, 182, 212, 0.35)',
+            'glow-lg': '0 0 50px -10px rgba(34, 211, 238, 0.45)',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- jsQR CDN (CCCD QR Code Scanning) -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <!-- QRCode.js CDN (Hall QR Code Generation) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- SheetJS (xlsx) CDN (Excel Export) -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <!-- Canvas Confetti CDN (Lucky Draw Celebration) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: #040914;
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(0, 96, 175, 0.28) 0%, transparent 42%),
+        radial-gradient(circle at 85% 18%, rgba(6, 182, 212, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 50% 95%, rgba(14, 165, 233, 0.14) 0%, transparent 45%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    /* Subtle corporate tech grid background */
+    .tech-grid {
+      background-size: 36px 36px;
+      background-image:
+        linear-gradient(to right, rgba(56, 189, 248, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.045) 1px, transparent 1px);
+    }
+
+    /* Glassmorphism panels */
+    .glass-panel {
+      background: rgba(11, 21, 43, 0.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(56, 189, 248, 0.16);
+      box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .glass-input {
+      background: rgba(7, 15, 32, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      transition: all 0.2s ease;
+    }
+    .glass-input:focus {
+      outline: none;
+      border-color: #22d3ee;
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+      background: rgba(7, 17, 38, 0.92);
+    }
+
+    /* Animated Holographic Digital E-Badge */
+    .holo-badge {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(10, 25, 58, 0.95) 0%, rgba(7, 17, 38, 0.98) 52%, rgba(8, 47, 73, 0.94) 100%);
+      border: 1px solid rgba(34, 211, 238, 0.45);
+      box-shadow:
+        0 25px 60px -15px rgba(0, 0, 0, 0.8),
+        0 0 35px -8px rgba(34, 211, 238, 0.38),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .holo-badge::before {
+      content: "";
+      position: absolute;
+      inset: -120%;
+      background: linear-gradient(
+        115deg,
+        transparent 32%,
+        rgba(34, 211, 238, 0.16) 44%,
+        rgba(129, 140, 248, 0.22) 50%,
+        rgba(56, 189, 248, 0.18) 56%,
+        transparent 68%
+      );
+      transform: translateX(-40%) rotate(12deg);
+      animation: holoSweep 4.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .holo-badge::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 15%, rgba(34, 211, 238, 0.16), transparent 45%),
+                  radial-gradient(circle at 15% 85%, rgba(0, 96, 175, 0.22), transparent 48%);
+      pointer-events: none;
+    }
+
+    @keyframes holoSweep {
+      0% { transform: translateX(-55%) rotate(12deg); }
+      50% { transform: translateX(55%) rotate(12deg); }
+      100% { transform: translateX(-55%) rotate(12deg); }
+    }
+
+    /* Scanner laser animation */
+    @keyframes scanLine {
+      0%, 100% { top: 8%; opacity: 0.7; }
+      50% { top: 88%; opacity: 1; }
+    }
+    .scan-laser {
+      animation: scanLine 2.2s ease-in-out infinite;
+    }
+
+    /* Shake animation for invalid password */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .animate-shake {
+      animation: shake 0.35s ease-in-out;
+    }
+
+    /* Smooth fade-in */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up {
+      animation: fadeUp 0.35s ease-out forwards;
+    }
+
+    /* Lucky Draw Stage Glow & Winner Pulse */
+    .lucky-stage-box {
+      background: radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.16), transparent 60%),
+                  linear-gradient(160deg, rgba(10, 22, 52, 0.94) 0%, rgba(5, 11, 26, 0.98) 100%);
+      border: 1.5px solid rgba(56, 189, 248, 0.32);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px -10px rgba(6, 182, 212, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: all 0.35s ease;
+    }
+    .lucky-stage-box.is-spinning {
+      border-color: rgba(34, 211, 238, 0.85);
+      box-shadow: 0 0 55px -5px rgba(34, 211, 238, 0.55), inset 0 0 30px rgba(34, 211, 238, 0.12);
+    }
+    .lucky-stage-box.is-winner {
+      border-color: rgba(250, 204, 21, 0.85);
+      box-shadow: 0 0 65px -5px rgba(250, 204, 21, 0.45), 0 0 35px -5px rgba(34, 211, 238, 0.35), inset 0 0 35px rgba(250, 204, 21, 0.1);
+    }
+    @keyframes winnerPop {
+      0% { transform: scale(0.92); opacity: 0.7; }
+      60% { transform: scale(1.04); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-winner-pop {
+      animation: winnerPop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .lucky-fullscreen-active {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 50 !important;
+      overflow-y: auto !important;
+      background-color: #040914 !important;
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(0, 96, 175, 0.32) 0%, transparent 45%),
+        radial-gradient(circle at 80% 15%, rgba(6, 182, 212, 0.24) 0%, transparent 45%),
+        linear-gradient(to right, rgba(56, 189, 248, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.045) 1px, transparent 1px) !important;
+      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px !important;
+      padding: 1.5rem 2rem !important;
+    }
+
+    /* QR Code container image styling */
+    #hall-qr-container img,
+    #hall-qr-container canvas,
+    #presentation-qr-container img,
+    #presentation-qr-container canvas {
+      display: block;
+      margin: 0 auto;
+      border-radius: 0.5rem;
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.55); }
+  </style>
+</head>
+<body class="text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200 tech-grid">
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="sticky top-0 z-40 border-b border-cyan-500/15 bg-navy-950/80 backdrop-blur-xl">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-3">
+        <!-- Brand Identity -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-cyan-500 to-teal-400 p-[1px] shadow-glow shrink-0">
+              <div class="w-full h-full rounded-[11px] bg-navy-950 flex items-center justify-center">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75z" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5 font-display font-extrabold tracking-wide text-sm sm:text-base leading-none">
+                <span class="text-blue-400">MOBIFONE</span>
+                <span class="text-slate-500 font-normal">×</span>
+                <span class="text-cyan-400">BETATECH</span>
+              </div>
+              <p class="text-[11px] text-slate-400 tracking-wider uppercase mt-1">Điểm Danh Hội Nghị Số</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-700/60 overflow-x-auto" role="tablist">
+          <button
+            id="tab-btn-checkin"
+            onclick="switchTab('checkin')"
+            class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap"
+            role="tab"
+            aria-selected="true"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Điểm Danh</span>
+          </button>
+
+          <button
+            id="tab-btn-qr"
+            onclick="switchTab('qr')"
+            class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap"
+            role="tab"
+            aria-selected="false"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+            </svg>
+            <span>QR Hội Trường</span>
+          </button>
+
+          <button
+            id="tab-btn-admin"
+            onclick="switchTab('admin')"
+            class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap"
+            role="tab"
+            aria-selected="false"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+            <span>Quản Trị</span>
+          </button>
+
+          <button
+            id="tab-btn-lucky"
+            onclick="switchTab('lucky')"
+            class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap"
+            role="tab"
+            aria-selected="false"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+            </svg>
+            <span>Quay Số Trúng Thưởng</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+
+    <!-- ================================================================
+         TAB 1: CHECK-IN FORM & DIGITAL E-BADGE
+         ================================================================ -->
+    <section id="view-checkin" class="fade-up">
+      <div class="max-w-xl mx-auto">
+
+        <!-- Co-branding Hero Header -->
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 shadow-glow mb-4">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="font-display font-extrabold tracking-widest text-xs sm:text-sm">
+              <span class="text-blue-400">MOBIFONE</span>
+              <span class="text-slate-400 mx-1.5">×</span>
+              <span class="text-cyan-300">BETATECH</span>
+            </span>
+          </div>
+          <h1 class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            ĐIỂM DANH ĐẠI BIỂU ĐIỆN TỬ
+          </h1>
+          <p class="text-sm text-slate-400 mt-1.5">
+            Hệ thống xác thực đại biểu hội nghị thông minh &amp; cấp thẻ điện tử tức thì
+          </p>
+        </div>
+
+        <!-- ==================== CHECK-IN FORM CARD ==================== -->
+        <div id="checkin-form-wrapper" class="glass-panel rounded-2xl p-5 sm:p-7">
+
+          <!-- GPS Geofencing Status Bar -->
+          <div id="gps-status-card" class="mb-5 p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/70 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div id="gps-icon-box" class="w-9 h-9 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-cyan-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span id="gps-badge-title" class="text-xs sm:text-sm font-semibold text-slate-200">Đang xác định vị trí GPS...</span>
+                  <span id="gps-mode-pill" class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Chế độ tiêu chuẩn</span>
+                </div>
+                <p id="gps-badge-desc" class="text-xs text-slate-400 truncate mt-0.5">Đang kiểm tra khoảng cách tới hội trường</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onclick="initGPSCheck()"
+              title="Cập nhật lại vị trí GPS"
+              class="shrink-0 p-2 rounded-lg bg-slate-800/90 hover:bg-slate-700/80 text-slate-300 hover:text-cyan-300 border border-slate-700 transition"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- CCCD QR Quick-Fill Helper -->
+          <div class="mb-6 p-4 rounded-xl bg-gradient-to-r from-blue-950/70 via-navy-800/70 to-cyan-950/60 border border-cyan-500/25">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 uppercase">Tiện ích nhanh</span>
+                  <h2 class="text-sm font-semibold text-white">Quét mã QR trên CCCD</h2>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Tự động điền Họ và tên từ thẻ Căn cước công dân (không bắt buộc)</p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onclick="openCCCDCameraModal()"
+                  class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-400/40 transition"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                  </svg>
+                  <span>Quét Camera</span>
+                </button>
+                <label class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800/90 hover:bg-slate-700/80 text-slate-200 border border-slate-600/70 cursor-pointer transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                  </svg>
+                  <span>Chọn Ảnh</span>
+                  <input type="file" id="cccd-file-input" accept="image/*" class="hidden" onchange="handleCCCDImageUpload(event)" />
+                </label>
+              </div>
+            </div>
+            <div id="cccd-feedback" class="hidden mt-2.5 text-xs px-3 py-2 rounded-lg"></div>
+          </div>
+
+          <!-- Check-in Form -->
+          <form id="checkin-form" onsubmit="handleCheckinSubmit(event)" class="space-y-4">
+            <!-- Họ và tên -->
+            <div>
+              <label for="input-fullname" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Họ và tên <span class="text-rose-400">*</span>
+              </label>
+              <input
+                type="text"
+                id="input-fullname"
+                required
+                autocomplete="name"
+                placeholder="VD: Nguyễn Văn An"
+                class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white placeholder-slate-500"
+              />
+            </div>
+
+            <!-- Chức vụ -->
+            <div>
+              <label for="input-position" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Chức vụ <span class="text-rose-400">*</span>
+              </label>
+              <input
+                type="text"
+                id="input-position"
+                required
+                placeholder="VD: Phó Giám đốc / Chuyên viên chính"
+                class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white placeholder-slate-500"
+              />
+            </div>
+
+            <!-- Cơ quan / Đơn vị công tác -->
+            <div>
+              <label for="input-organization" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Cơ quan / Đơn vị công tác <span class="text-rose-400">*</span>
+              </label>
+              <input
+                type="text"
+                id="input-organization"
+                required
+                placeholder="VD: Sở Thông tin và Truyền thông / UBND Tỉnh..."
+                class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white placeholder-slate-500"
+              />
+            </div>
+
+            <!-- Số điện thoại -->
+            <div>
+              <label for="input-phone" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Số điện thoại <span class="text-rose-400">*</span>
+              </label>
+              <input
+                type="tel"
+                id="input-phone"
+                required
+                inputmode="tel"
+                autocomplete="tel"
+                placeholder="VD: 0901 234 567"
+                class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white placeholder-slate-500"
+              />
+            </div>
+
+            <!-- Form Error Alert -->
+            <div id="form-error-box" class="hidden p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-200 text-xs flex items-start gap-2">
+              <svg class="w-4 h-4 text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              <span id="form-error-text"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              id="submit-checkin-btn"
+              class="w-full mt-2 py-3.5 px-6 rounded-xl font-display font-bold text-sm sm:text-base text-white bg-gradient-to-r from-blue-600 via-cyan-600 to-cyan-500 hover:from-blue-500 hover:via-cyan-500 hover:to-teal-400 shadow-glow hover:shadow-glow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span id="submit-btn-label">XÁC NHẬN ĐIỂM DANH</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ==================== DIGITAL E-BADGE (POST CHECK-IN) ==================== -->
+        <div id="ebadge-wrapper" class="hidden fade-up">
+          <div class="holo-badge rounded-3xl p-6 sm:p-8 text-white">
+            <!-- Top Badge Strip -->
+            <div class="relative z-10 flex items-center justify-between border-b border-cyan-400/20 pb-4 mb-6">
+              <div>
+                <div class="font-display font-extrabold tracking-widest text-sm sm:text-base">
+                  <span class="text-blue-400">MOBIFONE</span>
+                  <span class="text-slate-400 mx-1">×</span>
+                  <span class="text-cyan-300">BETATECH</span>
+                </div>
+                <p class="text-[11px] uppercase tracking-[0.2em] text-cyan-200/80 mt-0.5">Thẻ Đại Biểu Điện Tử</p>
+              </div>
+              <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>ĐÃ ĐIỂM DANH</span>
+              </div>
+            </div>
+
+            <!-- Verified Emblem & Attendee Name -->
+            <div class="relative z-10 text-center mb-6">
+              <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-emerald-400/25 to-cyan-500/25 border border-emerald-400/40 flex items-center justify-center shadow-glow">
+                <svg class="w-9 h-9 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                </svg>
+              </div>
+              <p class="text-[11px] uppercase tracking-[0.22em] text-cyan-300/80 font-semibold">Đại Biểu Tham Dự</p>
+              <h2 id="badge-name" class="font-display text-2xl sm:text-3xl font-extrabold text-white mt-1 tracking-tight break-words">
+                —
+              </h2>
+              <p id="badge-position" class="text-sm sm:text-base font-semibold text-cyan-300 mt-1">
+                —
+              </p>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="relative z-10 space-y-3 bg-slate-950/55 rounded-2xl p-4 border border-cyan-500/20">
+              <div class="flex items-start justify-between gap-4 border-b border-slate-800/80 pb-2.5">
+                <span class="text-xs text-slate-400 shrink-0">Cơ quan / Đơn vị</span>
+                <span id="badge-org" class="text-xs sm:text-sm font-semibold text-white text-right">—</span>
+              </div>
+              <div class="flex items-center justify-between gap-4 border-b border-slate-800/80 pb-2.5">
+                <span class="text-xs text-slate-400 shrink-0">Số điện thoại</span>
+                <span id="badge-phone" class="text-xs sm:text-sm font-mono font-semibold text-slate-200 text-right">—</span>
+              </div>
+              <div class="flex items-center justify-between gap-4 border-b border-slate-800/80 pb-2.5">
+                <span class="text-xs text-slate-400 shrink-0">Thời gian điểm danh</span>
+                <span id="badge-time" class="text-xs sm:text-sm font-mono font-semibold text-cyan-300 text-right">—</span>
+              </div>
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-xs text-slate-400 shrink-0">Trạng thái GPS</span>
+                <span id="badge-gps" class="text-xs font-semibold text-right">—</span>
+              </div>
+            </div>
+
+            <!-- Reception Instruction Footer -->
+            <div class="relative z-10 mt-5 pt-4 border-t border-cyan-400/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+              <p class="text-xs text-slate-300">
+                Vui lòng xuất trình thẻ điện tử này tại bàn lễ tân hội trường.
+              </p>
+              <span id="badge-code" class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/25 text-cyan-300 shrink-0">
+                #MB-0000
+              </span>
+            </div>
+          </div>
+
+          <!-- Subtle Reset Link for Device Lock -->
+          <div class="text-center mt-5">
+            <button
+              type="button"
+              onclick="resetDeviceLock()"
+              class="text-xs text-slate-400 hover:text-cyan-300 underline underline-offset-4 transition"
+            >
+              Điểm danh cho đại biểu khác
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================
+         TAB 2: HALL QR CODE DISPLAY (LED SCREEN / RECEPTION)
+         ================================================================ -->
+    <section id="view-qr" class="hidden fade-up">
+      <div class="max-w-3xl mx-auto">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 text-center">
+          <!-- Branding -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 mb-4">
+            <span class="font-display font-extrabold tracking-widest text-xs sm:text-sm">
+              <span class="text-blue-400">MOBIFONE</span>
+              <span class="text-slate-400 mx-1.5">×</span>
+              <span class="text-cyan-300">BETATECH</span>
+            </span>
+          </div>
+
+          <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            MÃ QR ĐIỂM DANH HỘI TRƯỜNG
+          </h2>
+          <p class="text-sm text-slate-400 mt-1.5 max-w-lg mx-auto">
+            Hiển thị trên màn hình LED hội trường hoặc bàn lễ tân để đại biểu quét bằng camera điện thoại hoặc Zalo.
+          </p>
+
+          <!-- QR Code Card -->
+          <div class="my-8 inline-block p-5 sm:p-6 rounded-3xl bg-white shadow-glow-lg border-4 border-cyan-400/40">
+            <div id="hall-qr-container" class="flex items-center justify-center"></div>
+          </div>
+
+          <!-- Encoded URL Display -->
+          <div class="max-w-lg mx-auto mb-6">
+            <div class="px-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700/70 flex items-center justify-between gap-3">
+              <span id="qr-url-text" class="text-xs font-mono text-cyan-300 truncate"></span>
+              <button
+                type="button"
+                onclick="copyLiveUrl()"
+                id="copy-url-btn"
+                class="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 transition"
+              >
+                Sao chép
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onclick="enterPresentationMode()"
+              class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-display font-bold text-sm sm:text-base text-white bg-gradient-to-r from-blue-600 via-cyan-600 to-cyan-500 hover:from-blue-500 hover:to-teal-400 shadow-glow transition"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              </svg>
+              <span>Chế Độ Toàn Màn Hình / Trình Chiếu LED</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         TAB 3: ADMIN DASHBOARD & EXCEL EXPORT
+         ================================================================ -->
+    <section id="view-admin" class="hidden fade-up">
+
+      <!-- Password Gate -->
+      <div id="admin-login-gate" class="max-w-md mx-auto glass-panel rounded-2xl p-6 sm:p-8 text-center">
+        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center shadow-glow">
+          <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+        </div>
+        <h2 class="font-display text-xl font-bold text-white">Khu Vực Quản Trị Viên</h2>
+        <p class="text-xs text-slate-400 mt-1 mb-6">Nhập mật khẩu ban tổ chức để xem danh sách điểm danh &amp; xuất báo cáo Excel</p>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-left">
+          <div class="relative">
+            <input
+              type="password"
+              id="admin-password-input"
+              required
+              placeholder="Nhập mật khẩu quản trị..."
+              class="glass-input w-full px-4 py-3 pr-11 rounded-xl text-sm text-white placeholder-slate-500"
+            />
+            <button
+              type="button"
+              onclick="toggleAdminPasswordVisibility()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-300"
+              title="Hiện / ẩn mật khẩu"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
+          <p id="admin-login-error" class="hidden text-xs text-rose-400 font-medium">Mật khẩu không chính xác. Vui lòng thử lại.</p>
+          <button
+            type="submit"
+            class="w-full py-3 rounded-xl font-display font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-glow transition"
+          >
+            Đăng Nhập Quản Trị
+          </button>
+        </form>
+      </div>
+
+      <!-- Authenticated Dashboard -->
+      <div id="admin-dashboard" class="hidden space-y-6">
+        <!-- Top Header & Actions -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <h2 class="font-display text-2xl font-extrabold text-white">Bảng Điều Khiển Điểm Danh</h2>
+              <span id="data-source-pill" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                LocalStorage
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Theo dõi số lượng đại biểu theo thời gian thực và xuất dữ liệu báo cáo</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              onclick="loadAdminData()"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+            >
+              <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              <span>Làm mới</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="exportToExcel()"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-lg shadow-emerald-900/40 transition"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              <span>Xuất Excel (.xlsx)</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="handleAdminLogout()"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition"
+            >
+              <span>Đăng xuất</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="glass-panel rounded-2xl p-4 sm:p-5">
+            <p class="text-xs font-medium text-slate-400">Tổng đại biểu đã điểm danh</p>
+            <div class="flex items-baseline gap-2 mt-2">
+              <span id="metric-total" class="font-display text-3xl sm:text-4xl font-extrabold text-cyan-400">0</span>
+              <span class="text-xs text-slate-500">đại biểu</span>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-4 sm:p-5">
+            <p class="text-xs font-medium text-slate-400">Xác thực GPS tại hội trường</p>
+            <div class="flex items-baseline gap-2 mt-2">
+              <span id="metric-gps-verified" class="font-display text-3xl sm:text-4xl font-extrabold text-emerald-400">0</span>
+              <span class="text-xs text-slate-500">lượt</span>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-4 sm:p-5">
+            <p class="text-xs font-medium text-slate-400">Cơ quan / Đơn vị tham dự</p>
+            <div class="flex items-baseline gap-2 mt-2">
+              <span id="metric-orgs" class="font-display text-3xl sm:text-4xl font-extrabold text-blue-400">0</span>
+              <span class="text-xs text-slate-500">đơn vị</span>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-4 sm:p-5">
+            <p class="text-xs font-medium text-slate-400">Điểm danh gần nhất</p>
+            <div class="mt-2">
+              <span id="metric-latest" class="font-mono text-lg sm:text-xl font-bold text-white">--:--:--</span>
+              <p id="metric-latest-name" class="text-xs text-slate-400 truncate mt-0.5">Chưa có dữ liệu</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Searchable Data Table Card -->
+        <div class="glass-panel rounded-2xl overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="relative flex-1 max-w-md">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <input
+                type="text"
+                id="admin-search-input"
+                oninput="renderAdminTable()"
+                placeholder="Tìm theo họ tên, chức vụ, đơn vị hoặc SĐT..."
+                class="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500"
+              />
+            </div>
+
+            <div class="flex items-center justify-between sm:justify-end gap-3">
+              <span id="table-count-label" class="text-xs text-slate-400">Hiển thị 0 kết quả</span>
+              <button
+                type="button"
+                id="clear-local-btn"
+                onclick="clearLocalTestData()"
+                class="hidden text-xs text-rose-400 hover:text-rose-300 underline underline-offset-4"
+              >
+                Xóa dữ liệu cục bộ
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-900/90 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                  <th class="py-3.5 px-4 w-14 text-center">STT</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap">Thời gian</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap">Họ tên</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap">Chức vụ</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap">Đơn vị</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap">SĐT</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap">Tọa độ GPS</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body" class="divide-y divide-slate-800/70 text-xs sm:text-sm">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         TAB 4: QUAY SỐ TRÚNG THƯỞNG (LUCKY DRAW - LED STAGE)
+         ================================================================ -->
+    <section id="view-lucky" class="hidden fade-up">
+
+      <!-- Shared Admin Password Gate for Lucky Draw -->
+      <div id="lucky-login-gate" class="max-w-md mx-auto glass-panel rounded-2xl p-6 sm:p-8 text-center">
+        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-amber-500/15 border border-amber-400/35 flex items-center justify-center shadow-glow">
+          <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+          </svg>
+        </div>
+        <h2 class="font-display text-xl font-bold text-white">Khu Vực Quay Số Trúng Thưởng</h2>
+        <p class="text-xs text-slate-400 mt-1 mb-6">Nhập mật khẩu Ban Tổ Chức để điều khiển sân khấu quay số trên màn hình LED</p>
+
+        <form onsubmit="handleLuckyLogin(event)" class="space-y-4 text-left">
+          <div class="relative">
+            <input
+              type="password"
+              id="lucky-password-input"
+              required
+              placeholder="Nhập mật khẩu quản trị..."
+              class="glass-input w-full px-4 py-3 pr-11 rounded-xl text-sm text-white placeholder-slate-500"
+            />
+            <button
+              type="button"
+              onclick="toggleLuckyPasswordVisibility()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-300"
+              title="Hiện / ẩn mật khẩu"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
+          <p id="lucky-login-error" class="hidden text-xs text-rose-400 font-medium">Mật khẩu không chính xác. Vui lòng thử lại.</p>
+          <button
+            type="submit"
+            class="w-full py-3 rounded-xl font-display font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-glow transition"
+          >
+            Mở Sân Khấu Quay Số
+          </button>
+        </form>
+      </div>
+
+      <!-- Authenticated Lucky Draw LED Stage -->
+      <div id="lucky-stage-container" class="hidden space-y-6">
+        <div class="max-w-5xl mx-auto space-y-6">
+
+          <!-- Top Stage Bar: Branding + Controls -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3 flex-wrap">
+              <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/35 shadow-glow">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span class="font-display font-extrabold tracking-widest text-xs sm:text-sm">
+                  <span class="text-blue-400">MOBIFONE</span>
+                  <span class="text-slate-400 mx-1.5">×</span>
+                  <span class="text-cyan-300">BETATECH</span>
+                </span>
+              </div>
+              <span class="text-xs sm:text-sm font-semibold uppercase tracking-widest text-amber-300/90">
+                Chương Trình Quay Số Trúng Thưởng
+              </span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onclick="refreshLuckyPool()"
+                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                title="Đồng bộ danh sách đại biểu mới nhất"
+              >
+                <svg id="lucky-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                <span>Cập nhật danh sách</span>
+              </button>
+
+              <button
+                type="button"
+                id="lucky-mute-btn"
+                onclick="toggleLuckySound()"
+                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 transition"
+              >
+                <svg id="lucky-sound-on-icon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                </svg>
+                <svg id="lucky-sound-off-icon" class="w-4 h-4 hidden text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                </svg>
+                <span id="lucky-mute-label">Âm thanh: BẬT</span>
+              </button>
+
+              <button
+                type="button"
+                id="lucky-fullscreen-btn"
+                onclick="toggleLuckyFullscreen()"
+                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-glow transition"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                </svg>
+                <span id="lucky-fullscreen-label">Toàn Màn Hình LED</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Eligible Pool Counter -->
+          <div class="glass-panel rounded-2xl px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <p class="text-sm sm:text-base font-semibold text-slate-200">
+                Tổng số đại biểu hợp lệ tham gia quay thưởng:
+                <span id="lucky-eligible-count" class="font-display font-extrabold text-cyan-300 text-lg sm:text-xl mx-1">0</span>
+                người
+              </p>
+            </div>
+            <span class="text-xs text-slate-400">Tự động lọc trùng SĐT &amp; loại trừ đại biểu đã trúng giải</span>
+          </div>
+
+          <!-- Prize Tier Selector -->
+          <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Chọn hạng mục giải thưởng</span>
+              <span id="lucky-active-prize-preview" class="text-xs font-bold text-amber-300">Giải Khuyến Khích</span>
+            </div>
+            <div id="prize-tier-pills" class="flex flex-wrap gap-2">
+              <button type="button" onclick="selectPrizeTier('Giải Khuyến Khích', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Khuyến Khích</button>
+              <button type="button" onclick="selectPrizeTier('Giải Ba', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Ba</button>
+              <button type="button" onclick="selectPrizeTier('Giải Nhì', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Nhì</button>
+              <button type="button" onclick="selectPrizeTier('Giải Nhất', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Nhất</button>
+              <button type="button" onclick="selectPrizeTier('Giải Đặc Biệt', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">Giải Đặc Biệt</button>
+              <button type="button" onclick="selectPrizeTier('__CUSTOM__', this)" class="prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">+ Giải tùy chỉnh</button>
+            </div>
+            <div id="custom-prize-wrapper" class="hidden pt-1">
+              <input
+                type="text"
+                id="custom-prize-input"
+                oninput="updateCustomPrizeName()"
+                placeholder="Nhập tên giải thưởng tùy chỉnh (VD: Giải Tài Trợ Mobifone, Quà Tặng Đặc Biệt...)"
+                class="glass-input w-full px-4 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
+              />
+            </div>
+          </div>
+
+          <!-- Central Slot-Machine / Randomizer LED Stage -->
+          <div id="lucky-stage-box" class="lucky-stage-box rounded-3xl p-6 sm:p-10 lg:p-12 text-center relative overflow-hidden">
+            <!-- Prize Banner -->
+            <div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 font-display font-bold text-xs sm:text-sm uppercase tracking-[0.2em] mb-6">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
+              </svg>
+              <span id="stage-prize-label">GIẢI KHUYẾN KHÍCH</span>
+            </div>
+
+            <!-- Rolling Attendee Display -->
+            <div id="stage-result-content" class="min-h-[190px] sm:min-h-[230px] flex flex-col items-center justify-center">
+              <p id="stage-status-subtitle" class="text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-400/80 font-semibold mb-3">
+                Sẵn sàng tìm chủ nhân may mắn
+              </p>
+              <h2 id="stage-winner-name" class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight break-words max-w-4xl">
+                MOBIFONE × BETATECH
+              </h2>
+              <p id="stage-winner-position" class="text-base sm:text-2xl font-semibold text-cyan-300 mt-3">
+                Nhấn nút bên dưới để bắt đầu quay số
+              </p>
+              <p id="stage-winner-org" class="text-sm sm:text-lg text-slate-300 mt-1.5 max-w-3xl">
+                —
+              </p>
+              <div id="stage-winner-phone-badge" class="hidden mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900/90 border border-cyan-500/35">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                </svg>
+                <span id="stage-winner-phone" class="font-mono text-lg sm:text-2xl font-bold tracking-widest text-amber-300"></span>
+              </div>
+            </div>
+
+            <!-- Spin Action Button -->
+            <div class="mt-8 flex flex-col items-center gap-3">
+              <button
+                type="button"
+                id="lucky-spin-btn"
+                onclick="startLuckyDrawSpin()"
+                class="group relative inline-flex items-center justify-center gap-3 px-10 sm:px-14 py-4 sm:py-5 rounded-2xl font-display font-extrabold text-base sm:text-xl tracking-wider text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 hover:from-blue-500 hover:via-cyan-400 hover:to-emerald-400 shadow-glow-lg transition-all duration-200 active:scale-[0.98] disabled:opacity-45 disabled:cursor-not-allowed"
+              >
+                <svg id="spin-btn-icon" class="w-6 h-6 transition-transform group-hover:rotate-180 duration-500" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                <span id="lucky-spin-label">QUAY SỐ NGAY</span>
+              </button>
+              <p id="lucky-spin-hint" class="text-xs text-slate-400">Thời gian quay 4 giây với hiệu ứng giảm tốc tự động</p>
+            </div>
+          </div>
+
+          <!-- Winners Board (Danh Sách Trúng Thưởng) -->
+          <div class="glass-panel rounded-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-400/35 flex items-center justify-center text-amber-400">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
+                  </svg>
+                </span>
+                <div>
+                  <h3 class="font-display font-bold text-base sm:text-lg text-white">Danh Sách Trúng Thưởng</h3>
+                  <p class="text-xs text-slate-400">Các đại biểu đã trúng giải sẽ được tự động loại khỏi vòng quay tiếp theo</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <span id="winners-count-badge" class="text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                  0 giải đã trao
+                </span>
+                <button
+                  type="button"
+                  onclick="exportToExcel()"
+                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/35 transition"
+                >
+                  Xuất Excel
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/90 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    <th class="py-3.5 px-4 whitespace-nowrap">Giải thưởng</th>
+                    <th class="py-3.5 px-4 whitespace-nowrap">Họ và tên</th>
+                    <th class="py-3.5 px-4 whitespace-nowrap">Chức vụ</th>
+                    <th class="py-3.5 px-4 whitespace-nowrap">Đơn vị</th>
+                    <th class="py-3.5 px-4 whitespace-nowrap">Số điện thoại</th>
+                    <th class="py-3.5 px-4 text-right whitespace-nowrap">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="lucky-winners-tbody" class="divide-y divide-slate-800/70 text-xs sm:text-sm">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="max-w-6xl mx-auto px-4 sm:px-6 pb-8 pt-2 text-center text-xs text-slate-500">
+    <p>Giải pháp điểm danh hội nghị điện tử tài trợ bởi <span class="text-blue-400 font-semibold">MOBIFONE</span> × <span class="text-cyan-400 font-semibold">BETATECH</span></p>
+  </footer>
+
+  <!-- ==================== CCCD LIVE CAMERA SCANNER MODAL ==================== -->
+  <div id="cccd-camera-modal" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-panel rounded-2xl w-full max-w-md overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-800">
+        <div>
+          <h3 class="font-display font-bold text-sm text-white">Quét mã QR trên thẻ CCCD</h3>
+          <p class="text-[11px] text-slate-400">Đưa mã QR ở góc phải mặt trước CCCD vào khung</p>
+        </div>
+        <button
+          type="button"
+          onclick="closeCCCDCameraModal()"
+          class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="relative bg-black aspect-[4/3] overflow-hidden flex items-center justify-center">
+        <video id="cccd-video" class="w-full h-full object-cover" playsinline muted></video>
+        <canvas id="cccd-canvas" class="hidden"></canvas>
+
+        <!-- Scanner Reticle Overlay -->
+        <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+          <div class="w-52 h-52 relative border-2 border-cyan-400/70 rounded-2xl shadow-[0_0_0_9999px_rgba(4,9,20,0.55)]">
+            <div class="scan-laser absolute left-2 right-2 h-0.5 bg-cyan-400 shadow-[0_0_12px_#22d3ee]"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 bg-slate-900/90 flex items-center justify-between gap-3">
+        <span id="camera-status-text" class="text-xs text-cyan-300">Đang khởi động camera...</span>
+        <button
+          type="button"
+          onclick="closeCCCDCameraModal()"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
+        >
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FULLSCREEN LED PRESENTATION OVERLAY ==================== -->
+  <div id="presentation-overlay" class="fixed inset-0 z-50 hidden bg-navy-950 tech-grid flex flex-col justify-between p-6 sm:p-12 overflow-y-auto">
+    <!-- Top Bar -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="px-5 py-2 rounded-full bg-slate-900/90 border border-cyan-500/40 shadow-glow">
+          <span class="font-display font-extrabold tracking-widest text-base sm:text-xl">
+            <span class="text-blue-400">MOBIFONE</span>
+            <span class="text-slate-400 mx-2">×</span>
+            <span class="text-cyan-300">BETATECH</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="hidden sm:block text-right">
+          <p id="presentation-clock" class="font-mono text-2xl font-bold text-cyan-300">--:--:--</p>
+          <p id="presentation-date" class="text-xs text-slate-400"></p>
+        </div>
+        <button
+          type="button"
+          onclick="exitPresentationMode()"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 transition"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span>Thoát trình chiếu</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center QR Presentation -->
+    <div class="my-auto py-6 flex flex-col items-center text-center">
+      <p class="text-xs sm:text-base font-semibold uppercase tracking-[0.28em] text-cyan-400 mb-2">
+        Hội Nghị Chuyển Đổi Số &amp; Quản Lý Hành Chính
+      </p>
+      <h1 class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight max-w-4xl">
+        QUÉT MÃ QR ĐỂ ĐIỂM DANH ĐẠI BIỂU
+      </h1>
+
+      <div class="my-8 p-6 sm:p-8 rounded-[2rem] bg-white shadow-glow-lg border-8 border-cyan-400/50">
+        <div id="presentation-qr-container"></div>
+      </div>
+
+      <p class="text-sm sm:text-lg text-slate-300 max-w-2xl">
+        Mở <strong class="text-white">Camera điện thoại</strong> hoặc <strong class="text-cyan-300">Zalo</strong>, quét mã QR phía trên để xác thực tham dự và nhận <strong class="text-white">Thẻ Đại Biểu Điện Tử</strong>.
+      </p>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-slate-400 border-t border-cyan-500/15 pt-4">
+      <span>Hệ thống Điểm danh Điện tử Thông minh — Tài trợ bởi MOBIFONE × BETATECH</span>
+      <span id="presentation-url" class="font-mono text-cyan-400/90 truncate max-w-md"></span>
+    </div>
+  </div>
+
+  <!-- ==================== APPLICATION SCRIPT ==================== -->
+  <script>
+    /* =========================================================================
+     * CẤU HÌNH HỆ THỐNG (SYSTEM CONFIGURATION)
+     * ========================================================================= */
+    // URL Web App của Google Apps Script (Để trống "" sẽ tự động chạy localStorage để test offline)
+    const GOOGLE_SCRIPT_URL = "";
+
+    // Cấu hình định vị GPS Hội trường (Geo-fencing)
+    const VENUE_LAT = 21.028511;       // Vĩ độ hội trường (VD: Khu vực Hà Nội)
+    const VENUE_LNG = 105.804817;      // Kinh độ hội trường
+    const MAX_RADIUS_METERS = 500;     // Bán kính hợp lệ (mét)
+    const ENABLE_GPS_LOCK = false;     // Đặt true khi vận hành thực tế để khóa điểm danh ngoài bán kính
+
+    // Mật khẩu cổng quản trị
+    const ADMIN_PASSWORD = "betatech1";
+
+    // Khóa lưu trữ localStorage
+    const STORAGE_KEY_LIST = "mb_bt_checkins_v1";
+    const STORAGE_KEY_DEVICE_LOCK = "mb_bt_device_lock_v1";
+    const STORAGE_KEY_LUCKY_WINNERS = "mb_bt_lucky_winners_v1";
+
+    /* =========================================================================
+     * TRẠNG THÁI ỨNG DỤNG (APP STATE)
+     * ========================================================================= */
+    let currentTab = "checkin";
+    let isAdminAuthenticated = false;
+    let adminRecords = [];
+
+    // Trạng thái Quay Số Trúng Thưởng (Lucky Draw)
+    let luckyWinners = [];
+    let luckyAbsentPhones = new Set(); // Loại trừ tạm thời các đại biểu đã vắng mặt khi bấm Hủy / Quay lại
+    let luckyEligiblePool = [];
+    let selectedPrizeTier = "Giải Khuyến Khích";
+    let isCustomPrizeMode = false;
+    let isLuckySpinning = false;
+    let isLuckyMuted = false;
+    let isLuckyFullscreen = false;
+    let luckyAudioCtx = null;
+
+    let gpsState = {
+      status: "loading", // 'loading' | 'verified' | 'outside' | 'unavailable'
+      lat: null,
+      lng: null,
+      distanceMeters: null,
+      label: "Đang kiểm tra GPS...",
+    };
+
+    let cameraStream = null;
+    let scanAnimationId = null;
+    let presentationClockInterval = null;
+    let qrInitialized = false;
+
+    /* =========================================================================
+     * KHỞI TẠO KHI TẢI TRANG
+     * ========================================================================= */
+    document.addEventListener("DOMContentLoaded", () => {
+      switchTab("checkin");
+      checkDeviceLockState();
+      initGPSCheck();
+      updateDataSourcePill();
+      initLuckyDrawState();
+
+      // Escape key exits presentation mode or lucky fullscreen
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          if (!document.getElementById("presentation-overlay").classList.contains("hidden")) {
+            exitPresentationMode();
+          }
+          if (isLuckyFullscreen) {
+            exitLuckyFullscreen();
+          }
+        }
+      });
+
+      document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) {
+          document.getElementById("presentation-overlay").classList.add("hidden");
+          stopPresentationClock();
+          if (isLuckyFullscreen) {
+            exitLuckyFullscreen();
+          }
+        }
+      });
+    });
+
+    /* =========================================================================
+     * ĐIỀU HƯỚNG TAB
+     * ========================================================================= */
+    function switchTab(tabName) {
+      currentTab = tabName;
+      const tabs = ["checkin", "qr", "admin", "lucky"];
+
+      tabs.forEach((t) => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tabName) {
+          view.classList.remove("hidden");
+          btn.classList.add("bg-gradient-to-r", "from-blue-600", "to-cyan-500", "text-white", "shadow-glow");
+          btn.classList.remove("text-slate-400", "hover:text-white");
+          btn.setAttribute("aria-selected", "true");
+        } else {
+          view.classList.add("hidden");
+          btn.classList.remove("bg-gradient-to-r", "from-blue-600", "to-cyan-500", "text-white", "shadow-glow");
+          btn.classList.add("text-slate-400", "hover:text-white");
+          btn.setAttribute("aria-selected", "false");
+        }
+      });
+
+      if (tabName === "qr" && !qrInitialized) {
+        generateHallQRCodes();
+        qrInitialized = true;
+      }
+
+      if (tabName === "admin") {
+        syncAuthGatesUI();
+        if (isAdminAuthenticated) loadAdminData();
+      }
+
+      if (tabName === "lucky") {
+        syncAuthGatesUI();
+        if (isAdminAuthenticated) refreshLuckyPool();
+      }
+    }
+
+    /* =========================================================================
+     * GPS GEOFENCING (HAVERSINE FORMULA)
+     * ========================================================================= */
+    function calculateHaversineMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371000; // Bán kính Trái Đất (mét)
+      const toRad = (deg) => (deg * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return Math.round(R * c);
+    }
+
+    function formatDistance(meters) {
+      if (meters < 1000) return `${meters} m`;
+      return `${(meters / 1000).toFixed(2)} km`;
+    }
+
+    function initGPSCheck() {
+      setGPSBadgeUI("loading");
+
+      if (!("geolocation" in navigator)) {
+        gpsState = {
+          status: "unavailable",
+          lat: null,
+          lng: null,
+          distanceMeters: null,
+          label: "Thiết bị không hỗ trợ GPS",
+        };
+        setGPSBadgeUI("unavailable", "Trình duyệt không hỗ trợ định vị GPS.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = Number(pos.coords.latitude.toFixed(6));
+          const lng = Number(pos.coords.longitude.toFixed(6));
+          const dist = calculateHaversineMeters(lat, lng, VENUE_LAT, VENUE_LNG);
+
+          if (dist <= MAX_RADIUS_METERS) {
+            gpsState = {
+              status: "verified",
+              lat,
+              lng,
+              distanceMeters: dist,
+              label: `Đã xác thực tại hội trường (${formatDistance(dist)})`,
+            };
+            setGPSBadgeUI("verified", `Cách tâm hội trường ${formatDistance(dist)} (trong phạm vi ${MAX_RADIUS_METERS}m)`);
+          } else {
+            gpsState = {
+              status: "outside",
+              lat,
+              lng,
+              distanceMeters: dist,
+              label: `Ngoài phạm vi (${formatDistance(dist)})`,
+            };
+            setGPSBadgeUI(
+              "outside",
+              ENABLE_GPS_LOCK
+                ? `Cách hội trường ${formatDistance(dist)} — Yêu cầu trong bán kính ${MAX_RADIUS_METERS}m`
+                : `Cách hội trường ${formatDistance(dist)} — Chế độ tiêu chuẩn vẫn cho phép điểm danh`
+            );
+          }
+        },
+        (err) => {
+          gpsState = {
+            status: "unavailable",
+            lat: null,
+            lng: null,
+            distanceMeters: null,
+            label: "Chế độ tiêu chuẩn (Chưa cấp quyền GPS)",
+          };
+          const reason =
+            err.code === 1
+              ? "Chưa cấp quyền định vị GPS."
+              : "Không thể lấy tín hiệu GPS hiện tại.";
+          setGPSBadgeUI(
+            "unavailable",
+            ENABLE_GPS_LOCK
+              ? `${reason} Bắt buộc bật GPS để điểm danh.`
+              : `${reason} Đang hoạt động ở chế độ tiêu chuẩn.`
+          );
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+      );
+    }
+
+    function setGPSBadgeUI(type, description = "") {
+      const card = document.getElementById("gps-status-card");
+      const iconBox = document.getElementById("gps-icon-box");
+      const title = document.getElementById("gps-badge-title");
+      const pill = document.getElementById("gps-mode-pill");
+      const desc = document.getElementById("gps-badge-desc");
+
+      pill.textContent = ENABLE_GPS_LOCK ? "Khóa GPS: BẬT" : "Chế độ tiêu chuẩn";
+      pill.className = ENABLE_GPS_LOCK
+        ? "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30"
+        : "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700";
+
+      if (type === "loading") {
+        card.className = "mb-5 p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/70 flex items-center justify-between gap-3";
+        iconBox.className = "w-9 h-9 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0";
+        iconBox.innerHTML = `<svg class="w-5 h-5 text-cyan-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>`;
+        title.className = "text-xs sm:text-sm font-semibold text-slate-200";
+        title.textContent = "Đang xác định vị trí GPS...";
+        desc.textContent = "Đang kiểm tra khoảng cách tới hội trường";
+      } else if (type === "verified") {
+        card.className = "mb-5 p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/35 flex items-center justify-between gap-3";
+        iconBox.className = "w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0";
+        iconBox.innerHTML = `<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>`;
+        title.className = "text-xs sm:text-sm font-semibold text-emerald-300";
+        title.textContent = "Đã xác thực tại hội trường";
+        desc.textContent = description;
+      } else if (type === "outside") {
+        card.className = "mb-5 p-3.5 rounded-xl bg-amber-950/35 border border-amber-500/40 flex items-center justify-between gap-3";
+        iconBox.className = "w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center shrink-0";
+        iconBox.innerHTML = `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>`;
+        title.className = "text-xs sm:text-sm font-semibold text-amber-300";
+        title.textContent = "Cảnh báo khoảng cách GPS";
+        desc.textContent = description;
+      } else {
+        card.className = "mb-5 p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/80 flex items-center justify-between gap-3";
+        iconBox.className = "w-9 h-9 rounded-lg bg-blue-500/15 border border-blue-400/30 flex items-center justify-center shrink-0";
+        iconBox.innerHTML = `<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>`;
+        title.className = "text-xs sm:text-sm font-semibold text-blue-300";
+        title.textContent = ENABLE_GPS_LOCK ? "Yêu cầu bật định vị GPS" : "Chế độ tiêu chuẩn";
+        desc.textContent = description;
+      }
+    }
+
+    /* =========================================================================
+     * QUÉT MÃ QR CCCD BẰNG jsQR (CAMERA & TẢI ẢNH)
+     * ========================================================================= */
+    function parseCCCDQRText(rawText) {
+      if (!rawText) return null;
+      // Định dạng chuẩn QR CCCD Việt Nam: SốCCCD|SốCMND|HọVàTên|NgàySinh|GiớiTính|ĐịaChỉ|NgàyCấp
+      const parts = rawText.split("|");
+      if (parts.length >= 3 && parts[2].trim().length >= 2) {
+        return {
+          fullName: parts[2].trim(),
+          cccdNumber: parts[0].trim(),
+        };
+      }
+      return null;
+    }
+
+    function showCCCDFeedback(success, message) {
+      const box = document.getElementById("cccd-feedback");
+      box.classList.remove("hidden", "bg-emerald-500/15", "text-emerald-300", "border-emerald-500/30", "bg-amber-500/15", "text-amber-300", "border-amber-500/30");
+      if (success) {
+        box.classList.add("bg-emerald-500/15", "text-emerald-300", "border", "border-emerald-500/30");
+      } else {
+        box.classList.add("bg-amber-500/15", "text-amber-300", "border", "border-amber-500/30");
+      }
+      box.textContent = message;
+    }
+
+    function applyCCCDResult(rawData) {
+      const parsed = parseCCCDQRText(rawData);
+      if (parsed) {
+        const nameInput = document.getElementById("input-fullname");
+        nameInput.value = parsed.fullName;
+        nameInput.focus();
+        showCCCDFeedback(true, `✓ Đã tự động điền Họ và tên từ CCCD: ${parsed.fullName}`);
+        return true;
+      } else {
+        showCCCDFeedback(false, "Đã quét được mã QR nhưng không đúng định dạng thẻ CCCD Việt Nam. Vui lòng nhập tay.");
+        return false;
+      }
+    }
+
+    function handleCCCDImageUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxDim = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            const scale = Math.min(maxDim / width, maxDim / height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "attemptBoth" });
+
+          if (code && code.data) {
+            applyCCCDResult(code.data);
+          } else {
+            showCCCDFeedback(false, "Không tìm thấy mã QR rõ nét trong ảnh. Vui lòng chụp gần mã QR trên CCCD hoặc nhập tay.");
+          }
+          event.target.value = "";
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function openCCCDCameraModal() {
+      const modal = document.getElementById("cccd-camera-modal");
+      const video = document.getElementById("cccd-video");
+      const statusText = document.getElementById("camera-status-text");
+
+      modal.classList.remove("hidden");
+      statusText.textContent = "Đang khởi động camera...";
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        statusText.textContent = "Trình duyệt không hỗ trợ mở camera trực tiếp. Hãy dùng nút Chọn Ảnh.";
+        return;
+      }
+
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false,
+        });
+        video.srcObject = cameraStream;
+        await video.play();
+        statusText.textContent = "Đang tìm mã QR trên thẻ CCCD...";
+        scanCameraFrame();
+      } catch (err) {
+        statusText.textContent = "Không thể truy cập camera (cần HTTPS hoặc cấp quyền). Vui lòng dùng nút Chọn Ảnh.";
+      }
+    }
+
+    function scanCameraFrame() {
+      const video = document.getElementById("cccd-video");
+      const canvas = document.getElementById("cccd-canvas");
+
+      if (!cameraStream) return;
+
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+
+        if (code && code.data) {
+          closeCCCDCameraModal();
+          applyCCCDResult(code.data);
+          return;
+        }
+      }
+      scanAnimationId = requestAnimationFrame(scanCameraFrame);
+    }
+
+    function closeCCCDCameraModal() {
+      const modal = document.getElementById("cccd-camera-modal");
+      modal.classList.add("hidden");
+      if (scanAnimationId) {
+        cancelAnimationFrame(scanAnimationId);
+        scanAnimationId = null;
+      }
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+        cameraStream = null;
+      }
+    }
+
+    /* =========================================================================
+     * XỬ LÝ ĐIỂM DANH, KHÓA THIẾT BỊ & THẺ ĐẠI BIỂU ĐIỆN TỬ
+     * ========================================================================= */
+    function formatVietnameseTimestamp(date) {
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} - ${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+    }
+
+    function showFormError(msg) {
+      const box = document.getElementById("form-error-box");
+      const text = document.getElementById("form-error-text");
+      if (!msg) {
+        box.classList.add("hidden");
+        return;
+      }
+      text.textContent = msg;
+      box.classList.remove("hidden");
+    }
+
+    async function handleCheckinSubmit(event) {
+      event.preventDefault();
+      showFormError("");
+
+      // Kiểm tra khóa GPS nếu bật ENABLE_GPS_LOCK
+      if (ENABLE_GPS_LOCK) {
+        if (gpsState.status !== "verified") {
+          showFormError(
+            gpsState.status === "outside"
+              ? `Bạn đang ở ngoài phạm vi hội trường (${formatDistance(gpsState.distanceMeters)} > ${MAX_RADIUS_METERS}m). Không thể điểm danh.`
+              : "Hệ thống yêu cầu bật định vị GPS tại hội trường để hoàn tất điểm danh."
+          );
+          return;
+        }
+      }
+
+      const fullName = document.getElementById("input-fullname").value.trim();
+      const position = document.getElementById("input-position").value.trim();
+      const organization = document.getElementById("input-organization").value.trim();
+      const phone = document.getElementById("input-phone").value.trim();
+
+      const digitsOnly = phone.replace(/\D/g, "");
+      if (digitsOnly.length < 9 || digitsOnly.length > 12) {
+        showFormError("Vui lòng nhập số điện thoại hợp lệ (9–12 chữ số).");
+        return;
+      }
+
+      const now = new Date();
+      const badgeCode = `MB-${String(now.getTime()).slice(-5)}`;
+      const gpsCoordsStr =
+        gpsState.lat !== null && gpsState.lng !== null
+          ? `${gpsState.lat}, ${gpsState.lng}`
+          : "Không có GPS";
+
+      const formattedTime = formatVietnameseTimestamp(now);
+      const record = {
+        id: badgeCode,
+        time: formattedTime,
+        timestamp: formattedTime,
+        isoTime: now.toISOString(),
+        fullName,
+        position,
+        organization,
+        phone,
+        gps: gpsCoordsStr,
+        gpsCoords: gpsCoordsStr,
+        gpsStatus: gpsState.status,
+        gpsLabel: gpsState.label,
+        distanceMeters: gpsState.distanceMeters,
+      };
+
+      const submitBtn = document.getElementById("submit-checkin-btn");
+      const btnLabel = document.getElementById("submit-btn-label");
+      submitBtn.disabled = true;
+      btnLabel.textContent = "ĐANG XÁC THỰC & LƯU DỮ LIỆU...";
+
+      try {
+        await saveCheckinRecord(record);
+        // Lưu cờ khóa thiết bị vào localStorage
+        localStorage.setItem(STORAGE_KEY_DEVICE_LOCK, JSON.stringify(record));
+        renderDigitalEBadge(record);
+        document.getElementById("checkin-form").reset();
+        document.getElementById("cccd-feedback").classList.add("hidden");
+      } catch (err) {
+        console.error(err);
+        showFormError("Không thể kết nối máy chủ điểm danh. Vui lòng thử lại sau giây lát.");
+      } finally {
+        submitBtn.disabled = false;
+        btnLabel.textContent = "XÁC NHẬN ĐIỂM DANH";
+      }
+    }
+
+    function checkDeviceLockState() {
+      const saved = localStorage.getItem(STORAGE_KEY_DEVICE_LOCK);
+      if (saved) {
+        try {
+          const record = JSON.parse(saved);
+          if (record && record.fullName) {
+            renderDigitalEBadge(record);
+            return;
+          }
+        } catch (_) {}
+      }
+      document.getElementById("checkin-form-wrapper").classList.remove("hidden");
+      document.getElementById("ebadge-wrapper").classList.add("hidden");
+    }
+
+    function renderDigitalEBadge(record) {
+      document.getElementById("badge-name").textContent = record.fullName;
+      document.getElementById("badge-position").textContent = record.position;
+      document.getElementById("badge-org").textContent = record.organization;
+      document.getElementById("badge-phone").textContent = record.phone;
+      document.getElementById("badge-time").textContent = record.timestamp;
+      document.getElementById("badge-code").textContent = `#${record.id || "MB-PASS"}`;
+
+      const gpsEl = document.getElementById("badge-gps");
+      if (record.gpsStatus === "verified") {
+        gpsEl.className = "text-xs font-semibold text-emerald-300 text-right";
+        gpsEl.textContent = `✓ ${record.gpsLabel}`;
+      } else if (record.gpsStatus === "outside") {
+        gpsEl.className = "text-xs font-semibold text-amber-300 text-right";
+        gpsEl.textContent = `⚠ ${record.gpsLabel}`;
+      } else {
+        gpsEl.className = "text-xs font-semibold text-cyan-300 text-right";
+        gpsEl.textContent = record.gpsLabel || "Chế độ tiêu chuẩn";
+      }
+
+      document.getElementById("checkin-form-wrapper").classList.add("hidden");
+      document.getElementById("ebadge-wrapper").classList.remove("hidden");
+    }
+
+    function resetDeviceLock() {
+      localStorage.removeItem(STORAGE_KEY_DEVICE_LOCK);
+      document.getElementById("ebadge-wrapper").classList.add("hidden");
+      document.getElementById("checkin-form-wrapper").classList.remove("hidden");
+      showFormError("");
+    }
+
+    /* =========================================================================
+     * LỚP LƯU TRỮ DỮ LIỆU (GOOGLE APPS SCRIPT / LOCALSTORAGE FALLBACK)
+     * ========================================================================= */
+    function isUsingGoogleScript() {
+      return typeof GOOGLE_SCRIPT_URL === "string" && GOOGLE_SCRIPT_URL.trim().length > 0;
+    }
+
+    function updateDataSourcePill() {
+      const pill = document.getElementById("data-source-pill");
+      const clearBtn = document.getElementById("clear-local-btn");
+      if (isUsingGoogleScript()) {
+        pill.textContent = "Google Sheets API";
+        pill.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+        clearBtn.classList.add("hidden");
+      } else {
+        pill.textContent = "LocalStorage (Offline / Test)";
+        pill.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30";
+        clearBtn.classList.remove("hidden");
+      }
+    }
+
+    async function saveCheckinRecord(record) {
+      if (isUsingGoogleScript()) {
+        // Dùng text/plain để tránh CORS preflight với Google Apps Script Web App
+        const res = await fetch(GOOGLE_SCRIPT_URL.trim(), {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(record),
+        });
+        if (!res.ok) throw new Error("Google Script POST failed");
+        return;
+      }
+
+      // Fallback LocalStorage
+      const existing = getLocalRecords();
+      existing.unshift(record);
+      localStorage.setItem(STORAGE_KEY_LIST, JSON.stringify(existing));
+    }
+
+    function getLocalRecords() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_LIST);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchAllRecords() {
+      if (isUsingGoogleScript()) {
+        const res = await fetch(GOOGLE_SCRIPT_URL.trim(), { method: "GET" });
+        if (!res.ok) throw new Error("Google Script GET failed");
+        const json = await res.json();
+        const rows = Array.isArray(json) ? json : Array.isArray(json.data) ? json.data : [];
+        return rows.map((r, idx) => {
+          const gpsVal = r.gps || r.gpsCoords || r["Tọa độ GPS"] || "Không có GPS";
+          let inferredStatus = r.gpsStatus || "unavailable";
+          if (!r.gpsStatus && gpsVal.includes(",")) {
+            const [latStr, lngStr] = gpsVal.split(",").map((v) => parseFloat(v.trim()));
+            if (!isNaN(latStr) && !isNaN(lngStr)) {
+              const dist = calculateHaversineMeters(latStr, lngStr, VENUE_LAT, VENUE_LNG);
+              inferredStatus = dist <= MAX_RADIUS_METERS ? "verified" : "outside";
+            }
+          }
+          return {
+            id: r.id || `GS-${idx + 1}`,
+            timestamp: r.time || r.timestamp || r["Thời gian"] || "",
+            fullName: r.fullName || r["Họ tên"] || r["Họ và tên"] || "",
+            position: r.position || r["Chức vụ"] || "",
+            organization: r.organization || r["Đơn vị"] || "",
+            phone: String(r.phone || r["SĐT"] || ""),
+            gpsCoords: gpsVal,
+            gpsStatus: inferredStatus,
+            gpsLabel: r.gpsLabel || "",
+          };
+        });
+      }
+      return getLocalRecords();
+    }
+
+    /* =========================================================================
+     * TAB 2: MÃ QR HỘI TRƯỜNG & CHẾ ĐỘ TRÌNH CHIẾU LED
+     * ========================================================================= */
+    function getLiveCheckinUrl() {
+      return window.location.href.split("#")[0];
+    }
+
+    function generateHallQRCodes() {
+      const liveUrl = getLiveCheckinUrl();
+      document.getElementById("qr-url-text").textContent = liveUrl;
+      document.getElementById("presentation-url").textContent = liveUrl;
+
+      const hallBox = document.getElementById("hall-qr-container");
+      hallBox.innerHTML = "";
+      new QRCode(hallBox, {
+        text: liveUrl,
+        width: 260,
+        height: 260,
+        colorDark: "#040914",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+
+      const presBox = document.getElementById("presentation-qr-container");
+      presBox.innerHTML = "";
+      new QRCode(presBox, {
+        text: liveUrl,
+        width: 340,
+        height: 340,
+        colorDark: "#040914",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+    }
+
+    function copyLiveUrl() {
+      const url = getLiveCheckinUrl();
+      const btn = document.getElementById("copy-url-btn");
+      navigator.clipboard.writeText(url).then(() => {
+        btn.textContent = "Đã sao chép!";
+        setTimeout(() => (btn.textContent = "Sao chép"), 2000);
+      });
+    }
+
+    function enterPresentationMode() {
+      if (!qrInitialized) {
+        generateHallQRCodes();
+        qrInitialized = true;
+      }
+      const overlay = document.getElementById("presentation-overlay");
+      overlay.classList.remove("hidden");
+      startPresentationClock();
+
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {
+          // Vẫn giữ overlay toàn màn hình kể cả khi trình duyệt chặn Fullscreen API
+        });
+      }
+    }
+
+    function exitPresentationMode() {
+      document.getElementById("presentation-overlay").classList.add("hidden");
+      stopPresentationClock();
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function startPresentationClock() {
+      const update = () => {
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        document.getElementById("presentation-clock").textContent =
+          `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        document.getElementById("presentation-date").textContent =
+          `Ngày ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+      };
+      update();
+      stopPresentationClock();
+      presentationClockInterval = setInterval(update, 1000);
+    }
+
+    function stopPresentationClock() {
+      if (presentationClockInterval) {
+        clearInterval(presentationClockInterval);
+        presentationClockInterval = null;
+      }
+    }
+
+    /* =========================================================================
+     * TAB 3: QUẢN TRỊ VIÊN & XUẤT EXCEL (SHEETJS)
+     * ========================================================================= */
+    function syncAuthGatesUI() {
+      const adminGate = document.getElementById("admin-login-gate");
+      const adminDash = document.getElementById("admin-dashboard");
+      const luckyGate = document.getElementById("lucky-login-gate");
+      const luckyStage = document.getElementById("lucky-stage-container");
+
+      if (isAdminAuthenticated) {
+        adminGate.classList.add("hidden");
+        adminDash.classList.remove("hidden");
+        luckyGate.classList.add("hidden");
+        luckyStage.classList.remove("hidden");
+      } else {
+        adminDash.classList.add("hidden");
+        adminGate.classList.remove("hidden");
+        luckyStage.classList.add("hidden");
+        luckyGate.classList.remove("hidden");
+      }
+    }
+
+    function handleAdminLogin(event) {
+      event.preventDefault();
+      const input = document.getElementById("admin-password-input");
+      const errorEl = document.getElementById("admin-login-error");
+      const gate = document.getElementById("admin-login-gate");
+
+      if (input.value === ADMIN_PASSWORD) {
+        isAdminAuthenticated = true;
+        errorEl.classList.add("hidden");
+        input.value = "";
+        syncAuthGatesUI();
+        loadAdminData();
+      } else {
+        errorEl.classList.remove("hidden");
+        gate.classList.remove("animate-shake");
+        void gate.offsetWidth;
+        gate.classList.add("animate-shake");
+        input.select();
+      }
+    }
+
+    function handleLuckyLogin(event) {
+      event.preventDefault();
+      const input = document.getElementById("lucky-password-input");
+      const errorEl = document.getElementById("lucky-login-error");
+      const gate = document.getElementById("lucky-login-gate");
+
+      if (input.value === ADMIN_PASSWORD) {
+        isAdminAuthenticated = true;
+        errorEl.classList.add("hidden");
+        input.value = "";
+        syncAuthGatesUI();
+        refreshLuckyPool();
+      } else {
+        errorEl.classList.remove("hidden");
+        gate.classList.remove("animate-shake");
+        void gate.offsetWidth;
+        gate.classList.add("animate-shake");
+        input.select();
+      }
+    }
+
+    function handleAdminLogout() {
+      isAdminAuthenticated = false;
+      if (isLuckyFullscreen) exitLuckyFullscreen();
+      syncAuthGatesUI();
+    }
+
+    function toggleAdminPasswordVisibility() {
+      const input = document.getElementById("admin-password-input");
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    function toggleLuckyPasswordVisibility() {
+      const input = document.getElementById("lucky-password-input");
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    async function loadAdminData() {
+      const refreshIcon = document.getElementById("refresh-icon");
+      refreshIcon.classList.add("animate-spin");
+
+      try {
+        adminRecords = await fetchAllRecords();
+        updateAdminMetrics();
+        renderAdminTable();
+      } catch (err) {
+        console.error(err);
+        document.getElementById("admin-table-body").innerHTML = `
+          <tr>
+            <td colspan="7" class="py-10 text-center text-rose-400 text-sm">
+              Không thể tải dữ liệu từ máy chủ. Vui lòng kiểm tra lại cấu hình GOOGLE_SCRIPT_URL.
+            </td>
+          </tr>`;
+      } finally {
+        refreshIcon.classList.remove("animate-spin");
+      }
+    }
+
+    function updateAdminMetrics() {
+      const total = adminRecords.length;
+      const gpsVerified = adminRecords.filter((r) => r.gpsStatus === "verified").length;
+      const uniqueOrgs = new Set(
+        adminRecords.map((r) => (r.organization || "").trim().toLowerCase()).filter(Boolean)
+      ).size;
+
+      document.getElementById("metric-total").textContent = total;
+      document.getElementById("metric-gps-verified").textContent = gpsVerified;
+      document.getElementById("metric-orgs").textContent = uniqueOrgs;
+
+      if (total > 0) {
+        const latest = adminRecords[0];
+        document.getElementById("metric-latest").textContent = (latest.timestamp || "").split(" - ")[0] || latest.timestamp;
+        document.getElementById("metric-latest-name").textContent = latest.fullName || "";
+      } else {
+        document.getElementById("metric-latest").textContent = "--:--:--";
+        document.getElementById("metric-latest-name").textContent = "Chưa có dữ liệu";
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function renderAdminTable() {
+      const query = (document.getElementById("admin-search-input").value || "").trim().toLowerCase();
+      const tbody = document.getElementById("admin-table-body");
+
+      const filtered = adminRecords.filter((r) => {
+        if (!query) return true;
+        return [r.fullName, r.position, r.organization, r.phone, r.timestamp, r.gpsCoords]
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      });
+
+      document.getElementById("table-count-label").textContent = `Hiển thị ${filtered.length} / ${adminRecords.length} đại biểu`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-12 text-center text-slate-500">
+              ${adminRecords.length === 0 ? "Chưa có đại biểu nào điểm danh." : "Không tìm thấy đại biểu phù hợp với từ khóa."}
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered
+        .map((r, index) => {
+          const hasCoords = r.gpsCoords && r.gpsCoords.includes(",");
+          const mapLink = hasCoords
+            ? `<a href="https://www.google.com/maps?q=${encodeURIComponent(r.gpsCoords)}" target="_blank" rel="noopener" class="text-cyan-400 hover:underline font-mono text-xs">${escapeHtml(r.gpsCoords)}</a>`
+            : `<span class="text-slate-500 text-xs">${escapeHtml(r.gpsCoords || "Không có GPS")}</span>`;
+
+          const statusDot =
+            r.gpsStatus === "verified"
+              ? `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1.5" title="Đã xác thực tại hội trường"></span>`
+              : r.gpsStatus === "outside"
+              ? `<span class="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1.5" title="Ngoài bán kính hội trường"></span>`
+              : `<span class="inline-block w-2 h-2 rounded-full bg-slate-500 mr-1.5" title="Chế độ tiêu chuẩn"></span>`;
+
+          return `
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="py-3.5 px-4 text-center font-mono text-slate-400">${index + 1}</td>
+              <td class="py-3.5 px-4 font-mono text-xs text-cyan-300 whitespace-nowrap">${escapeHtml(r.timestamp)}</td>
+              <td class="py-3.5 px-4 font-semibold text-white whitespace-nowrap">${escapeHtml(r.fullName)}</td>
+              <td class="py-3.5 px-4 text-slate-300">${escapeHtml(r.position)}</td>
+              <td class="py-3.5 px-4 text-slate-300">${escapeHtml(r.organization)}</td>
+              <td class="py-3.5 px-4 font-mono text-slate-200 whitespace-nowrap">${escapeHtml(r.phone)}</td>
+              <td class="py-3.5 px-4 whitespace-nowrap">${statusDot}${mapLink}</td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    function exportToExcel() {
+      if ((!adminRecords || adminRecords.length === 0) && (!luckyWinners || luckyWinners.length === 0)) {
+        alert("Chưa có dữ liệu đại biểu hoặc danh sách trúng thưởng để xuất Excel.");
+        return;
+      }
+
+      const workbook = XLSX.utils.book_new();
+
+      // Sheet 1: DanhSachDiemDanh
+      const checkinRows = (adminRecords || []).map((r, idx) => ({
+        "STT": idx + 1,
+        "Thời gian": r.timestamp || "",
+        "Họ tên": r.fullName || "",
+        "Chức vụ": r.position || "",
+        "Đơn vị": r.organization || "",
+        "SĐT": r.phone || "",
+        "Tọa độ GPS": r.gpsCoords || "Không có GPS",
+      }));
+
+      const wsCheckin =
+        checkinRows.length > 0
+          ? XLSX.utils.json_to_sheet(checkinRows)
+          : XLSX.utils.aoa_to_sheet([["STT", "Thời gian", "Họ tên", "Chức vụ", "Đơn vị", "SĐT", "Tọa độ GPS"]]);
+
+      wsCheckin["!cols"] = [
+        { wch: 6 },  // STT
+        { wch: 22 }, // Thời gian
+        { wch: 28 }, // Họ tên
+        { wch: 24 }, // Chức vụ
+        { wch: 36 }, // Đơn vị
+        { wch: 16 }, // SĐT
+        { wch: 24 }, // Tọa độ GPS
+      ];
+      XLSX.utils.book_append_sheet(workbook, wsCheckin, "DanhSachDiemDanh");
+
+      // Sheet 2: DanhSachTrungThuong
+      const winnerRows = (luckyWinners || []).map((w, idx) => ({
+        "STT": idx + 1,
+        "Giải thưởng": w.prizeTier || "",
+        "Thời gian quay": w.drawnAt || "",
+        "Họ tên": w.fullName || "",
+        "Chức vụ": w.position || "",
+        "Đơn vị": w.organization || "",
+        "SĐT": w.phone || "",
+      }));
+
+      const wsWinners =
+        winnerRows.length > 0
+          ? XLSX.utils.json_to_sheet(winnerRows)
+          : XLSX.utils.aoa_to_sheet([["STT", "Giải thưởng", "Thời gian quay", "Họ tên", "Chức vụ", "Đơn vị", "SĐT"]]);
+
+      wsWinners["!cols"] = [
+        { wch: 6 },  // STT
+        { wch: 24 }, // Giải thưởng
+        { wch: 22 }, // Thời gian quay
+        { wch: 28 }, // Họ tên
+        { wch: 24 }, // Chức vụ
+        { wch: 36 }, // Đơn vị
+        { wch: 16 }, // SĐT
+      ];
+      XLSX.utils.book_append_sheet(workbook, wsWinners, "DanhSachTrungThuong");
+
+      // Tên file: DiemDanh_Mobifone_Betatech_YYYY-MM-DD.xlsx
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+      const fileName = `DiemDanh_Mobifone_Betatech_${dateStr}.xlsx`;
+
+      XLSX.writeFile(workbook, fileName);
+    }
+
+    function clearLocalTestData() {
+      if (!confirm("Bạn có chắc muốn xóa toàn bộ dữ liệu điểm danh thử nghiệm trong trình duyệt này?")) {
+        return;
+      }
+      localStorage.removeItem(STORAGE_KEY_LIST);
+      localStorage.removeItem(STORAGE_KEY_DEVICE_LOCK);
+      loadAdminData();
+      checkDeviceLockState();
+    }
+
+    /* =========================================================================
+     * TAB 4: QUAY SỐ TRÚNG THƯỞNG (LUCKY DRAW - LED STAGE)
+     * ========================================================================= */
+    function initLuckyDrawState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_LUCKY_WINNERS);
+        luckyWinners = saved ? JSON.parse(saved) : [];
+        if (!Array.isArray(luckyWinners)) luckyWinners = [];
+      } catch (_) {
+        luckyWinners = [];
+      }
+
+      const firstPill = document.querySelector("#prize-tier-pills .prize-pill");
+      if (firstPill) {
+        selectPrizeTier("Giải Khuyến Khích", firstPill);
+      }
+      renderWinnersBoard();
+    }
+
+    function saveLuckyWinnersToStorage() {
+      localStorage.setItem(STORAGE_KEY_LUCKY_WINNERS, JSON.stringify(luckyWinners));
+    }
+
+    function normalizePhoneKey(phone) {
+      return String(phone || "").replace(/\D/g, "");
+    }
+
+    function maskPhoneNumber(phone) {
+      const digits = normalizePhoneKey(phone);
+      if (digits.length >= 8) {
+        return `${digits.slice(0, 4)} *** ${digits.slice(-3)}`;
+      }
+      if (digits.length >= 5) {
+        return `${digits.slice(0, 2)}***${digits.slice(-2)}`;
+      }
+      return phone || "—";
+    }
+
+    async function refreshLuckyPool() {
+      const icon = document.getElementById("lucky-refresh-icon");
+      if (icon) icon.classList.add("animate-spin");
+
+      try {
+        adminRecords = await fetchAllRecords();
+        rebuildLuckyEligiblePool();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (icon) icon.classList.remove("animate-spin");
+      }
+    }
+
+    function rebuildLuckyEligiblePool() {
+      const winnerPhones = new Set(luckyWinners.map((w) => normalizePhoneKey(w.phone)).filter(Boolean));
+      const seenPhones = new Set();
+      const pool = [];
+
+      for (const r of adminRecords) {
+        const phoneKey = normalizePhoneKey(r.phone);
+        if (!phoneKey) continue;
+        if (seenPhones.has(phoneKey)) continue; // Lọc trùng SĐT
+        seenPhones.add(phoneKey);
+
+        if (winnerPhones.has(phoneKey)) continue; // Loại đại biểu đã trúng giải
+        if (luckyAbsentPhones.has(phoneKey)) continue; // Loại đại biểu đã hủy do vắng mặt
+
+        pool.push({
+          fullName: r.fullName || "Đại biểu",
+          position: r.position || "",
+          organization: r.organization || "",
+          phone: r.phone || "",
+          phoneKey,
+        });
+      }
+
+      luckyEligiblePool = pool;
+      document.getElementById("lucky-eligible-count").textContent = luckyEligiblePool.length;
+
+      const spinBtn = document.getElementById("lucky-spin-btn");
+      if (!isLuckySpinning) {
+        spinBtn.disabled = luckyEligiblePool.length === 0;
+      }
+      renderWinnersBoard();
+    }
+
+    function selectPrizeTier(tier, btnEl) {
+      const pills = document.querySelectorAll("#prize-tier-pills .prize-pill");
+      pills.forEach((p) => {
+        p.className = "prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition bg-slate-900/80 border-slate-700 text-slate-300 hover:border-cyan-500/40 hover:text-white";
+      });
+
+      if (btnEl) {
+        btnEl.className = "prize-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-gradient-to-r from-amber-500/25 to-cyan-500/25 border-amber-400/70 text-amber-200 shadow-glow";
+      }
+
+      const customWrapper = document.getElementById("custom-prize-wrapper");
+      if (tier === "__CUSTOM__") {
+        isCustomPrizeMode = true;
+        customWrapper.classList.remove("hidden");
+        const customInput = document.getElementById("custom-prize-input");
+        customInput.focus();
+        updateCustomPrizeName();
+      } else {
+        isCustomPrizeMode = false;
+        customWrapper.classList.add("hidden");
+        selectedPrizeTier = tier;
+        updateStagePrizeLabel();
+      }
+    }
+
+    function updateCustomPrizeName() {
+      const val = (document.getElementById("custom-prize-input").value || "").trim();
+      selectedPrizeTier = val || "Giải Thưởng Đặc Biệt";
+      updateStagePrizeLabel();
+    }
+
+    function updateStagePrizeLabel() {
+      document.getElementById("lucky-active-prize-preview").textContent = selectedPrizeTier;
+      document.getElementById("stage-prize-label").textContent = selectedPrizeTier.toUpperCase();
+    }
+
+    /* ----- Web Audio API Synthesized Sound Effects (Offline, Zero External Audio) ----- */
+    function getLuckyAudioContext() {
+      if (!luckyAudioCtx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) luckyAudioCtx = new AudioCtx();
+      }
+      if (luckyAudioCtx && luckyAudioCtx.state === "suspended") {
+        luckyAudioCtx.resume().catch(() => {});
+      }
+      return luckyAudioCtx;
+    }
+
+    function playSpinTickSound(progress) {
+      if (isLuckyMuted) return;
+      const ctx = getLuckyAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "triangle";
+      // Tần số tăng nhẹ theo tiến độ giảm tốc để tạo cảm giác hồi hộp
+      osc.frequency.setValueAtTime(340 + progress * 260, now);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.06);
+    }
+
+    function playWinnerFanfareSound() {
+      if (isLuckyMuted) return;
+      const ctx = getLuckyAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      // Arpeggio chiến thắng (C5 - E5 - G5 - C6)
+      const notes = [
+        { freq: 523.25, start: 0.0, dur: 0.18 },
+        { freq: 659.25, start: 0.12, dur: 0.18 },
+        { freq: 783.99, start: 0.24, dur: 0.22 },
+        { freq: 1046.5, start: 0.38, dur: 0.75 },
+      ];
+
+      notes.forEach((n) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(n.freq, now + n.start);
+
+        gain.gain.setValueAtTime(0.001, now + n.start);
+        gain.gain.linearRampToValueAtTime(0.16, now + n.start + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + n.start + n.dur);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + n.start);
+        osc.stop(now + n.start + n.dur + 0.05);
+      });
+    }
+
+    function toggleLuckySound() {
+      isLuckyMuted = !isLuckyMuted;
+      const onIcon = document.getElementById("lucky-sound-on-icon");
+      const offIcon = document.getElementById("lucky-sound-off-icon");
+      const label = document.getElementById("lucky-mute-label");
+
+      if (isLuckyMuted) {
+        onIcon.classList.add("hidden");
+        offIcon.classList.remove("hidden");
+        label.textContent = "Âm thanh: TẮT";
+      } else {
+        offIcon.classList.add("hidden");
+        onIcon.classList.remove("hidden");
+        label.textContent = "Âm thanh: BẬT";
+        getLuckyAudioContext();
+      }
+    }
+
+    /* ----- Confetti Celebration ----- */
+    function fireLuckyConfetti() {
+      if (typeof confetti !== "function") return;
+      const colors = ["#22d3ee", "#3b82f6", "#facc15", "#ffffff", "#34d399"];
+
+      confetti({
+        particleCount: 90,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors,
+      });
+
+      setTimeout(() => {
+        confetti({
+          particleCount: 55,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0.08, y: 0.68 },
+          colors,
+        });
+        confetti({
+          particleCount: 55,
+          angle: 120,
+          spread: 55,
+          origin: { x: 0.92, y: 0.68 },
+          colors,
+        });
+      }, 220);
+    }
+
+    /* ----- Slot-Machine Smooth Deceleration Spin (~4 seconds) ----- */
+    function startLuckyDrawSpin() {
+      if (isLuckySpinning) return;
+
+      if (luckyEligiblePool.length === 0) {
+        alert("Không còn đại biểu hợp lệ nào trong danh sách quay thưởng.");
+        return;
+      }
+
+      // Khởi tạo AudioContext theo thao tác người dùng
+      if (!isLuckyMuted) getLuckyAudioContext();
+
+      isLuckySpinning = true;
+      const spinBtn = document.getElementById("lucky-spin-btn");
+      const spinLabel = document.getElementById("lucky-spin-label");
+      const spinIcon = document.getElementById("spin-btn-icon");
+      const stageBox = document.getElementById("lucky-stage-box");
+      const resultContent = document.getElementById("stage-result-content");
+      const subtitle = document.getElementById("stage-status-subtitle");
+      const phoneBadge = document.getElementById("stage-winner-phone-badge");
+
+      spinBtn.disabled = true;
+      spinLabel.textContent = "ĐANG QUAY SỐ...";
+      spinIcon.classList.add("animate-spin");
+      stageBox.classList.remove("is-winner");
+      stageBox.classList.add("is-spinning");
+      resultContent.classList.remove("animate-winner-pop");
+      subtitle.textContent = "Đang lựa chọn ngẫu nhiên đại biểu may mắn...";
+      subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-300 font-semibold mb-3 animate-pulse";
+      phoneBadge.classList.remove("hidden");
+
+      // Chọn ngẫu nhiên người trúng giải trước bằng crypto.getRandomValues nếu có
+      const winnerIndex = getSecureRandomInt(luckyEligiblePool.length);
+      const finalWinner = luckyEligiblePool[winnerIndex];
+
+      const totalDurationMs = 4000;
+      const startTime = performance.now();
+      let lastIndex = -1;
+
+      function displayCandidate(candidate) {
+        document.getElementById("stage-winner-name").textContent = candidate.fullName;
+        document.getElementById("stage-winner-position").textContent = candidate.position || "Đại biểu tham dự";
+        document.getElementById("stage-winner-org").textContent = candidate.organization || "";
+        document.getElementById("stage-winner-phone").textContent = maskPhoneNumber(candidate.phone);
+      }
+
+      function tick() {
+        const elapsed = performance.now() - startTime;
+        const progress = Math.min(elapsed / totalDurationMs, 1);
+
+        if (progress < 1) {
+          let randomIdx = Math.floor(Math.random() * luckyEligiblePool.length);
+          if (luckyEligiblePool.length > 1 && randomIdx === lastIndex) {
+            randomIdx = (randomIdx + 1) % luckyEligiblePool.length;
+          }
+          lastIndex = randomIdx;
+          displayCandidate(luckyEligiblePool[randomIdx]);
+          playSpinTickSound(progress);
+
+          // Vật lý giảm tốc mượt (ease-out cubic: từ 45ms tăng dần lên ~370ms)
+          const eased = Math.pow(progress, 3);
+          const nextDelay = Math.round(45 + eased * 325);
+          setTimeout(tick, nextDelay);
+        } else {
+          // Chốt kết quả người thắng cuộc
+          displayCandidate(finalWinner);
+          stageBox.classList.remove("is-spinning");
+          stageBox.classList.add("is-winner");
+          resultContent.classList.add("animate-winner-pop");
+          subtitle.textContent = "🎉 CHÚC MỪNG ĐẠI BIỂU TRÚNG THƯỞNG 🎉";
+          subtitle.className = "text-xs sm:text-base uppercase tracking-[0.25em] text-amber-300 font-extrabold mb-3";
+
+          const winnerEntry = {
+            id: `WIN-${Date.now()}`,
+            prizeTier: selectedPrizeTier,
+            drawnAt: formatVietnameseTimestamp(new Date()),
+            fullName: finalWinner.fullName,
+            position: finalWinner.position,
+            organization: finalWinner.organization,
+            phone: finalWinner.phone,
+          };
+
+          luckyWinners.unshift(winnerEntry);
+          saveLuckyWinnersToStorage();
+          rebuildLuckyEligiblePool();
+
+          playWinnerFanfareSound();
+          fireLuckyConfetti();
+
+          isLuckySpinning = false;
+          spinIcon.classList.remove("animate-spin");
+          spinLabel.textContent = "QUAY SỐ NGAY";
+          spinBtn.disabled = luckyEligiblePool.length === 0;
+        }
+      }
+
+      tick();
+    }
+
+    function getSecureRandomInt(max) {
+      if (window.crypto && window.crypto.getRandomValues) {
+        const arr = new Uint32Array(1);
+        window.crypto.getRandomValues(arr);
+        return arr[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    /* ----- Winners Board & Cancel/Redraw ----- */
+    function renderWinnersBoard() {
+      const tbody = document.getElementById("lucky-winners-tbody");
+      const badge = document.getElementById("winners-count-badge");
+      if (!tbody || !badge) return;
+
+      badge.textContent = `${luckyWinners.length} giải đã trao`;
+
+      if (luckyWinners.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-10 text-center text-slate-500">
+              Chưa có đại biểu nào trúng thưởng. Chọn hạng mục giải và nhấn "QUAY SỐ NGAY" để bắt đầu.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = luckyWinners
+        .map(
+          (w) => `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-3.5 px-4 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-400/35">
+                ${escapeHtml(w.prizeTier)}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 font-bold text-white whitespace-nowrap">${escapeHtml(w.fullName)}</td>
+            <td class="py-3.5 px-4 text-slate-300">${escapeHtml(w.position)}</td>
+            <td class="py-3.5 px-4 text-slate-300">${escapeHtml(w.organization)}</td>
+            <td class="py-3.5 px-4 font-mono text-cyan-300 whitespace-nowrap" title="${escapeHtml(w.phone)}">${escapeHtml(maskPhoneNumber(w.phone))}</td>
+            <td class="py-3.5 px-4 text-right whitespace-nowrap">
+              <button
+                type="button"
+                onclick="cancelWinnerAndRedraw('${escapeHtml(w.id)}')"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/35 transition"
+              >
+                Hủy / Quay lại
+              </button>
+            </td>
+          </tr>`
+        )
+        .join("");
+    }
+
+    function cancelWinnerAndRedraw(winnerId) {
+      if (isLuckySpinning) return;
+      const idx = luckyWinners.findIndex((w) => w.id === winnerId);
+      if (idx === -1) return;
+
+      const target = luckyWinners[idx];
+      if (!confirm(`Hủy giải "${target.prizeTier}" của đại biểu ${target.fullName} (do vắng mặt) và quay lại giải này?`)) {
+        return;
+      }
+
+      // Đánh dấu vắng mặt để không quay trúng lại người đã rời hội trường
+      const phoneKey = normalizePhoneKey(target.phone);
+      if (phoneKey) luckyAbsentPhones.add(phoneKey);
+
+      luckyWinners.splice(idx, 1);
+      saveLuckyWinnersToStorage();
+
+      // Tự động đặt lại hạng mục giải vừa hủy để MC quay lại ngay
+      selectedPrizeTier = target.prizeTier;
+      updateStagePrizeLabel();
+      rebuildLuckyEligiblePool();
+    }
+
+    /* ----- Lucky Draw Full-Screen LED Presentation Toggle ----- */
+    function toggleLuckyFullscreen() {
+      if (isLuckyFullscreen) {
+        exitLuckyFullscreen();
+      } else {
+        enterLuckyFullscreen();
+      }
+    }
+
+    function enterLuckyFullscreen() {
+      const container = document.getElementById("lucky-stage-container");
+      container.classList.add("lucky-fullscreen-active");
+      isLuckyFullscreen = true;
+      document.getElementById("lucky-fullscreen-label").textContent = "Thoát Toàn Màn Hình";
+
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    }
+
+    function exitLuckyFullscreen() {
+      const container = document.getElementById("lucky-stage-container");
+      container.classList.remove("lucky-fullscreen-active");
+      isLuckyFullscreen = false;
+      document.getElementById("lucky-fullscreen-label").textContent = "Toàn Màn Hình LED";
+
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  </script>
+</body>
+</html>
