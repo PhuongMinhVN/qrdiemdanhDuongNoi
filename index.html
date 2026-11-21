@@ -2556,8 +2556,10 @@
     }
 
     /* =========================================================================
-     * LỚP LƯU TRỮ DỮ LIỆU (GOOGLE APPS SCRIPT / LOCALSTORAGE FALLBACK)
+     * LỚP LƯU TRỮ DỮ LIỆU (CLOUDFLARE KV / GOOGLE APPS SCRIPT / LOCALSTORAGE FALLBACK)
      * ========================================================================= */
+    let activeStorageMode = "local"; // 'cloudflare_kv' | 'google_sheets' | 'local'
+
     function isUsingGoogleScript() {
       return typeof GOOGLE_SCRIPT_URL === "string" && GOOGLE_SCRIPT_URL.trim().length > 0;
     }
@@ -2565,13 +2567,22 @@
     function updateDataSourcePill() {
       const pill = document.getElementById("data-source-pill");
       const clearBtn = document.getElementById("clear-local-btn");
+      if (!pill || !clearBtn) return;
+
       if (isUsingGoogleScript()) {
+        activeStorageMode = "google_sheets";
         pill.textContent = "Google Sheets API";
         pill.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
         clearBtn.classList.add("hidden");
+      } else if (activeStorageMode === "cloudflare_kv") {
+        pill.textContent = "Cloudflare KV (Trực tuyến)";
+        pill.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+        clearBtn.textContent = "Xóa dữ liệu hệ thống";
+        clearBtn.classList.remove("hidden");
       } else {
         pill.textContent = "LocalStorage (Offline / Test)";
         pill.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30";
+        clearBtn.textContent = "Xóa dữ liệu cục bộ";
         clearBtn.classList.remove("hidden");
       }
     }
@@ -2588,7 +2599,23 @@
         return;
       }
 
-      // Fallback LocalStorage
+      // Ưu tiên lưu vào Cloudflare Pages Function (/api/checkins -> Cloudflare KV)
+      if (window.location.protocol.startsWith("http")) {
+        try {
+          const res = await fetch("/api/checkins", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(record),
+          });
+          if (res.ok) {
+            activeStorageMode = "cloudflare_kv";
+            updateDataSourcePill();
+            return;
+          }
+        } catch (_) {}
+      }
+
+      // Fallback LocalStorage khi chưa gắn KV hoặc mở file trực tiếp
       const existing = getLocalRecords();
       existing.unshift(record);
       localStorage.setItem(STORAGE_KEY_LIST, JSON.stringify(existing));
@@ -2604,35 +2631,55 @@
       }
     }
 
+    function normalizeRecordRow(r, idx) {
+      const gpsVal = r.gps || r.gpsCoords || r["Tọa độ GPS"] || "Không có GPS";
+      let inferredStatus = r.gpsStatus || "unavailable";
+      if (!r.gpsStatus && gpsVal.includes(",")) {
+        const [latStr, lngStr] = gpsVal.split(",").map((v) => parseFloat(v.trim()));
+        if (!isNaN(latStr) && !isNaN(lngStr)) {
+          const dist = calculateHaversineMeters(latStr, lngStr, VENUE_LAT, VENUE_LNG);
+          inferredStatus = dist <= MAX_RADIUS_METERS ? "verified" : "outside";
+        }
+      }
+      return {
+        id: r.id || `ROW-${idx + 1}`,
+        timestamp: r.time || r.timestamp || r["Thời gian"] || "",
+        fullName: r.fullName || r["Họ tên"] || r["Họ và tên"] || "",
+        position: r.position || r["Chức vụ"] || "",
+        organization: r.organization || r["Đơn vị"] || "",
+        phone: String(r.phone || r["SĐT"] || ""),
+        gpsCoords: gpsVal,
+        gpsStatus: inferredStatus,
+        gpsLabel: r.gpsLabel || "",
+      };
+    }
+
     async function fetchAllRecords() {
       if (isUsingGoogleScript()) {
         const res = await fetch(GOOGLE_SCRIPT_URL.trim(), { method: "GET" });
         if (!res.ok) throw new Error("Google Script GET failed");
         const json = await res.json();
         const rows = Array.isArray(json) ? json : Array.isArray(json.data) ? json.data : [];
-        return rows.map((r, idx) => {
-          const gpsVal = r.gps || r.gpsCoords || r["Tọa độ GPS"] || "Không có GPS";
-          let inferredStatus = r.gpsStatus || "unavailable";
-          if (!r.gpsStatus && gpsVal.includes(",")) {
-            const [latStr, lngStr] = gpsVal.split(",").map((v) => parseFloat(v.trim()));
-            if (!isNaN(latStr) && !isNaN(lngStr)) {
-              const dist = calculateHaversineMeters(latStr, lngStr, VENUE_LAT, VENUE_LNG);
-              inferredStatus = dist <= MAX_RADIUS_METERS ? "verified" : "outside";
+        return rows.map((r, idx) => normalizeRecordRow(r, idx));
+      }
+
+      // Ưu tiên đọc từ Cloudflare Pages Function (/api/checkins -> Cloudflare KV)
+      if (window.location.protocol.startsWith("http")) {
+        try {
+          const res = await fetch("/api/checkins", { method: "GET", cache: "no-store" });
+          if (res.ok) {
+            const json = await res.json();
+            if (json && json.status === "success" && Array.isArray(json.data)) {
+              activeStorageMode = "cloudflare_kv";
+              updateDataSourcePill();
+              return json.data.map((r, idx) => normalizeRecordRow(r, idx));
             }
           }
-          return {
-            id: r.id || `GS-${idx + 1}`,
-            timestamp: r.time || r.timestamp || r["Thời gian"] || "",
-            fullName: r.fullName || r["Họ tên"] || r["Họ và tên"] || "",
-            position: r.position || r["Chức vụ"] || "",
-            organization: r.organization || r["Đơn vị"] || "",
-            phone: String(r.phone || r["SĐT"] || ""),
-            gpsCoords: gpsVal,
-            gpsStatus: inferredStatus,
-            gpsLabel: r.gpsLabel || "",
-          };
-        });
+        } catch (_) {}
       }
+
+      activeStorageMode = "local";
+      updateDataSourcePill();
       return getLocalRecords();
     }
 
@@ -2988,9 +3035,23 @@
       XLSX.writeFile(workbook, fileName);
     }
 
-    function clearLocalTestData() {
-      if (!confirm("Bạn có chắc muốn xóa toàn bộ dữ liệu điểm danh thử nghiệm trong trình duyệt này?")) {
+    async function clearLocalTestData() {
+      const msg =
+        activeStorageMode === "cloudflare_kv"
+          ? "Bạn có chắc muốn xóa TOÀN BỘ danh sách điểm danh đang lưu trên Cloudflare KV không?"
+          : "Bạn có chắc muốn xóa toàn bộ dữ liệu điểm danh thử nghiệm trong trình duyệt này?";
+      if (!confirm(msg)) {
         return;
+      }
+      if (activeStorageMode === "cloudflare_kv") {
+        try {
+          await fetch("/api/checkins", {
+            method: "DELETE",
+            headers: { "X-Admin-Password": ADMIN_PASSWORD },
+          });
+        } catch (err) {
+          console.error(err);
+        }
       }
       localStorage.removeItem(STORAGE_KEY_LIST);
       localStorage.removeItem(STORAGE_KEY_DEVICE_LOCK);
