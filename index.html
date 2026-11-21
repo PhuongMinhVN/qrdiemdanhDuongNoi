@@ -1655,10 +1655,17 @@
 
       if (enhanceContrast) {
         const d = imageData.data;
+        // Tính độ sáng trung bình cục bộ để tách đen-trắng chuẩn hơn
+        let sum = 0;
+        for (let i = 0; i < d.length; i += 16) {
+          sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        }
+        const avg = sum / (d.length / 16);
+        const thresh = Math.max(70, Math.min(185, avg * 0.92));
         for (let i = 0; i < d.length; i += 4) {
           const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-          const boosted = gray > 130 ? 255 : gray < 95 ? 0 : Math.min(255, Math.max(0, (gray - 112) * 3 + 128));
-          d[i] = d[i + 1] = d[i + 2] = boosted;
+          const v = gray > thresh ? 255 : 0;
+          d[i] = d[i + 1] = d[i + 2] = v;
         }
       }
 
@@ -1666,18 +1673,37 @@
       return code && code.data ? code.data : null;
     }
 
+    async function tryNativeBarcodeDetector(img) {
+      if (!("BarcodeDetector" in window)) return null;
+      try {
+        const detector = new BarcodeDetector({ formats: ["qr_code"] });
+        // Quét toàn ảnh gốc trước (ML Kit đọc cực nhạy kể cả QR nhỏ/nghiêng)
+        const results = await detector.detect(img);
+        for (const r of results) {
+          if (r && r.rawValue) {
+            const parsed = parseCCCDQRText(r.rawValue);
+            if (parsed) return parsed;
+          }
+        }
+      } catch (_) {}
+      return null;
+    }
+
     function tryMultiRegionCCCDQR(img) {
       const W = img.naturalWidth || img.width;
       const H = img.naturalHeight || img.height;
 
-      // Ưu tiên góc trên-phải (vị trí QR chuẩn trên CCCD), sau đó 3 góc còn lại (khi ảnh bị xoay) và toàn ảnh độ phân giải cao
+      // Bao phủ cả ảnh chụp cận cảnh thẻ (QR ở góc) lẫn ảnh chụp dọc trên bàn (QR ở giữa-phải)
       const regions = [
-        [W * 0.52, 0, W * 0.48, H * 0.52, 1100, false],
-        [W * 0.52, 0, W * 0.48, H * 0.52, 1100, true],
-        [0, 0, W * 0.48, H * 0.52, 1000, false],
-        [W * 0.52, H * 0.48, W * 0.48, H * 0.52, 1000, false],
-        [0, H * 0.48, W * 0.48, H * 0.52, 1000, false],
-        [0, 0, W, H, 1800, false],
+        [W * 0.48, 0, W * 0.52, H * 0.55, 1200, false],
+        [W * 0.48, 0, W * 0.52, H * 0.55, 1200, true],
+        [W * 0.35, H * 0.12, W * 0.62, H * 0.6, 1200, false],
+        [W * 0.35, H * 0.12, W * 0.62, H * 0.6, 1200, true],
+        [W * 0.12, H * 0.12, W * 0.76, H * 0.76, 1400, false],
+        [0, 0, W * 0.52, H * 0.55, 1000, false],
+        [W * 0.48, H * 0.45, W * 0.52, H * 0.55, 1000, false],
+        [0, H * 0.45, W * 0.52, H * 0.55, 1000, false],
+        [0, 0, W, H, 2200, false],
       ];
 
       for (const [sx, sy, sw, sh, dim, contrast] of regions) {
@@ -1704,40 +1730,55 @@
       return tesseractLoadPromise;
     }
 
-    function extractNameFromCCCDText(ocrText) {
-      const lines = String(ocrText || "")
+    function extractInfoFromCCCDText(ocrText) {
+      const rawText = String(ocrText || "");
+      const cccdMatch = rawText.match(/\b0\d{11}\b/);
+      const cccdNumber = cccdMatch ? cccdMatch[0] : "";
+
+      const lines = rawText
         .split(/\r?\n/)
         .map((l) => l.trim())
         .filter((l) => l.length >= 3);
 
-      const blacklist = /CỘNG HÒA|XÃ HỘI|CHỦ NGHĨA|VIỆT NAM|ĐỘC LẬP|TỰ DO|HẠNH PHÚC|CĂN CƯỚC|CÔNG DÂN|CITIZEN|IDENTITY|CARD|SOCIALIST|REPUBLIC|VIET NAM|NGÀY SINH|DATE OF BIRTH|GIỚI TÍNH|QUỐC TỊCH|QUÊ QUÁN|NƠI THƯỜNG TRÚ|CÓ GIÁ TRỊ/i;
+      const blacklist = /CỘNG HÒA|XÃ HỘI|CHỦ NGHĨA|VIỆT NAM|ĐỘC LẬP|TỰ DO|HẠNH PHÚC|CĂN CƯỚC|CÔNG DÂN|CITIZEN|IDENTITY|CARD|SOCIALIST|REPUBLIC|VIET NAM|NGÀY SINH|DATE OF BIRTH|GIỚI TÍNH|QUỐC TỊCH|QUÊ QUÁN|NƠI THƯỜNG TRÚ|CÓ GIÁ TRỊ|KHAI SINH|FULL NAME|PLACE OF/i;
 
-      // Cách 1: Tìm dòng ngay sau nhãn "Họ và tên" / "Full name"
+      const cleanCandidate = (s) =>
+        String(s || "")
+          .replace(/^[^A-Za-zÀ-ỹĐđ]+/, "")
+          .replace(/[^A-Za-zÀ-ỹĐđ\s]/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+      // Cách 1: Tìm dòng ngay sau nhãn "Họ và tên" / "Họ, chữ đệm và tên khai sinh" / "Full name"
       for (let i = 0; i < lines.length; i++) {
-        if (/h[ọo]\s*(v[àa])?\s*t[êe]n|full\s*name/i.test(lines[i])) {
-          // Trường hợp tên nằm cùng dòng sau dấu :
-          const inlineMatch = lines[i].split(/[:\-]/).slice(1).join(" ").trim();
-          const cleanedInline = inlineMatch.replace(/[^A-Za-zÀ-ỹ\s]/g, "").trim();
-          if (cleanedInline.split(/\s+/).length >= 2 && cleanedInline.length >= 5) {
-            return toVietnameseTitleCase(cleanedInline);
+        if (/h[ọo]\s*(,?\s*ch[ữư]\s*[đd][ệe]m)?\s*(v[àa])?\s*t[êe]n|full\s*name/i.test(lines[i])) {
+          const afterColon = lines[i].includes(":") ? lines[i].split(":").slice(1).join(" ") : "";
+          const cleanedInline = cleanCandidate(afterColon);
+          if (cleanedInline.split(" ").length >= 2 && cleanedInline.length >= 5 && !blacklist.test(cleanedInline)) {
+            return { fullName: toVietnameseTitleCase(cleanedInline), cccdNumber };
           }
-          // Trường hợp tên nằm ở dòng kế tiếp
-          if (lines[i + 1]) {
-            const cleanedNext = lines[i + 1].replace(/[^A-Za-zÀ-ỹ\s]/g, "").trim();
-            if (cleanedNext.split(/\s+/).length >= 2 && !blacklist.test(cleanedNext)) {
-              return toVietnameseTitleCase(cleanedNext);
+          // Kiểm tra 1–2 dòng kế tiếp
+          for (let offset = 1; offset <= 2; offset++) {
+            if (!lines[i + offset]) continue;
+            const cleanedNext = cleanCandidate(lines[i + offset]);
+            const words = cleanedNext.split(" ").filter((w) => w.length >= 1);
+            if (words.length >= 2 && words.length <= 6 && cleanedNext.length >= 5 && !blacklist.test(cleanedNext)) {
+              return { fullName: toVietnameseTitleCase(cleanedNext), cccdNumber };
             }
           }
         }
       }
 
-      // Cách 2: Tìm dòng chữ IN HOA thuần tiếng Việt (2-5 từ) đặc trưng cho Họ và tên trên CCCD
+      // Cách 2: Tìm dòng chữ IN HOA tiếng Việt (2–5 từ) đặc trưng cho Họ và tên trên CCCD
       for (const line of lines) {
         if (blacklist.test(line)) continue;
-        const cleaned = line.replace(/[^A-ZÀÁẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬĐÈÉẺẼẸÊẾỀỂỄỆÌÍỈĨỊÒÓỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÙÚỦŨỤƯỨỪỬỮỰỲÝỶỸỴ\s]/g, "").trim();
-        const words = cleaned.split(/\s+/).filter(Boolean);
-        if (words.length >= 2 && words.length <= 5 && cleaned.length >= 7 && cleaned.length / line.length >= 0.7) {
-          return toVietnameseTitleCase(cleaned);
+        const cleaned = line
+          .replace(/[^A-ZÀÁẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬĐÈÉẺẼẸÊẾỀỂỄỆÌÍỈĨỊÒÓỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÙÚỦŨỤƯỨỪỬỮỰỲÝỶỸỴ\s]/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+        const words = cleaned.split(" ").filter((w) => w.length >= 2);
+        if (words.length >= 2 && words.length <= 5 && cleaned.length >= 6) {
+          return { fullName: toVietnameseTitleCase(cleaned), cccdNumber };
         }
       }
 
@@ -1750,64 +1791,86 @@
 
       showCCCDFeedback("loading", "⏳ Đang phân tích ảnh CCCD (quét mã QR độ phân giải cao)...");
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = async () => {
-          try {
-            // Bước 1: Quét QR đa vùng độ phân giải cao (tức thì < 0.2s)
-            const qrParsed = tryMultiRegionCCCDQR(img);
-            if (qrParsed) {
-              applyCCCDName(qrParsed.fullName, "từ mã QR trên ảnh CCCD", qrParsed.cccdNumber);
-              event.target.value = "";
-              return;
-            }
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
 
-            // Bước 2: Dự phòng tự động đọc chữ tiếng Việt bằng OCR (Tesseract.js)
-            showCCCDFeedback("loading", "⏳ Mã QR trên ảnh hơi mờ — đang tự động nhận diện chữ tiếng Việt trên CCCD...");
-            const Tesseract = await loadTesseractIfNeeded();
-
-            // Chuẩn hóa ảnh OCR kích thước vừa phải để xử lý nhanh trên điện thoại
-            const ocrCanvas = document.createElement("canvas");
-            const maxOcrDim = 1400;
-            let w = img.naturalWidth || img.width;
-            let h = img.naturalHeight || img.height;
-            if (w > maxOcrDim || h > maxOcrDim) {
-              const s = Math.min(maxOcrDim / w, maxOcrDim / h);
-              w = Math.round(w * s);
-              h = Math.round(h * s);
-            }
-            ocrCanvas.width = w;
-            ocrCanvas.height = h;
-            ocrCanvas.getContext("2d").drawImage(img, 0, 0, w, h);
-
-            const result = await Tesseract.recognize(ocrCanvas, "vie", {
-              logger: (m) => {
-                if (m.status === "recognizing text" && typeof m.progress === "number") {
-                  showCCCDFeedback("loading", `⏳ Đang đọc thông tin trên ảnh CCCD... ${Math.round(m.progress * 100)}%`);
-                }
-              },
-            });
-
-            const extractedName = extractNameFromCCCDText(result && result.data ? result.data.text : "");
-            if (extractedName) {
-              applyCCCDName(extractedName, "nhận diện chữ từ ảnh CCCD");
-            } else {
-              showCCCDFeedback(
-                false,
-                "Không đọc được rõ Họ và tên trên ảnh CCCD. Vui lòng chụp thẳng, đủ sáng hoặc nhập trực tiếp vào ô Họ và tên."
-              );
-            }
-          } catch (err) {
-            console.error(err);
-            showCCCDFeedback(false, "Không thể đọc ảnh CCCD lúc này. Vui lòng nhập trực tiếp Họ và tên bên dưới.");
-          } finally {
-            event.target.value = "";
-          }
-        };
-        img.src = e.target.result;
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        showCCCDFeedback(false, "Không thể mở ảnh vừa chọn (định dạng không hỗ trợ). Vui lòng chụp lại hoặc nhập tay.");
+        event.target.value = "";
       };
-      reader.readAsDataURL(file);
+
+      img.onload = async () => {
+        try {
+          // Tầng 0: Dùng BarcodeDetector gốc của trình duyệt (cực nhanh & chuẩn trên Android/Chrome)
+          const nativeParsed = await tryNativeBarcodeDetector(img);
+          if (nativeParsed) {
+            applyCCCDName(nativeParsed.fullName, "từ mã QR CCCD", nativeParsed.cccdNumber);
+            return;
+          }
+
+          // Tầng 1: Quét jsQR đa vùng độ phân giải cao (tương thích iPhone/Safari & mọi máy)
+          const qrParsed = tryMultiRegionCCCDQR(img);
+          if (qrParsed) {
+            applyCCCDName(qrParsed.fullName, "từ mã QR trên ảnh CCCD", qrParsed.cccdNumber);
+            return;
+          }
+
+          // Tầng 2: Tự động dự phòng OCR tiếng Việt (Tesseract.js) khi mã QR mờ/lóa
+          showCCCDFeedback("loading", "⏳ Đang tự động đọc chữ tiếng Việt trên mặt trước CCCD (chờ vài giây)...");
+          const Tesseract = await loadTesseractIfNeeded();
+
+          const ocrCanvas = document.createElement("canvas");
+          const maxOcrDim = 1500;
+          let w = img.naturalWidth || img.width;
+          let h = img.naturalHeight || img.height;
+          if (w > maxOcrDim || h > maxOcrDim) {
+            const s = Math.min(maxOcrDim / w, maxOcrDim / h);
+            w = Math.round(w * s);
+            h = Math.round(h * s);
+          }
+          ocrCanvas.width = w;
+          ocrCanvas.height = h;
+          const octx = ocrCanvas.getContext("2d", { willReadFrequently: true });
+          octx.drawImage(img, 0, 0, w, h);
+
+          // Tiền xử lý tăng tương phản nhẹ cho chữ đen trên nền thẻ CCCD
+          const oData = octx.getImageData(0, 0, w, h);
+          const od = oData.data;
+          for (let i = 0; i < od.length; i += 4) {
+            const g = 0.299 * od[i] + 0.587 * od[i + 1] + 0.114 * od[i + 2];
+            const c = Math.min(255, Math.max(0, (g - 128) * 1.45 + 128));
+            od[i] = od[i + 1] = od[i + 2] = c;
+          }
+          octx.putImageData(oData, 0, 0);
+
+          const result = await Tesseract.recognize(ocrCanvas, "vie", {
+            logger: (m) => {
+              if (m.status === "recognizing text" && typeof m.progress === "number") {
+                showCCCDFeedback("loading", `⏳ Đang đọc chữ trên ảnh CCCD... ${Math.round(m.progress * 100)}%`);
+              }
+            },
+          });
+
+          const extracted = extractInfoFromCCCDText(result && result.data ? result.data.text : "");
+          if (extracted && extracted.fullName) {
+            applyCCCDName(extracted.fullName, "nhận diện chữ từ ảnh CCCD", extracted.cccdNumber);
+          } else {
+            showCCCDFeedback(
+              false,
+              "Ảnh hơi mờ hoặc lóa sáng nên chưa đọc được rõ Họ và tên. Bạn hãy chụp gần hơn vào mặt trước CCCD (hoặc nhập trực tiếp bên dưới)."
+            );
+          }
+        } catch (err) {
+          console.error(err);
+          showCCCDFeedback(false, "Không thể đọc ảnh CCCD lúc này. Vui lòng nhập trực tiếp Họ và tên bên dưới.");
+        } finally {
+          URL.revokeObjectURL(objectUrl);
+          event.target.value = "";
+        }
+      };
+
+      img.src = objectUrl;
     }
 
     async function openCCCDCameraModal() {
