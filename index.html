@@ -1526,6 +1526,14 @@
                 </span>
                 <button
                   type="button"
+                  onclick="resetLuckyWinnersBoard()"
+                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/35 transition"
+                  title="Xóa danh sách trúng thưởng hiện tại để quay lại từ đầu (không xóa dữ liệu điểm danh)"
+                >
+                  Đặt lại vòng quay
+                </button>
+                <button
+                  type="button"
                   onclick="exportToExcel()"
                   class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/35 transition"
                 >
@@ -3565,26 +3573,34 @@
       renderAdminAllocationsUI();
     }
 
-    function findAllocatedWinnerForPrize(prizeName, pool) {
-      const rule = luckyAllocations.find((a) => !a.used && a.prizeTier === prizeName);
-      if (!rule) return null;
-
+    function doesCandidateMatchAllocationRule(candidate, rule) {
       const normTargetName = normalizeVietnameseSearch(rule.targetName);
       const targetDigits = String(rule.targetCCCD || "").replace(/\D/g, "");
+      if (!normTargetName && !targetDigits) return false;
 
-      const matchedCandidate = pool.find((c) => {
-        const cName = normalizeVietnameseSearch(c.fullName);
-        const cDigitsBlob = `${c.organization || ""} ${c.phone || ""}`.replace(/\D/g, "");
+      const cName = normalizeVietnameseSearch(candidate.fullName);
+      const cDigitsBlob = `${candidate.organization || ""} ${candidate.phone || ""}`.replace(/\D/g, "");
 
-        const nameOk = !normTargetName || cName === normTargetName || cName.includes(normTargetName);
-        const cccdOk = !targetDigits || cDigitsBlob.includes(targetDigits);
-        return nameOk && cccdOk;
-      });
+      const nameOk = !normTargetName || cName === normTargetName || cName.includes(normTargetName);
+      const cccdOk = !targetDigits || cDigitsBlob.includes(targetDigits);
+      return nameOk && cccdOk;
+    }
 
-      if (matchedCandidate) {
-        return { rule, candidate: matchedCandidate };
+    function findAllocatedWinnerForPrize(prizeName, pool) {
+      const rules = luckyAllocations.filter((a) => !a.used && a.prizeTier === prizeName);
+      for (const rule of rules) {
+        const matchedCandidate = pool.find((c) => doesCandidateMatchAllocationRule(c, rule));
+        if (matchedCandidate) {
+          return { rule, candidate: matchedCandidate };
+        }
       }
       return null;
+    }
+
+    function isCandidateReservedForOtherPrize(candidate, currentPrizeName) {
+      return luckyAllocations.some(
+        (rule) => !rule.used && rule.prizeTier !== currentPrizeName && doesCandidateMatchAllocationRule(candidate, rule)
+      );
     }
 
     function toggleAddPrizeForm() {
@@ -3893,6 +3909,31 @@
         return;
       }
 
+      // Kiểm tra cấu hình cơ cấu giải & bảo vệ người đã được giữ chỗ cho giải khác
+      let allocatedMatch = null;
+      let finalWinner = null;
+
+      if (isDemo) {
+        finalWinner = activePool[getSecureRandomInt(activePool.length)];
+      } else {
+        allocatedMatch = findAllocatedWinnerForPrize(selectedPrizeTier, activePool);
+        if (allocatedMatch) {
+          finalWinner = allocatedMatch.candidate;
+        } else {
+          // Loại trừ những người đang được cơ cấu cho hạng mục giải khác để không bao giờ trúng nhầm giải
+          const nonReservedPool = activePool.filter(
+            (c) => !isCandidateReservedForOtherPrize(c, selectedPrizeTier)
+          );
+          if (nonReservedPool.length === 0) {
+            alert(
+              `Các đại biểu còn lại đang được cơ cấu cho hạng mục giải khác (không phải "${selectedPrizeTier}"). Vui lòng chọn đúng hạng mục giải đã cơ cấu để quay!`
+            );
+            return;
+          }
+          finalWinner = nonReservedPool[getSecureRandomInt(nonReservedPool.length)];
+        }
+      }
+
       if (!isLuckyMuted) getLuckyAudioContext();
 
       isLuckySpinning = true;
@@ -3917,11 +3958,6 @@
         : "Đang lựa chọn ngẫu nhiên đại biểu may mắn...";
       subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-300 font-semibold mb-2.5 animate-pulse";
       phoneBadge.classList.remove("hidden");
-
-      // Kiểm tra cấu hình cơ cấu giải (nếu có và không phải chế độ quay mẫu)
-      const allocatedMatch = !isDemo ? findAllocatedWinnerForPrize(selectedPrizeTier, activePool) : null;
-      const winnerIndex = getSecureRandomInt(activePool.length);
-      const finalWinner = allocatedMatch ? allocatedMatch.candidate : activePool[winnerIndex];
 
       const totalDurationMs = 4000;
       const startTime = performance.now();
@@ -4075,6 +4111,20 @@
       selectedPrizeGift = "";
       renderPrizeTierPills();
       updateStagePrizeLabel();
+      rebuildLuckyEligiblePool();
+    }
+
+    function resetLuckyWinnersBoard() {
+      if (isLuckySpinning) return;
+      if (!confirm("Đặt lại toàn bộ Danh Sách Trúng Thưởng và đưa tất cả đại biểu quay lại vòng quay? (Dữ liệu điểm danh vẫn giữ nguyên)")) {
+        return;
+      }
+      luckyWinners = [];
+      luckyAbsentPhones.clear();
+      luckyAllocations.forEach((a) => (a.used = false));
+      saveLuckyWinnersToStorage();
+      saveLuckyAllocationsToStorage();
+      renderAdminAllocationsUI();
       rebuildLuckyEligiblePool();
     }
 
