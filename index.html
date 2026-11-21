@@ -1261,11 +1261,11 @@
         </div>
         </div><!-- End #admin-panel-attendees -->
 
-        <!-- ===== ADMIN SUB-TAB 2: THÊM & QUẢN LÝ GIẢI THƯỞNG ===== -->
+        <!-- ===== ADMIN SUB-TAB 2: KỊCH BẢN & SỐ LƯỢNG GIẢI THƯỞNG ===== -->
         <div id="admin-panel-prizes" class="hidden space-y-5">
           <div class="glass-panel rounded-2xl p-5 sm:p-6">
-            <h3 class="font-display font-bold text-lg text-white">Thêm Giải Thưởng Mới</h3>
-            <p class="text-xs text-slate-400 mt-1 mb-4">Giải thưởng sau khi thêm sẽ tự động đồng bộ sang màn hình Quay Số Trúng Thưởng.</p>
+            <h3 class="font-display font-bold text-lg text-white">Thêm Giải Thưởng &amp; Quy Định Số Lần Quay (X)</h3>
+            <p class="text-xs text-slate-400 mt-1 mb-4">Hệ thống sẽ tự động quay theo đúng thứ tự từ trên xuống dưới (mỗi hạng mục quay đủ <strong>X</strong> lần rồi tự động chuyển sang giải tiếp theo).</p>
 
             <form onsubmit="handleAdminAddPrize(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3">
               <div class="sm:col-span-4">
@@ -1274,43 +1274,69 @@
                   type="text"
                   id="admin-prize-name"
                   required
-                  placeholder="VD: Giải Đặc Biệt, Giải Tài Trợ..."
+                  placeholder="VD: Giải Khuyến Khích, Giải Tài Trợ..."
                   class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
                 />
               </div>
-              <div class="sm:col-span-5">
+              <div class="sm:col-span-4">
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Quà tặng / Giá trị (tùy chọn)</label>
                 <input
                   type="text"
                   id="admin-prize-gift"
-                  placeholder="VD: iPhone 16 Pro / Voucher 5.000.000đ"
+                  placeholder="VD: Quà lưu niệm / Voucher..."
                   class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
                 />
               </div>
-              <div class="sm:col-span-3 flex items-end">
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Số lần quay (X) *</label>
+                <input
+                  type="number"
+                  id="admin-prize-qty"
+                  min="1"
+                  max="100"
+                  value="1"
+                  required
+                  class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-mono font-bold text-cyan-300 text-center"
+                />
+              </div>
+              <div class="sm:col-span-2 flex items-end">
                 <button
                   type="submit"
-                  class="w-full py-2.5 px-4 rounded-xl font-display font-bold text-sm text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-glow transition"
+                  class="w-full py-2.5 px-3 rounded-xl font-display font-bold text-sm text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-glow transition"
                 >
-                  + Thêm giải thưởng
+                  + Thêm giải
                 </button>
               </div>
             </form>
           </div>
 
           <div class="glass-panel rounded-2xl overflow-hidden">
-            <div class="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between">
-              <h3 class="font-display font-bold text-base text-white">Danh Sách Hạng Mục Giải Thưởng</h3>
-              <span id="admin-prizes-count" class="text-xs text-amber-300 font-semibold">0 giải</span>
+            <div class="px-5 py-4 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="font-display font-bold text-base text-white">Thứ Tự Quay &amp; Số Lần Quay (X)</h3>
+                <p class="text-[11px] text-slate-400">Chỉnh trực tiếp số X hoặc đổi thứ tự quay ↑ ↓</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <span id="admin-prizes-count" class="text-xs text-amber-300 font-semibold">0 lượt quay</span>
+                <button
+                  type="button"
+                  onclick="resetDefaultPrizeSchedule()"
+                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-600 transition"
+                >
+                  Mặc định (5-4-3-2-1-1)
+                </button>
+              </div>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
                   <tr class="bg-slate-900/90 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
-                    <th class="py-3 px-4 w-14 text-center">STT</th>
+                    <th class="py-3 px-4 w-16 text-center">Thứ tự</th>
                     <th class="py-3 px-4">Tên giải thưởng</th>
                     <th class="py-3 px-4">Quà tặng / Mô tả</th>
-                    <th class="py-3 px-4 text-right">Thao tác</th>
+                    <th class="py-3 px-4 text-center whitespace-nowrap">Số lần quay (X)</th>
+                    <th class="py-3 px-4 text-center whitespace-nowrap">Tiến độ</th>
+                    <th class="py-3 px-4 text-right whitespace-nowrap">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="admin-prizes-tbody" class="divide-y divide-slate-800/70 text-xs sm:text-sm"></tbody>
@@ -3460,14 +3486,15 @@
     /* =========================================================================
      * TAB 4: QUAY SỐ TRÚNG THƯỞNG (LUCKY DRAW - LED STAGE) & QUẢN LÝ CƠ CẤU
      * ========================================================================= */
-    const STORAGE_KEY_LUCKY_PRIZES = "mb_bt_lucky_prizes_v1";
+    const STORAGE_KEY_LUCKY_PRIZES = "mb_bt_lucky_prizes_v2";
     const STORAGE_KEY_LUCKY_ALLOCATIONS = "mb_bt_lucky_allocations_v1";
     const DEFAULT_PRIZE_TIERS = [
-      { id: "p-kk", name: "Giải Khuyến Khích", gift: "", custom: false },
-      { id: "p-3", name: "Giải Ba", gift: "", custom: false },
-      { id: "p-2", name: "Giải Nhì", gift: "", custom: false },
-      { id: "p-1", name: "Giải Nhất", gift: "", custom: false },
-      { id: "p-db", name: "Giải Đặc Biệt", gift: "", custom: false },
+      { id: "p-kk", name: "Giải Khuyến Khích", gift: "", quantity: 5, custom: false },
+      { id: "p-4", name: "Giải Tư", gift: "", quantity: 4, custom: false },
+      { id: "p-3", name: "Giải Ba", gift: "", quantity: 3, custom: false },
+      { id: "p-2", name: "Giải Nhì", gift: "", quantity: 2, custom: false },
+      { id: "p-1", name: "Giải Nhất", gift: "", quantity: 1, custom: false },
+      { id: "p-db", name: "Giải Đặc Biệt", gift: "", quantity: 1, custom: false },
     ];
 
     const DEMO_PARTICIPANTS = [
@@ -3526,15 +3553,15 @@
         if (!res.ok) return;
         const json = await res.json();
         if (json && json.status === "success") {
-          if (Array.isArray(json.prizes) && json.prizes.length > 0) {
+          if (Array.isArray(json.prizes) && json.prizes.length > 0 && json.prizes.every((p) => typeof p.quantity === "number")) {
             luckyPrizeTiers = json.prizes;
             localStorage.setItem(STORAGE_KEY_LUCKY_PRIZES, JSON.stringify(luckyPrizeTiers));
-            renderPrizeTierPills();
           }
           if (Array.isArray(json.allocations)) {
             luckyAllocations = json.allocations;
             localStorage.setItem(STORAGE_KEY_LUCKY_ALLOCATIONS, JSON.stringify(luckyAllocations));
           }
+          syncUpcomingPrizeBanner();
         }
       } catch (_) {}
     }
@@ -3570,11 +3597,14 @@
         if (savedPrizes) {
           const parsed = JSON.parse(savedPrizes);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            luckyPrizeTiers = parsed;
+            luckyPrizeTiers = parsed.map((p) => ({
+              ...p,
+              quantity: Math.max(1, parseInt(p.quantity, 10) || 1),
+            }));
           }
         }
       } catch (_) {
-        luckyPrizeTiers = [...DEFAULT_PRIZE_TIERS];
+        luckyPrizeTiers = DEFAULT_PRIZE_TIERS.map((p) => ({ ...p }));
       }
 
       try {
@@ -3585,10 +3615,7 @@
         luckyAllocations = [];
       }
 
-      selectedPrizeTier = "QUAY SỐ MAY MẮN";
-      selectedPrizeGift = "";
-      renderPrizeTierPills();
-      updateStagePrizeLabel("QUAY SỐ MAY MẮN", "");
+      syncUpcomingPrizeBanner();
       renderWinnersBoard();
       renderAdminPrizesTable();
       renderAdminAllocationsUI();
@@ -3608,26 +3635,109 @@
       saveConfigToCloudflareKV();
     }
 
-    /* ----- Quản lý Giải Thưởng trong Tab Quản Trị ----- */
+    /* ----- Quản lý Kịch bản & Số lượng Giải Thưởng (X) trong Tab Quản Trị ----- */
+    function countAwardedForPrize(prizeName) {
+      return luckyWinners.filter((w) => {
+        const base = String(w.prizeTier || "").split(" (")[0].trim();
+        return base === prizeName;
+      }).length;
+    }
+
+    function getNextScheduledPrizeSlot() {
+      const tiers = luckyPrizeTiers.length > 0 ? luckyPrizeTiers : DEFAULT_PRIZE_TIERS;
+      for (const tier of tiers) {
+        const qty = Math.max(1, parseInt(tier.quantity, 10) || 1);
+        const awarded = countAwardedForPrize(tier.name);
+        if (awarded < qty) {
+          return {
+            prizeObj: tier,
+            currentTurn: awarded + 1,
+            totalTurns: qty,
+            isBonus: false,
+          };
+        }
+      }
+      return {
+        prizeObj: { id: "p-bonus", name: "Giải May Mắn Bổ Sung", gift: "", quantity: 1 },
+        currentTurn: 1,
+        totalTurns: 1,
+        isBonus: true,
+      };
+    }
+
+    function syncUpcomingPrizeBanner() {
+      if (isLuckySpinning) return;
+      const slot = getNextScheduledPrizeSlot();
+      selectedPrizeTier = slot.prizeObj.name;
+      selectedPrizeGift = slot.prizeObj.gift || "";
+      const displayLabel = slot.isBonus
+        ? slot.prizeObj.name
+        : `${slot.prizeObj.name} (Lượt ${slot.currentTurn}/${slot.totalTurns})`;
+      updateStagePrizeLabel(displayLabel, selectedPrizeGift);
+    }
+
     function handleAdminAddPrize(event) {
       event.preventDefault();
       const nameInput = document.getElementById("admin-prize-name");
       const giftInput = document.getElementById("admin-prize-gift");
+      const qtyInput = document.getElementById("admin-prize-qty");
       const name = (nameInput.value || "").trim();
       const gift = (giftInput.value || "").trim();
+      const quantity = Math.max(1, parseInt(qtyInput.value, 10) || 1);
       if (!name) return;
 
       luckyPrizeTiers.push({
         id: `p-custom-${Date.now()}`,
         name,
         gift,
+        quantity,
         custom: true,
       });
       saveLuckyPrizesToStorage();
       nameInput.value = "";
       giftInput.value = "";
+      qtyInput.value = "1";
 
-      renderPrizeTierPills();
+      syncUpcomingPrizeBanner();
+      renderAdminPrizesTable();
+      renderAdminAllocationsUI();
+    }
+
+    function updatePrizeQuantity(prizeId, newQty) {
+      const target = luckyPrizeTiers.find((p) => p.id === prizeId);
+      if (!target) return;
+      target.quantity = Math.max(1, Math.min(100, parseInt(newQty, 10) || 1));
+      saveLuckyPrizesToStorage();
+      syncUpcomingPrizeBanner();
+      renderAdminPrizesTable();
+    }
+
+    function stepPrizeQuantity(prizeId, delta) {
+      const target = luckyPrizeTiers.find((p) => p.id === prizeId);
+      if (!target) return;
+      const cur = Math.max(1, parseInt(target.quantity, 10) || 1);
+      updatePrizeQuantity(prizeId, cur + delta);
+    }
+
+    function movePrizeOrder(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= luckyPrizeTiers.length) return;
+      const temp = luckyPrizeTiers[index];
+      luckyPrizeTiers[index] = luckyPrizeTiers[targetIndex];
+      luckyPrizeTiers[targetIndex] = temp;
+      saveLuckyPrizesToStorage();
+      syncUpcomingPrizeBanner();
+      renderAdminPrizesTable();
+      renderAdminAllocationsUI();
+    }
+
+    function resetDefaultPrizeSchedule() {
+      if (!confirm("Khôi phục kịch bản mặc định: Khuyến Khích ×5 → Tư ×4 → Ba ×3 → Nhì ×2 → Nhất ×1 → Đặc Biệt ×1?")) {
+        return;
+      }
+      luckyPrizeTiers = DEFAULT_PRIZE_TIERS.map((p) => ({ ...p }));
+      saveLuckyPrizesToStorage();
+      syncUpcomingPrizeBanner();
       renderAdminPrizesTable();
       renderAdminAllocationsUI();
     }
@@ -3637,25 +3747,51 @@
       const countEl = document.getElementById("admin-prizes-count");
       if (!tbody || !countEl) return;
 
-      countEl.textContent = `${luckyPrizeTiers.length} hạng mục`;
+      const totalSpins = luckyPrizeTiers.reduce((acc, p) => acc + (parseInt(p.quantity, 10) || 1), 0);
+      countEl.textContent = `${luckyPrizeTiers.length} giải • Tổng ${totalSpins} lượt quay`;
+
       tbody.innerHTML = luckyPrizeTiers
-        .map(
-          (p, i) => `
+        .map((p, i) => {
+          const qty = Math.max(1, parseInt(p.quantity, 10) || 1);
+          const awarded = countAwardedForPrize(p.name);
+          const doneClass = awarded >= qty ? "text-emerald-300 bg-emerald-500/15 border-emerald-400/35" : "text-cyan-300 bg-cyan-500/15 border-cyan-400/30";
+          return `
           <tr class="hover:bg-slate-800/40 transition-colors">
             <td class="py-3 px-4 text-center font-mono text-slate-400">${i + 1}</td>
-            <td class="py-3 px-4 font-bold text-amber-300">${escapeHtml(p.name)}</td>
+            <td class="py-3 px-4 font-bold text-amber-300 whitespace-nowrap">${escapeHtml(p.name)}</td>
             <td class="py-3 px-4 text-slate-300">${escapeHtml(p.gift || "—")}</td>
-            <td class="py-3 px-4 text-right">
-              <button
-                type="button"
-                onclick="removeCustomPrizeTier('${escapeHtml(p.id)}', event)"
-                class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition"
-              >
-                Xóa
-              </button>
+            <td class="py-3 px-4 text-center whitespace-nowrap">
+              <div class="inline-flex items-center gap-1 bg-slate-900/90 border border-slate-700 rounded-lg p-0.5">
+                <button type="button" onclick="stepPrizeQuantity('${escapeHtml(p.id)}', -1)" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold">−</button>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value="${qty}"
+                  onchange="updatePrizeQuantity('${escapeHtml(p.id)}', this.value)"
+                  class="w-12 bg-transparent text-center font-mono font-bold text-cyan-300 text-sm focus:outline-none"
+                />
+                <button type="button" onclick="stepPrizeQuantity('${escapeHtml(p.id)}', 1)" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold">+</button>
+              </div>
             </td>
-          </tr>`
-        )
+            <td class="py-3 px-4 text-center whitespace-nowrap">
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono font-bold border ${doneClass}">${awarded} / ${qty}</span>
+            </td>
+            <td class="py-3 px-4 text-right whitespace-nowrap">
+              <div class="inline-flex items-center gap-1">
+                <button type="button" onclick="movePrizeOrder(${i}, -1)" ${i === 0 ? "disabled" : ""} class="px-2 py-1 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30" title="Đưa lên trước">↑</button>
+                <button type="button" onclick="movePrizeOrder(${i}, 1)" ${i === luckyPrizeTiers.length - 1 ? "disabled" : ""} class="px-2 py-1 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30" title="Đưa xuống sau">↓</button>
+                <button
+                  type="button"
+                  onclick="removeCustomPrizeTier('${escapeHtml(p.id)}', event)"
+                  class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition"
+                >
+                  Xóa
+                </button>
+              </div>
+            </td>
+          </tr>`;
+        })
         .join("");
     }
 
@@ -4175,78 +4311,41 @@
       }, 220);
     }
 
-    /* ----- Chọn ngẫu nhiên (hoặc khớp cơ cấu) Cả Giải Thưởng & Đại Biểu ----- */
+    /* ----- Xác định Giải & Đại Biểu theo đúng kịch bản thứ tự (Khuyến khích ×5 → Tư ×4 → Ba ×3 → Nhì ×2 → Nhất ×1 → Đặc biệt ×1) ----- */
     function resolveAutomaticSpinOutcome(activePool, isDemo) {
-      const allPrizes = luckyPrizeTiers.length > 0 ? luckyPrizeTiers : DEFAULT_PRIZE_TIERS;
+      const slot = getNextScheduledPrizeSlot();
+      const targetPrize = slot.prizeObj;
 
       if (isDemo) {
-        const randPrize = allPrizes[getSecureRandomInt(allPrizes.length)];
-        const randWinner = activePool[getSecureRandomInt(activePool.length)];
         return {
-          prizeObj: randPrize,
-          finalWinner: randWinner,
+          slot,
+          prizeObj: targetPrize,
+          finalWinner: activePool[getSecureRandomInt(activePool.length)],
           allocatedMatch: null,
         };
       }
 
-      // Danh sách giải chưa có người trúng (nếu đã trao hết thì cho phép quay tiếp mọi giải)
-      const wonPrizeNames = new Set(luckyWinners.map((w) => String(w.prizeTier || "").split(" (")[0].trim()));
-      const remainingPrizes = allPrizes.filter((p) => !wonPrizeNames.has(p.name));
-      const candidatePrizes = remainingPrizes.length > 0 ? remainingPrizes : allPrizes;
+      // 1. Kiểm tra xem lượt giải hiện tại (VD: Giải Nhất) có được cơ cấu cho ai không
+      const allocMatch = findAllocatedWinnerForPrize(targetPrize.name, activePool);
+      if (allocMatch) {
+        return {
+          slot,
+          prizeObj: targetPrize,
+          finalWinner: allocMatch.candidate,
+          allocatedMatch: allocMatch,
+        };
+      }
 
-      // Nhóm 1: Các đại biểu tự do (không bị giữ chỗ cho giải cơ cấu nào)
-      const freeDelegates = activePool.filter(
-        (c) => !luckyAllocations.some((r) => !r.used && doesCandidateMatchAllocationRule(c, r))
+      // 2. Nếu không cơ cấu giải này -> ưu tiên bốc ngẫu nhiên người KHÔNG bị giữ chỗ cho giải lớn hơn
+      const nonReservedPool = activePool.filter(
+        (c) => !isCandidateReservedForOtherPrize(c, targetPrize.name)
       );
+      const pickPool = nonReservedPool.length > 0 ? nonReservedPool : activePool;
 
-      // Nhóm 2: Các cặp (Giải thưởng, Đại biểu) đang có cơ cấu hợp lệ trong danh sách hiện tại
-      const readyAllocatedOutcomes = [];
-      for (const p of candidatePrizes) {
-        const match = findAllocatedWinnerForPrize(p.name, activePool);
-        if (match) {
-          readyAllocatedOutcomes.push({ prizeObj: p, finalWinner: match.candidate, allocatedMatch: match });
-        }
-      }
-      // Nếu người cơ cấu nằm ở giải ngoài candidatePrizes (trường hợp đặc biệt), vẫn kiểm tra toàn bộ allPrizes
-      if (readyAllocatedOutcomes.length === 0) {
-        for (const p of allPrizes) {
-          const match = findAllocatedWinnerForPrize(p.name, activePool);
-          if (match) {
-            readyAllocatedOutcomes.push({ prizeObj: p, finalWinner: match.candidate, allocatedMatch: match });
-          }
-        }
-      }
-
-      // Các giải không có cơ cấu (dành cho đại biểu tự do)
-      const unallocatedPrizes = candidatePrizes.filter(
-        (p) => !luckyAllocations.some((r) => !r.used && r.prizeTier === p.name)
-      );
-
-      // Tạo danh sách các phương án hợp lệ để chọn ngẫu nhiên tự nhiên:
-      // - Nếu có đại biểu tự do và có giải không cơ cấu -> có thể ra giải ngẫu nhiên hoặc giải cơ cấu
-      // - Nếu chỉ còn đại biểu đã cơ cấu (VD: test 1 người) -> tự động chọn đúng giải đã cơ cấu cho người đó!
-      const possibleOutcomes = [];
-
-      if (freeDelegates.length > 0 && unallocatedPrizes.length > 0) {
-        unallocatedPrizes.forEach((p) => {
-          possibleOutcomes.push({
-            prizeObj: p,
-            finalWinner: freeDelegates[getSecureRandomInt(freeDelegates.length)],
-            allocatedMatch: null,
-          });
-        });
-      }
-
-      readyAllocatedOutcomes.forEach((o) => possibleOutcomes.push(o));
-
-      if (possibleOutcomes.length > 0) {
-        return possibleOutcomes[getSecureRandomInt(possibleOutcomes.length)];
-      }
-
-      // Fallback an toàn cuối cùng (không bao giờ lỗi hay hiện popup)
       return {
-        prizeObj: candidatePrizes[getSecureRandomInt(candidatePrizes.length)],
-        finalWinner: activePool[getSecureRandomInt(activePool.length)],
+        slot,
+        prizeObj: targetPrize,
+        finalWinner: pickPool[getSecureRandomInt(pickPool.length)],
         allocatedMatch: null,
       };
     }
@@ -4284,11 +4383,16 @@
       }
 
       const outcome = resolveAutomaticSpinOutcome(activePool, isDemo);
+      const slot = outcome.slot;
       const targetPrize = outcome.prizeObj;
       const finalWinner = outcome.finalWinner;
       const allocatedMatch = outcome.allocatedMatch;
       selectedPrizeTier = targetPrize.name;
       selectedPrizeGift = targetPrize.gift || "";
+      const stagePrizeDisplay = slot.isBonus
+        ? targetPrize.name
+        : `${targetPrize.name} (Lượt ${slot.currentTurn}/${slot.totalTurns})`;
+      updateStagePrizeLabel(stagePrizeDisplay, selectedPrizeGift);
 
       // Tạo danh sách xáo trộn trực quan (nếu danh sách thật ít hơn 6 người, tự pha thêm tên mẫu làm hiệu ứng quay mượt rồi chốt đúng người thật!)
       const visualRollPool =
@@ -4375,15 +4479,6 @@
           }
           lastIndex = randomIdx;
           displayCandidate(visualRollPool[randomIdx], randomIdx, visualRollPool);
-
-          // Xáo trộn cả tên giải thưởng lúc đầu, rồi chốt khóa hạng mục giải ở giai đoạn cuối cho hồi hộp!
-          if (progress < 0.72) {
-            const rp = allPrizes[Math.floor(Math.random() * allPrizes.length)];
-            updateStagePrizeLabel(rp.name, "");
-          } else {
-            updateStagePrizeLabel(targetPrize.name, targetPrize.gift || "");
-          }
-
           playSpinTickSound(progress);
 
           let nextDelay = 42;
@@ -4408,7 +4503,7 @@
           setTimeout(tick, nextDelay);
         } else {
           // Chốt kết quả & bật khung chân dung nổi bật người trúng giải
-          updateStagePrizeLabel(targetPrize.name, targetPrize.gift || "");
+          updateStagePrizeLabel(stagePrizeDisplay, targetPrize.gift || "");
           displayCandidate(finalWinner, 0, visualRollPool);
           reelPrev.classList.add("hidden");
           reelNext.classList.add("hidden");
@@ -4458,6 +4553,7 @@
               saveLuckyAllocationsToStorage();
               renderAdminAllocationsUI();
             }
+            renderAdminPrizesTable();
             rebuildLuckyEligiblePool();
           }
 
@@ -4545,11 +4641,8 @@
 
       luckyWinners.splice(idx, 1);
       saveLuckyWinnersToStorage();
-
-      selectedPrizeTier = target.prizeTier;
-      selectedPrizeGift = "";
-      renderPrizeTierPills();
-      updateStagePrizeLabel();
+      syncUpcomingPrizeBanner();
+      renderAdminPrizesTable();
       rebuildLuckyEligiblePool();
     }
 
@@ -4563,6 +4656,8 @@
       luckyAllocations.forEach((a) => (a.used = false));
       saveLuckyWinnersToStorage();
       saveLuckyAllocationsToStorage();
+      syncUpcomingPrizeBanner();
+      renderAdminPrizesTable();
       renderAdminAllocationsUI();
       rebuildLuckyEligiblePool();
     }
