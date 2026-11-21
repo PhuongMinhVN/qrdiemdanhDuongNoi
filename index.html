@@ -993,6 +993,36 @@
           </div>
         </div>
 
+        <!-- Admin Sub-Tabs Navigation -->
+        <div class="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900/85 border border-slate-700/70 overflow-x-auto">
+          <button
+            type="button"
+            id="admin-subtab-attendees"
+            onclick="switchAdminSubTab('attendees')"
+            class="admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow"
+          >
+            Danh sách điểm danh
+          </button>
+          <button
+            type="button"
+            id="admin-subtab-prizes"
+            onclick="switchAdminSubTab('prizes')"
+            class="admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-400 hover:text-white"
+          >
+            + Thêm &amp; Quản lý giải thưởng
+          </button>
+          <button
+            type="button"
+            id="admin-subtab-allocations"
+            onclick="switchAdminSubTab('allocations')"
+            class="admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-400 hover:text-white"
+          >
+            Cơ cấu trúng thưởng
+          </button>
+        </div>
+
+        <!-- ===== ADMIN SUB-TAB 1: DANH SÁCH ĐIỂM DANH ===== -->
+        <div id="admin-panel-attendees" class="space-y-6">
         <!-- Metrics Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="glass-panel rounded-2xl p-4 sm:p-5">
@@ -1074,6 +1104,152 @@
                 <!-- Populated dynamically -->
               </tbody>
             </table>
+          </div>
+        </div>
+        </div><!-- End #admin-panel-attendees -->
+
+        <!-- ===== ADMIN SUB-TAB 2: THÊM & QUẢN LÝ GIẢI THƯỞNG ===== -->
+        <div id="admin-panel-prizes" class="hidden space-y-5">
+          <div class="glass-panel rounded-2xl p-5 sm:p-6">
+            <h3 class="font-display font-bold text-lg text-white">Thêm Giải Thưởng Mới</h3>
+            <p class="text-xs text-slate-400 mt-1 mb-4">Giải thưởng sau khi thêm sẽ tự động đồng bộ sang màn hình Quay Số Trúng Thưởng.</p>
+
+            <form onsubmit="handleAdminAddPrize(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <div class="sm:col-span-4">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Tên giải thưởng *</label>
+                <input
+                  type="text"
+                  id="admin-prize-name"
+                  required
+                  placeholder="VD: Giải Đặc Biệt, Giải Tài Trợ..."
+                  class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
+                />
+              </div>
+              <div class="sm:col-span-5">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Quà tặng / Giá trị (tùy chọn)</label>
+                <input
+                  type="text"
+                  id="admin-prize-gift"
+                  placeholder="VD: iPhone 16 Pro / Voucher 5.000.000đ"
+                  class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
+                />
+              </div>
+              <div class="sm:col-span-3 flex items-end">
+                <button
+                  type="submit"
+                  class="w-full py-2.5 px-4 rounded-xl font-display font-bold text-sm text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-glow transition"
+                >
+                  + Thêm giải thưởng
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="glass-panel rounded-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between">
+              <h3 class="font-display font-bold text-base text-white">Danh Sách Hạng Mục Giải Thưởng</h3>
+              <span id="admin-prizes-count" class="text-xs text-amber-300 font-semibold">0 giải</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/90 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    <th class="py-3 px-4 w-14 text-center">STT</th>
+                    <th class="py-3 px-4">Tên giải thưởng</th>
+                    <th class="py-3 px-4">Quà tặng / Mô tả</th>
+                    <th class="py-3 px-4 text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-prizes-tbody" class="divide-y divide-slate-800/70 text-xs sm:text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ADMIN SUB-TAB 3: CƠ CẤU TRÚNG THƯỞNG (CHỈ QUẢN TRỊ VIÊN) ===== -->
+        <div id="admin-panel-allocations" class="hidden space-y-5">
+          <div class="glass-panel rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/35 uppercase">Bảo mật BTC</span>
+              <h3 class="font-display font-bold text-lg text-white">Cơ Cấu Người Trúng Thưởng Theo Giải</h3>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">
+              Chỉ định trước đại biểu trúng cho hạng mục giải mong muốn theo <strong class="text-slate-200">Họ và tên</strong> và/hoặc <strong class="text-slate-200">Số CCCD</strong>. Khi quay giải đó trên màn hình LED, hệ thống sẽ tự động dừng đúng người được cơ cấu (nếu đại biểu đó đã điểm danh và chưa trúng giải nào khác).
+            </p>
+
+            <form onsubmit="handleAddAllocation(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Hạng mục giải thưởng *</label>
+                  <select
+                    id="alloc-prize-select"
+                    required
+                    class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white bg-slate-900"
+                  ></select>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Chọn nhanh từ đại biểu đã điểm danh</label>
+                  <select
+                    id="alloc-attendee-quick"
+                    onchange="fillAllocationFromQuickSelect()"
+                    class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-slate-200 bg-slate-900"
+                  >
+                    <option value="">-- Hoặc nhập tay Họ tên / CCCD bên dưới --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Họ và tên đại biểu (nhập 1 trong 2 hoặc cả 2)</label>
+                  <input
+                    type="text"
+                    id="alloc-target-name"
+                    placeholder="VD: Chu Trần Trung"
+                    class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Số CCCD (12 số hoặc 6 số cuối)</label>
+                  <input
+                    type="text"
+                    id="alloc-target-cccd"
+                    placeholder="VD: 037089001801"
+                    class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white font-mono placeholder-slate-500"
+                  />
+                </div>
+              </div>
+
+              <div class="flex justify-end">
+                <button
+                  type="submit"
+                  class="px-5 py-2.5 rounded-xl font-display font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-glow transition"
+                >
+                  Lưu cơ cấu giải
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="glass-panel rounded-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between">
+              <h3 class="font-display font-bold text-base text-white">Danh Sách Cơ Cấu Đã Cài Đặt</h3>
+              <span id="alloc-count-badge" class="text-xs text-cyan-300 font-semibold">0 cấu hình</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/90 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    <th class="py-3 px-4">Giải thưởng</th>
+                    <th class="py-3 px-4">Họ tên mục tiêu</th>
+                    <th class="py-3 px-4">Số CCCD</th>
+                    <th class="py-3 px-4">Trạng thái</th>
+                    <th class="py-3 px-4 text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-allocations-tbody" class="divide-y divide-slate-800/70 text-xs sm:text-sm"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -2866,8 +3042,11 @@
 
       try {
         adminRecords = await fetchAllRecords();
+        await syncConfigFromCloudflareKV();
         updateAdminMetrics();
         renderAdminTable();
+        renderAdminPrizesTable();
+        renderAdminAllocationsUI();
       } catch (err) {
         console.error(err);
         document.getElementById("admin-table-body").innerHTML = `
@@ -3060,9 +3239,10 @@
     }
 
     /* =========================================================================
-     * TAB 4: QUAY SỐ TRÚNG THƯỞNG (LUCKY DRAW - LED STAGE)
+     * TAB 4: QUAY SỐ TRÚNG THƯỞNG (LUCKY DRAW - LED STAGE) & QUẢN LÝ CƠ CẤU
      * ========================================================================= */
     const STORAGE_KEY_LUCKY_PRIZES = "mb_bt_lucky_prizes_v1";
+    const STORAGE_KEY_LUCKY_ALLOCATIONS = "mb_bt_lucky_allocations_v1";
     const DEFAULT_PRIZE_TIERS = [
       { id: "p-kk", name: "Giải Khuyến Khích", gift: "", custom: false },
       { id: "p-3", name: "Giải Ba", gift: "", custom: false },
@@ -3083,7 +3263,79 @@
     ];
 
     let luckyPrizeTiers = [...DEFAULT_PRIZE_TIERS];
+    let luckyAllocations = [];
     let selectedPrizeGift = "";
+
+    function normalizeVietnameseSearch(str) {
+      return String(str || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function switchAdminSubTab(subTab) {
+      const panels = ["attendees", "prizes", "allocations"];
+      panels.forEach((p) => {
+        const panel = document.getElementById(`admin-panel-${p}`);
+        const btn = document.getElementById(`admin-subtab-${p}`);
+        if (!panel || !btn) return;
+        if (p === subTab) {
+          panel.classList.remove("hidden");
+          btn.className = "admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow";
+        } else {
+          panel.classList.add("hidden");
+          btn.className = "admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-400 hover:text-white";
+        }
+      });
+
+      if (subTab === "prizes") renderAdminPrizesTable();
+      if (subTab === "allocations") renderAdminAllocationsUI();
+    }
+
+    async function syncConfigFromCloudflareKV() {
+      if (!window.location.protocol.startsWith("http") || !isAdminAuthenticated) return;
+      try {
+        const res = await fetch("/api/config", {
+          method: "GET",
+          headers: { "X-Admin-Password": ADMIN_PASSWORD },
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json && json.status === "success") {
+          if (Array.isArray(json.prizes) && json.prizes.length > 0) {
+            luckyPrizeTiers = json.prizes;
+            localStorage.setItem(STORAGE_KEY_LUCKY_PRIZES, JSON.stringify(luckyPrizeTiers));
+            renderPrizeTierPills();
+          }
+          if (Array.isArray(json.allocations)) {
+            luckyAllocations = json.allocations;
+            localStorage.setItem(STORAGE_KEY_LUCKY_ALLOCATIONS, JSON.stringify(luckyAllocations));
+          }
+        }
+      } catch (_) {}
+    }
+
+    async function saveConfigToCloudflareKV() {
+      if (!window.location.protocol.startsWith("http") || !isAdminAuthenticated) return;
+      try {
+        await fetch("/api/config", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Admin-Password": ADMIN_PASSWORD,
+          },
+          body: JSON.stringify({
+            prizes: luckyPrizeTiers,
+            allocations: luckyAllocations,
+          }),
+        });
+      } catch (_) {}
+    }
 
     function initLuckyDrawState() {
       try {
@@ -3106,11 +3358,21 @@
         luckyPrizeTiers = [...DEFAULT_PRIZE_TIERS];
       }
 
+      try {
+        const savedAlloc = localStorage.getItem(STORAGE_KEY_LUCKY_ALLOCATIONS);
+        luckyAllocations = savedAlloc ? JSON.parse(savedAlloc) : [];
+        if (!Array.isArray(luckyAllocations)) luckyAllocations = [];
+      } catch (_) {
+        luckyAllocations = [];
+      }
+
       selectedPrizeTier = luckyPrizeTiers[0].name;
       selectedPrizeGift = luckyPrizeTiers[0].gift || "";
       renderPrizeTierPills();
       updateStagePrizeLabel();
       renderWinnersBoard();
+      renderAdminPrizesTable();
+      renderAdminAllocationsUI();
     }
 
     function saveLuckyWinnersToStorage() {
@@ -3119,6 +3381,196 @@
 
     function saveLuckyPrizesToStorage() {
       localStorage.setItem(STORAGE_KEY_LUCKY_PRIZES, JSON.stringify(luckyPrizeTiers));
+      saveConfigToCloudflareKV();
+    }
+
+    function saveLuckyAllocationsToStorage() {
+      localStorage.setItem(STORAGE_KEY_LUCKY_ALLOCATIONS, JSON.stringify(luckyAllocations));
+      saveConfigToCloudflareKV();
+    }
+
+    /* ----- Quản lý Giải Thưởng trong Tab Quản Trị ----- */
+    function handleAdminAddPrize(event) {
+      event.preventDefault();
+      const nameInput = document.getElementById("admin-prize-name");
+      const giftInput = document.getElementById("admin-prize-gift");
+      const name = (nameInput.value || "").trim();
+      const gift = (giftInput.value || "").trim();
+      if (!name) return;
+
+      luckyPrizeTiers.push({
+        id: `p-custom-${Date.now()}`,
+        name,
+        gift,
+        custom: true,
+      });
+      saveLuckyPrizesToStorage();
+      nameInput.value = "";
+      giftInput.value = "";
+
+      renderPrizeTierPills();
+      renderAdminPrizesTable();
+      renderAdminAllocationsUI();
+    }
+
+    function renderAdminPrizesTable() {
+      const tbody = document.getElementById("admin-prizes-tbody");
+      const countEl = document.getElementById("admin-prizes-count");
+      if (!tbody || !countEl) return;
+
+      countEl.textContent = `${luckyPrizeTiers.length} hạng mục`;
+      tbody.innerHTML = luckyPrizeTiers
+        .map(
+          (p, i) => `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-3 px-4 text-center font-mono text-slate-400">${i + 1}</td>
+            <td class="py-3 px-4 font-bold text-amber-300">${escapeHtml(p.name)}</td>
+            <td class="py-3 px-4 text-slate-300">${escapeHtml(p.gift || "—")}</td>
+            <td class="py-3 px-4 text-right">
+              <button
+                type="button"
+                onclick="removeCustomPrizeTier('${escapeHtml(p.id)}', event)"
+                class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition"
+              >
+                Xóa
+              </button>
+            </td>
+          </tr>`
+        )
+        .join("");
+    }
+
+    /* ----- Quản lý Cơ Cấu Trúng Thưởng trong Tab Quản Trị ----- */
+    function renderAdminAllocationsUI() {
+      const prizeSelect = document.getElementById("alloc-prize-select");
+      const attendeeSelect = document.getElementById("alloc-attendee-quick");
+      const tbody = document.getElementById("admin-allocations-tbody");
+      const countBadge = document.getElementById("alloc-count-badge");
+      if (!prizeSelect || !attendeeSelect || !tbody) return;
+
+      const prevPrize = prizeSelect.value;
+      prizeSelect.innerHTML = luckyPrizeTiers
+        .map((p) => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}${p.gift ? " — " + escapeHtml(p.gift) : ""}</option>`)
+        .join("");
+      if (prevPrize && luckyPrizeTiers.some((p) => p.name === prevPrize)) {
+        prizeSelect.value = prevPrize;
+      }
+
+      attendeeSelect.innerHTML =
+        `<option value="">-- Chọn nhanh từ danh sách đã điểm danh (${adminRecords.length}) --</option>` +
+        adminRecords
+          .map((r, idx) => {
+            const cccdExtract = (String(r.organization || "").match(/\d{9,12}/) || [""])[0];
+            const extra = cccdExtract ? `CCCD: ${cccdExtract}` : (r.phone || r.organization || "");
+            return `<option value="${idx}">${escapeHtml(r.fullName)}${extra ? " — " + escapeHtml(extra) : ""}</option>`;
+          })
+          .join("");
+
+      countBadge.textContent = `${luckyAllocations.length} cấu hình`;
+
+      if (luckyAllocations.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-8 text-center text-slate-500">
+              Chưa có cấu hình cơ cấu nào. Hệ thống đang quay ngẫu nhiên 100%.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = luckyAllocations
+        .map(
+          (a) => `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-3 px-4 font-bold text-amber-300 whitespace-nowrap">${escapeHtml(a.prizeTier)}</td>
+            <td class="py-3 px-4 font-semibold text-white">${escapeHtml(a.targetName || "—")}</td>
+            <td class="py-3 px-4 font-mono text-cyan-300">${escapeHtml(a.targetCCCD || "—")}</td>
+            <td class="py-3 px-4 whitespace-nowrap">
+              ${
+                a.used
+                  ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/35">Đã trúng</span>`
+                  : `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-400/35">Đang chờ quay</span>`
+              }
+            </td>
+            <td class="py-3 px-4 text-right whitespace-nowrap">
+              <button
+                type="button"
+                onclick="deleteAllocationRule('${escapeHtml(a.id)}')"
+                class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition"
+              >
+                Xóa
+              </button>
+            </td>
+          </tr>`
+        )
+        .join("");
+    }
+
+    function fillAllocationFromQuickSelect() {
+      const idxStr = document.getElementById("alloc-attendee-quick").value;
+      if (idxStr === "") return;
+      const r = adminRecords[Number(idxStr)];
+      if (!r) return;
+      document.getElementById("alloc-target-name").value = r.fullName || "";
+      const cccdMatch =
+        (String(r.organization || "").match(/\d{9,12}/) || [])[0] ||
+        (String(r.phone || "").match(/\d{6,12}/) || [])[0] ||
+        "";
+      document.getElementById("alloc-target-cccd").value = cccdMatch;
+    }
+
+    function handleAddAllocation(event) {
+      event.preventDefault();
+      const prizeTier = document.getElementById("alloc-prize-select").value;
+      const targetName = (document.getElementById("alloc-target-name").value || "").trim();
+      const targetCCCD = (document.getElementById("alloc-target-cccd").value || "").replace(/\D/g, "");
+
+      if (!targetName && !targetCCCD) {
+        alert("Vui lòng nhập ít nhất Họ và tên hoặc Số CCCD của đại biểu.");
+        return;
+      }
+
+      luckyAllocations.push({
+        id: `alloc-${Date.now()}`,
+        prizeTier,
+        targetName,
+        targetCCCD,
+        used: false,
+      });
+
+      saveLuckyAllocationsToStorage();
+      document.getElementById("alloc-target-name").value = "";
+      document.getElementById("alloc-target-cccd").value = "";
+      document.getElementById("alloc-attendee-quick").value = "";
+      renderAdminAllocationsUI();
+    }
+
+    function deleteAllocationRule(ruleId) {
+      luckyAllocations = luckyAllocations.filter((a) => a.id !== ruleId);
+      saveLuckyAllocationsToStorage();
+      renderAdminAllocationsUI();
+    }
+
+    function findAllocatedWinnerForPrize(prizeName, pool) {
+      const rule = luckyAllocations.find((a) => !a.used && a.prizeTier === prizeName);
+      if (!rule) return null;
+
+      const normTargetName = normalizeVietnameseSearch(rule.targetName);
+      const targetDigits = String(rule.targetCCCD || "").replace(/\D/g, "");
+
+      const matchedCandidate = pool.find((c) => {
+        const cName = normalizeVietnameseSearch(c.fullName);
+        const cDigitsBlob = `${c.organization || ""} ${c.phone || ""}`.replace(/\D/g, "");
+
+        const nameOk = !normTargetName || cName === normTargetName || cName.includes(normTargetName);
+        const cccdOk = !targetDigits || cDigitsBlob.includes(targetDigits);
+        return nameOk && cccdOk;
+      });
+
+      if (matchedCandidate) {
+        return { rule, candidate: matchedCandidate };
+      }
+      return null;
     }
 
     function toggleAddPrizeForm() {
@@ -3159,10 +3611,16 @@
 
       renderPrizeTierPills();
       updateStagePrizeLabel();
+      renderAdminPrizesTable();
+      renderAdminAllocationsUI();
     }
 
     function removeCustomPrizeTier(prizeId, event) {
       if (event) event.stopPropagation();
+      if (luckyPrizeTiers.length <= 1) {
+        alert("Cần giữ lại ít nhất 1 hạng mục giải thưởng.");
+        return;
+      }
       const idx = luckyPrizeTiers.findIndex((p) => p.id === prizeId);
       if (idx === -1) return;
 
@@ -3176,6 +3634,8 @@
       }
       renderPrizeTierPills();
       updateStagePrizeLabel();
+      renderAdminPrizesTable();
+      renderAdminAllocationsUI();
     }
 
     function renderPrizeTierPills() {
@@ -3252,6 +3712,7 @@
 
       try {
         adminRecords = await fetchAllRecords();
+        await syncConfigFromCloudflareKV();
         rebuildLuckyEligiblePool();
       } catch (err) {
         console.error(err);
@@ -3261,17 +3722,19 @@
     }
 
     function rebuildLuckyEligiblePool() {
-      const winnerPhones = new Set(luckyWinners.map((w) => normalizePhoneKey(w.phone)).filter(Boolean));
-      const seenPhones = new Set();
+      const winnerKeys = new Set(
+        luckyWinners.map((w) => normalizePhoneKey(w.phone) || normalizeVietnameseSearch(w.fullName)).filter(Boolean)
+      );
+      const seenKeys = new Set();
       const pool = [];
 
       for (const r of adminRecords) {
-        const phoneKey = normalizePhoneKey(r.phone);
+        const phoneKey = normalizePhoneKey(r.phone) || normalizeVietnameseSearch(r.fullName);
         if (!phoneKey) continue;
-        if (seenPhones.has(phoneKey)) continue; // Lọc trùng SĐT
-        seenPhones.add(phoneKey);
+        if (seenKeys.has(phoneKey)) continue; // Lọc trùng SĐT / đại biểu
+        seenKeys.add(phoneKey);
 
-        if (winnerPhones.has(phoneKey)) continue; // Loại đại biểu đã trúng giải
+        if (winnerKeys.has(phoneKey)) continue; // Loại đại biểu đã trúng giải
         if (luckyAbsentPhones.has(phoneKey)) continue; // Loại đại biểu đã hủy do vắng mặt
 
         pool.push({
@@ -3441,8 +3904,10 @@
       subtitle.className = "text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-300 font-semibold mb-2.5 animate-pulse";
       phoneBadge.classList.remove("hidden");
 
+      // Kiểm tra cấu hình cơ cấu giải (nếu có và không phải chế độ quay mẫu)
+      const allocatedMatch = !isDemo ? findAllocatedWinnerForPrize(selectedPrizeTier, activePool) : null;
       const winnerIndex = getSecureRandomInt(activePool.length);
-      const finalWinner = activePool[winnerIndex];
+      const finalWinner = allocatedMatch ? allocatedMatch.candidate : activePool[winnerIndex];
 
       const totalDurationMs = 4000;
       const startTime = performance.now();
@@ -3500,6 +3965,11 @@
 
             luckyWinners.unshift(winnerEntry);
             saveLuckyWinnersToStorage();
+            if (allocatedMatch && allocatedMatch.rule) {
+              allocatedMatch.rule.used = true;
+              saveLuckyAllocationsToStorage();
+              renderAdminAllocationsUI();
+            }
             rebuildLuckyEligiblePool();
           }
 
