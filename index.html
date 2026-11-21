@@ -1346,15 +1346,37 @@
                   ></select>
                 </div>
 
-                <div>
-                  <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Chọn nhanh từ đại biểu đã điểm danh</label>
-                  <select
-                    id="alloc-attendee-quick"
-                    onchange="fillAllocationFromQuickSelect()"
-                    class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-slate-200 bg-slate-900"
-                  >
-                    <option value="">-- Hoặc nhập tay Họ tên / CCCD bên dưới --</option>
-                  </select>
+                <div class="relative" id="alloc-search-container">
+                  <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                    Tìm nhanh đại biểu đã điểm danh (<span id="alloc-pool-total-label">0</span> người)
+                  </label>
+                  <div class="relative">
+                    <svg class="w-4 h-4 text-cyan-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                    <input
+                      type="text"
+                      id="alloc-attendee-search"
+                      autocomplete="off"
+                      onfocus="renderAllocationSearchResults()"
+                      oninput="renderAllocationSearchResults()"
+                      placeholder="Gõ tên, số CCCD, SĐT hoặc đơn vị để tìm..."
+                      class="glass-input w-full pl-10 pr-9 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
+                    />
+                    <button
+                      type="button"
+                      onclick="clearAllocationSearch()"
+                      title="Xóa từ khóa tìm kiếm"
+                      class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm px-1"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                  <!-- Live Search Results Dropdown -->
+                  <div
+                    id="alloc-search-results"
+                    class="hidden absolute left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-xl bg-slate-900/98 border border-cyan-500/40 shadow-2xl z-30 divide-y divide-slate-800/80 backdrop-blur-xl"
+                  ></div>
                 </div>
 
                 <div>
@@ -3824,29 +3846,20 @@
     /* ----- Quản lý Cơ Cấu Trúng Thưởng trong Tab Quản Trị ----- */
     function renderAdminAllocationsUI() {
       const prizeSelect = document.getElementById("alloc-prize-select");
-      const attendeeSelect = document.getElementById("alloc-attendee-quick");
+      const totalLabel = document.getElementById("alloc-pool-total-label");
       const tbody = document.getElementById("admin-allocations-tbody");
       const countBadge = document.getElementById("alloc-count-badge");
-      if (!prizeSelect || !attendeeSelect || !tbody) return;
+      if (!prizeSelect || !tbody) return;
 
       const prevPrize = prizeSelect.value;
       prizeSelect.innerHTML = luckyPrizeTiers
-        .map((p) => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}${p.gift ? " — " + escapeHtml(p.gift) : ""}</option>`)
+        .map((p) => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)} (×${p.quantity || 1})${p.gift ? " — " + escapeHtml(p.gift) : ""}</option>`)
         .join("");
       if (prevPrize && luckyPrizeTiers.some((p) => p.name === prevPrize)) {
         prizeSelect.value = prevPrize;
       }
 
-      attendeeSelect.innerHTML =
-        `<option value="">-- Chọn nhanh từ danh sách đã điểm danh (${adminRecords.length}) --</option>` +
-        adminRecords
-          .map((r, idx) => {
-            const cccdExtract = (String(r.organization || "").match(/\d{9,12}/) || [""])[0];
-            const extra = cccdExtract ? `CCCD: ${cccdExtract}` : (r.phone || r.organization || "");
-            return `<option value="${idx}">${escapeHtml(r.fullName)}${extra ? " — " + escapeHtml(extra) : ""}</option>`;
-          })
-          .join("");
-
+      if (totalLabel) totalLabel.textContent = adminRecords.length;
       countBadge.textContent = `${luckyAllocations.length} cấu hình`;
 
       if (luckyAllocations.length === 0) {
@@ -3887,10 +3900,60 @@
         .join("");
     }
 
-    function fillAllocationFromQuickSelect() {
-      const idxStr = document.getElementById("alloc-attendee-quick").value;
-      if (idxStr === "") return;
-      const r = adminRecords[Number(idxStr)];
+    function renderAllocationSearchResults() {
+      const input = document.getElementById("alloc-attendee-search");
+      const resultsBox = document.getElementById("alloc-search-results");
+      if (!input || !resultsBox) return;
+
+      const rawQ = (input.value || "").trim();
+      const normQ = normalizeVietnameseSearch(rawQ);
+      const digitsQ = rawQ.replace(/\D/g, "");
+
+      const matches = adminRecords
+        .map((r, idx) => ({ r, idx }))
+        .filter(({ r }) => {
+          if (!normQ && !digitsQ) return true;
+          const haystack = normalizeVietnameseSearch(`${r.fullName} ${r.position} ${r.organization} ${r.phone}`);
+          const digitsBlob = `${r.organization || ""} ${r.phone || ""}`.replace(/\D/g, "");
+          return (normQ && haystack.includes(normQ)) || (digitsQ && digitsBlob.includes(digitsQ));
+        })
+        .slice(0, 20);
+
+      resultsBox.classList.remove("hidden");
+
+      if (matches.length === 0) {
+        resultsBox.innerHTML = `
+          <div class="px-4 py-3 text-xs text-slate-400 text-center">
+            ${adminRecords.length === 0 ? "Chưa có đại biểu nào điểm danh." : "Không tìm thấy đại biểu phù hợp."}
+          </div>`;
+        return;
+      }
+
+      resultsBox.innerHTML = matches
+        .map(({ r, idx }) => {
+          const cccdExtract = (String(r.organization || "").match(/\d{9,12}/) || [""])[0];
+          const sub = [r.position, cccdExtract ? `CCCD: ${cccdExtract}` : r.organization, r.phone]
+            .filter(Boolean)
+            .join(" • ");
+          return `
+            <button
+              type="button"
+              onclick="selectAttendeeForAllocation(${idx})"
+              class="w-full text-left px-3.5 py-2.5 hover:bg-cyan-500/15 transition flex items-center justify-between gap-2"
+            >
+              <div class="min-w-0">
+                <p class="text-xs sm:text-sm font-bold text-white truncate">${escapeHtml(r.fullName)}</p>
+                <p class="text-[11px] text-slate-400 truncate mt-0.5">${escapeHtml(sub)}</p>
+              </div>
+              <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">Chọn</span>
+            </button>
+          `;
+        })
+        .join("");
+    }
+
+    function selectAttendeeForAllocation(recordIdx) {
+      const r = adminRecords[recordIdx];
       if (!r) return;
       document.getElementById("alloc-target-name").value = r.fullName || "";
       const cccdMatch =
@@ -3898,7 +3961,24 @@
         (String(r.phone || "").match(/\d{6,12}/) || [])[0] ||
         "";
       document.getElementById("alloc-target-cccd").value = cccdMatch;
+      document.getElementById("alloc-attendee-search").value = `${r.fullName}${cccdMatch ? " — " + cccdMatch : ""}`;
+      document.getElementById("alloc-search-results").classList.add("hidden");
     }
+
+    function clearAllocationSearch() {
+      const input = document.getElementById("alloc-attendee-search");
+      const box = document.getElementById("alloc-search-results");
+      if (input) input.value = "";
+      if (box) box.classList.add("hidden");
+    }
+
+    document.addEventListener("click", (e) => {
+      const container = document.getElementById("alloc-search-container");
+      const box = document.getElementById("alloc-search-results");
+      if (container && box && !container.contains(e.target)) {
+        box.classList.add("hidden");
+      }
+    });
 
     let pendingAllocPhotoDataUrl = "";
 
@@ -3953,7 +4033,7 @@
       saveLuckyAllocationsToStorage();
       document.getElementById("alloc-target-name").value = "";
       document.getElementById("alloc-target-cccd").value = "";
-      document.getElementById("alloc-attendee-quick").value = "";
+      clearAllocationSearch();
       const prev = document.getElementById("alloc-photo-preview");
       if (prev) {
         prev.src = "";
