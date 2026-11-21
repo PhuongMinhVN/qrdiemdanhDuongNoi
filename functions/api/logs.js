@@ -15,6 +15,12 @@ function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: CORS_HEADERS });
 }
 
+function formatVietnamTime(ms) {
+  const d = new Date(ms + 7 * 3600 * 1000); // Chuẩn giờ Việt Nam UTC+7 (không phụ thuộc múi giờ máy khách)
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} - ${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+}
+
 function parseDeviceSummary(ua) {
   const s = String(ua || "");
   let os = "Khác";
@@ -56,7 +62,8 @@ export async function onRequestPost({ request, env }) {
     const device = parseDeviceSummary(ua);
     const sessionId = String(body.sessionId || "SES-ANON").slice(0, 32);
     const tab = String(body.tab || "checkin").slice(0, 32);
-    const timeStr = String(body.time || new Date(nowMs).toISOString());
+    // Luôn dùng giờ chuẩn máy chủ Việt Nam (UTC+7) để không bị lệch múi giờ hoặc sai đồng hồ máy khách
+    const timeStr = formatVietnamTime(nowMs);
 
     // 1. Luôn cập nhật trạng thái "đang truy cập" (tự hết hạn sau 120 giây nếu đóng trang)
     const presenceData = {
@@ -123,10 +130,18 @@ export async function onRequestGet({ request, env }) {
 
     const activeSessions = activeRaw
       .filter(Boolean)
+      .map((s) => ({
+        ...s,
+        lastSeen: s.lastSeenMs ? formatVietnamTime(s.lastSeenMs) : s.lastSeen,
+      }))
       .sort((a, b) => (b.lastSeenMs || 0) - (a.lastSeenMs || 0));
 
     const logs = logsRaw
       .filter(Boolean)
+      .map((l) => ({
+        ...l,
+        time: l.ts ? formatVietnamTime(l.ts) : l.time,
+      }))
       .sort((a, b) => (b.ts || 0) - (a.ts || 0));
 
     return jsonResponse({

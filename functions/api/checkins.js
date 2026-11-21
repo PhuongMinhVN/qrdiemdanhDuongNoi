@@ -21,6 +21,12 @@ function jsonResponse(data, status = 200) {
   });
 }
 
+function formatVietnamTime(ms) {
+  const d = new Date(ms + 7 * 3600 * 1000); // Chuẩn giờ Việt Nam UTC+7
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} - ${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+}
+
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
@@ -79,11 +85,12 @@ export async function onRequestPost({ request, env }) {
     const id = payload.id || `MB-${String(nowMs).slice(-5)}`;
     const key = `checkin:${nowMs}_${rand}`;
 
+    const serverVnTime = formatVietnamTime(nowMs);
     const record = {
       id,
-      time: payload.time || payload.timestamp || "",
-      timestamp: payload.timestamp || payload.time || "",
-      isoTime: payload.isoTime || new Date(nowMs).toISOString(),
+      time: serverVnTime,
+      timestamp: serverVnTime,
+      isoTime: new Date(nowMs).toISOString(),
       fullName: String(payload.fullName || "").trim(),
       position: String(payload.position || "").trim(),
       organization: String(payload.organization || "").trim(),
