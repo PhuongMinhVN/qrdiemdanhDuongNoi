@@ -950,6 +950,14 @@
                   <div id="badge-mini-qr"></div>
                 </div>
               </div>
+
+              <!-- Subtle Sponsor Micro-Strip inside 3D Pass -->
+              <div class="relative z-10 mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-center gap-2 text-[10px] text-slate-400">
+                <span class="uppercase tracking-wider">Tài trợ công nghệ:</span>
+                <span class="font-display font-extrabold tracking-tight text-xs"><span class="text-sky-400">mobi</span><span class="text-rose-500">fone</span></span>
+                <span class="text-slate-600">•</span>
+                <span class="font-display font-extrabold tracking-wider text-[11px] text-cyan-300">BETATECH</span>
+              </div>
             </div>
           </div>
 
@@ -1738,15 +1746,56 @@
             </div>
           </div>
 
+          <!-- Subtle Sponsor Strip inside Lucky Draw Stage (Visible in LED Fullscreen) -->
+          <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-5 pt-2 pb-1 text-slate-400">
+            <span class="text-[11px] uppercase tracking-[0.22em] font-semibold text-slate-400">Đơn vị tài trợ công nghệ</span>
+            <div class="inline-flex items-center gap-4 px-5 py-2 rounded-full bg-slate-900/75 border border-cyan-500/20 backdrop-blur-md">
+              <svg class="h-5 w-auto" viewBox="0 0 132 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="MobiFone">
+                <text x="0" y="21" font-family="Plus Jakarta Sans, Inter, sans-serif" font-weight="800" font-size="22" letter-spacing="-0.6">
+                  <tspan fill="#38BDF8">mobi</tspan><tspan fill="#EF4444">fone</tspan>
+                </text>
+                <circle cx="122" cy="8" r="3.2" fill="#EF4444" />
+              </svg>
+              <span class="w-px h-4 bg-slate-700"></span>
+              <span class="inline-flex items-center gap-1.5">
+                <svg class="w-5 h-5" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <polygon points="14,2 25,8.2 25,19.8 14,26 3,19.8 3,8.2" stroke="#22D3EE" stroke-width="2" fill="rgba(34,211,238,0.12)" />
+                  <path d="M10 9.5H15.2C17.2 9.5 18.4 10.5 18.4 12C18.4 13.1 17.6 13.9 16.5 14.2C17.9 14.5 18.8 15.4 18.8 16.7C18.8 18.3 17.5 19.3 15.4 19.3H10V9.5Z" stroke="#67E8F9" stroke-width="1.8" stroke-linejoin="round" />
+                </svg>
+                <span class="font-display font-extrabold tracking-[0.16em] text-sm text-cyan-300">BETATECH</span>
+              </span>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ==================== FOOTER ==================== -->
-  <footer class="max-w-6xl mx-auto px-4 sm:px-6 pb-8 pt-2 text-center text-xs text-slate-500">
-    <p>Giải pháp điểm danh hội nghị điện tử tài trợ bởi <span class="text-blue-400 font-semibold">MOBIFONE</span> × <span class="text-cyan-400 font-semibold">BETATECH</span></p>
+  <!-- ==================== REFINED SPONSOR FOOTER ==================== -->
+  <footer class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-8 pt-4">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5">
+      <span class="text-[11px] uppercase tracking-[0.22em] font-semibold text-slate-400">Đơn vị đồng hành &amp; tài trợ công nghệ</span>
+      <div class="inline-flex items-center gap-4 px-5 py-2.5 rounded-full bg-slate-900/75 border border-cyan-500/20 backdrop-blur-md shadow-lg">
+        <!-- MobiFone Wordmark Logo -->
+        <svg class="h-5 w-auto" viewBox="0 0 132 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="MobiFone">
+          <text x="0" y="21" font-family="Plus Jakarta Sans, Inter, sans-serif" font-weight="800" font-size="22" letter-spacing="-0.6">
+            <tspan fill="#38BDF8">mobi</tspan><tspan fill="#EF4444">fone</tspan>
+          </text>
+          <circle cx="122" cy="8" r="3.2" fill="#EF4444" />
+        </svg>
+        <span class="w-px h-5 bg-slate-700/90"></span>
+        <!-- Betatech Emblem + Wordmark Logo -->
+        <span class="inline-flex items-center gap-2">
+          <svg class="w-5 h-5" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <polygon points="14,2 25,8.2 25,19.8 14,26 3,19.8 3,8.2" stroke="#22D3EE" stroke-width="2" fill="rgba(34,211,238,0.12)" />
+            <path d="M10 9.5H15.2C17.2 9.5 18.4 10.5 18.4 12C18.4 13.1 17.6 13.9 16.5 14.2C17.9 14.5 18.8 15.4 18.8 16.7C18.8 18.3 17.5 19.3 15.4 19.3H10V9.5Z" stroke="#67E8F9" stroke-width="1.8" stroke-linejoin="round" />
+          </svg>
+          <span class="font-display font-extrabold tracking-[0.16em] text-sm text-cyan-300">BETATECH</span>
+        </span>
+      </div>
+    </div>
   </footer>
 
   <!-- ==================== CCCD LIVE CAMERA SCANNER MODAL ==================== -->
@@ -1848,9 +1897,27 @@
       </p>
     </div>
 
-    <!-- Bottom Bar -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-slate-300 border-t border-cyan-500/20 pt-3">
-      <span>Hệ thống Điểm danh Điện tử Thông minh — Tài trợ bởi <strong class="text-blue-400">MOBIFONE</strong> &amp; <strong class="text-cyan-300">BETATECH</strong></span>
+    <!-- Bottom Bar with Sponsor Logos -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-slate-300 border-t border-cyan-500/20 pt-3">
+      <div class="flex items-center gap-3.5 flex-wrap justify-center">
+        <span class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Tài trợ công nghệ</span>
+        <div class="inline-flex items-center gap-3.5 px-4 py-1.5 rounded-full bg-slate-900/75 border border-cyan-500/25 backdrop-blur-md">
+          <svg class="h-4 sm:h-5 w-auto" viewBox="0 0 132 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="MobiFone">
+            <text x="0" y="21" font-family="Plus Jakarta Sans, Inter, sans-serif" font-weight="800" font-size="22" letter-spacing="-0.6">
+              <tspan fill="#38BDF8">mobi</tspan><tspan fill="#EF4444">fone</tspan>
+            </text>
+            <circle cx="122" cy="8" r="3.2" fill="#EF4444" />
+          </svg>
+          <span class="w-px h-4 bg-slate-700"></span>
+          <span class="inline-flex items-center gap-1.5">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <polygon points="14,2 25,8.2 25,19.8 14,26 3,19.8 3,8.2" stroke="#22D3EE" stroke-width="2" fill="rgba(34,211,238,0.12)" />
+              <path d="M10 9.5H15.2C17.2 9.5 18.4 10.5 18.4 12C18.4 13.1 17.6 13.9 16.5 14.2C17.9 14.5 18.8 15.4 18.8 16.7C18.8 18.3 17.5 19.3 15.4 19.3H10V9.5Z" stroke="#67E8F9" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+            <span class="font-display font-extrabold tracking-[0.16em] text-xs sm:text-sm text-cyan-300">BETATECH</span>
+          </span>
+        </div>
+      </div>
       <span id="presentation-url" class="font-mono text-cyan-300 font-semibold truncate max-w-md"></span>
     </div>
   </div>
@@ -2931,10 +2998,13 @@
       ctx.textAlign = "center";
       ctx.font = "700 30px monospace";
       ctx.fillStyle = "#67e8f9";
-      ctx.fillText(`MÃ THẺ: #${r.id || "MB-PASS"}`, 540, 1715);
-      ctx.font = "500 24px Inter, sans-serif";
+      ctx.fillText(`MÃ THẺ: #${r.id || "MB-PASS"}`, 540, 1700);
+      ctx.font = "500 23px Inter, sans-serif";
       ctx.fillStyle = "#cbd5e1";
-      ctx.fillText("Xuất trình thẻ ra vào này tại cửa kiểm soát hội trường", 540, 1765);
+      ctx.fillText("Xuất trình thẻ ra vào này tại cửa kiểm soát hội trường", 540, 1746);
+      ctx.font = "700 22px Inter, sans-serif";
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillText("Tài trợ công nghệ: mobifone  •  BETATECH", 540, 1796);
 
       const fileName = `TheRaVao_${(r.id || "MB").replace(/[^A-Za-z0-9_-]/g, "")}.png`;
       const btnLabel = document.getElementById("download-pass-label");
