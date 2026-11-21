@@ -497,7 +497,7 @@
             <!-- Chức vụ -->
             <div>
               <label for="input-position" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Chức vụ <span class="text-rose-400">*</span>
+                Chức vụ <span class="cccd-optional-star text-rose-400">*</span><span class="cccd-optional-hint hidden text-[11px] font-normal normal-case text-emerald-400 ml-1">(không bắt buộc)</span>
               </label>
               <input
                 type="text"
@@ -511,7 +511,7 @@
             <!-- Cơ quan / Đơn vị công tác -->
             <div>
               <label for="input-organization" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Cơ quan / Đơn vị công tác <span class="text-rose-400">*</span>
+                Cơ quan / Đơn vị công tác <span class="cccd-optional-star text-rose-400">*</span><span class="cccd-optional-hint hidden text-[11px] font-normal normal-case text-emerald-400 ml-1">(không bắt buộc)</span>
               </label>
               <input
                 type="text"
@@ -525,7 +525,7 @@
             <!-- Số điện thoại -->
             <div>
               <label for="input-phone" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Số điện thoại <span class="text-rose-400">*</span>
+                Số điện thoại <span class="cccd-optional-star text-rose-400">*</span><span class="cccd-optional-hint hidden text-[11px] font-normal normal-case text-emerald-400 ml-1">(không bắt buộc)</span>
               </label>
               <input
                 type="tel"
@@ -1591,17 +1591,47 @@
       box.textContent = message;
     }
 
-    function applyCCCDName(fullName, sourceLabel) {
+    let isCCCDVerified = false;
+    let verifiedCCCDNumber = "";
+
+    function setCCCDVerifiedMode(verified, cccdNumber = "") {
+      isCCCDVerified = Boolean(verified);
+      verifiedCCCDNumber = cccdNumber || "";
+
+      const optionalInputs = ["input-position", "input-organization", "input-phone"];
+      optionalInputs.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (isCCCDVerified) {
+          el.removeAttribute("required");
+        } else {
+          el.setAttribute("required", "required");
+        }
+      });
+
+      document.querySelectorAll(".cccd-optional-star").forEach((el) => {
+        el.classList.toggle("hidden", isCCCDVerified);
+      });
+      document.querySelectorAll(".cccd-optional-hint").forEach((el) => {
+        el.classList.toggle("hidden", !isCCCDVerified);
+      });
+    }
+
+    function applyCCCDName(fullName, sourceLabel, cccdNumber = "") {
       const nameInput = document.getElementById("input-fullname");
       nameInput.value = fullName;
-      nameInput.focus();
-      showCCCDFeedback("success", `✓ Đã tự động điền Họ và tên (${sourceLabel}): ${fullName}`);
+      setCCCDVerifiedMode(true, cccdNumber);
+      showFormError("");
+      showCCCDFeedback(
+        "success",
+        `✓ Đã xác thực CCCD (${sourceLabel}): ${fullName}. Bạn có thể bấm "XÁC NHẬN ĐIỂM DANH" ngay (các mục bên dưới không còn bắt buộc).`
+      );
     }
 
     function applyCCCDResult(rawData) {
       const parsed = parseCCCDQRText(rawData);
       if (parsed) {
-        applyCCCDName(parsed.fullName, "từ mã QR CCCD");
+        applyCCCDName(parsed.fullName, "từ mã QR CCCD", parsed.cccdNumber);
         return true;
       }
       return false;
@@ -1728,7 +1758,7 @@
             // Bước 1: Quét QR đa vùng độ phân giải cao (tức thì < 0.2s)
             const qrParsed = tryMultiRegionCCCDQR(img);
             if (qrParsed) {
-              applyCCCDName(qrParsed.fullName, "từ mã QR trên ảnh CCCD");
+              applyCCCDName(qrParsed.fullName, "từ mã QR trên ảnh CCCD", qrParsed.cccdNumber);
               event.target.value = "";
               return;
             }
@@ -1879,15 +1909,36 @@
       }
 
       const fullName = document.getElementById("input-fullname").value.trim();
-      const position = document.getElementById("input-position").value.trim();
-      const organization = document.getElementById("input-organization").value.trim();
-      const phone = document.getElementById("input-phone").value.trim();
+      const rawPosition = document.getElementById("input-position").value.trim();
+      const rawOrganization = document.getElementById("input-organization").value.trim();
+      const rawPhone = document.getElementById("input-phone").value.trim();
 
-      const digitsOnly = phone.replace(/\D/g, "");
-      if (digitsOnly.length < 9 || digitsOnly.length > 12) {
-        showFormError("Vui lòng nhập số điện thoại hợp lệ (9–12 chữ số).");
+      if (!fullName) {
+        showFormError("Vui lòng nhập Họ và tên hoặc quét/chụp ảnh CCCD.");
         return;
       }
+
+      if (!isCCCDVerified) {
+        if (!rawPosition || !rawOrganization || !rawPhone) {
+          showFormError("Vui lòng điền đầy đủ Họ tên, Chức vụ, Cơ quan/Đơn vị và Số điện thoại (hoặc quét/chụp ảnh CCCD để điểm danh nhanh).");
+          return;
+        }
+        const digitsOnly = rawPhone.replace(/\D/g, "");
+        if (digitsOnly.length < 9 || digitsOnly.length > 12) {
+          showFormError("Vui lòng nhập số điện thoại hợp lệ (9–12 chữ số).");
+          return;
+        }
+      } else if (rawPhone) {
+        const digitsOnly = rawPhone.replace(/\D/g, "");
+        if (digitsOnly.length < 9 || digitsOnly.length > 12) {
+          showFormError("Số điện thoại vừa nhập chưa đúng định dạng (9–12 chữ số). Hoặc bạn có thể để trống.");
+          return;
+        }
+      }
+
+      const position = rawPosition || "Đại biểu (Xác thực CCCD)";
+      const organization = rawOrganization || (verifiedCCCDNumber ? `CCCD: ${verifiedCCCDNumber}` : "Xác thực qua CCCD");
+      const phone = rawPhone || (verifiedCCCDNumber ? `CCCD-${verifiedCCCDNumber.slice(-6)}` : "Chưa cung cấp");
 
       const now = new Date();
       const badgeCode = `MB-${String(now.getTime()).slice(-5)}`;
@@ -1924,6 +1975,7 @@
         localStorage.setItem(STORAGE_KEY_DEVICE_LOCK, JSON.stringify(record));
         renderDigitalEBadge(record);
         document.getElementById("checkin-form").reset();
+        setCCCDVerifiedMode(false, "");
         document.getElementById("cccd-feedback").classList.add("hidden");
       } catch (err) {
         console.error(err);
@@ -1975,6 +2027,7 @@
 
     function resetDeviceLock() {
       localStorage.removeItem(STORAGE_KEY_DEVICE_LOCK);
+      setCCCDVerifiedMode(false, "");
       document.getElementById("ebadge-wrapper").classList.add("hidden");
       document.getElementById("checkin-form-wrapper").classList.remove("hidden");
       showFormError("");
