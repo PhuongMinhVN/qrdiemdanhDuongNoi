@@ -2,7 +2,7 @@
 <html lang="vi" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Điểm Danh Đại Biểu Điện Tử | MOBIFONE × BETATECH</title>
 
   <!-- Google Fonts: Inter & Plus Jakarta Sans (Full Vietnamese Support) -->
@@ -52,6 +52,12 @@
   <style>
     :root {
       color-scheme: dark;
+    }
+
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
     }
 
     body {
@@ -280,6 +286,20 @@
       animation: qrRadar 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
     }
 
+    /* Tối ưu hiển thị Mobile (kể cả khi bật chế độ Trang web cho máy tính ở màn hình dọc) */
+    @media (max-width: 1024px) and (orientation: portrait) {
+      .checkin-mobile-wrap {
+        width: 92vw !important;
+        max-width: 92vw !important;
+      }
+    }
+    @media (min-width: 720px) and (max-width: 1024px) and (orientation: portrait) {
+      /* Khi điện thoại bị bật "Desktop site" (~980px dọc), phóng to chữ & ô nhập cho dễ đọc */
+      html {
+        font-size: 20px;
+      }
+    }
+
     /* QR Code container image styling */
     #hall-qr-container img,
     #hall-qr-container canvas,
@@ -393,7 +413,7 @@
          TAB 1: CHECK-IN FORM & DIGITAL E-BADGE
          ================================================================ -->
     <section id="view-checkin" class="fade-up">
-      <div class="w-[94%] sm:w-full max-w-2xl mx-auto">
+      <div class="checkin-mobile-wrap w-[92vw] sm:w-full max-w-2xl mx-auto">
 
         <!-- Co-branding Hero Header -->
         <div class="text-center mb-6">
